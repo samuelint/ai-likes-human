@@ -19,13 +19,13 @@ from ai_assistant_core.assistant_agent_factory import AssistantAgentFactory
 _ = load_dotenv(find_dotenv())
 
 
-api = FastAPI(
+app = FastAPI(
     title="AI Assistant Core",
     version="1.0",
     description="AI Assistant Core API",
 )
 
-api.add_middleware(
+app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
@@ -42,16 +42,16 @@ assistant_app = AssistantApp(
 )
 
 
-@api.get("/health", response_class=PlainTextResponse)
+@app.get("/health", response_class=PlainTextResponse)
 async def health():
     return "healthy"
 
 
-include_assistant(app=api, assistant_app=assistant_app, prefix="/assistant")
+include_assistant(app=app, assistant_app=assistant_app, prefix="/assistant")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", type=int, default=8000, help="Port number")
     args = parser.parse_args()
 
-    uvicorn.run(api, host="localhost", port=args.port)
+    uvicorn.run(app, host="localhost", port=args.port)

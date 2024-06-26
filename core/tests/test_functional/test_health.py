@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
-from ai_assistant_core.main import api
+from ai_assistant_core.main import app
 
-test_api = TestClient(api)
+test_api = TestClient(app)
 
 
 def test_health():

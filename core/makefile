@@ -16,6 +16,6 @@ test-watch:
 lint:
 	poetry run flake8 ai-assistant-core tests
 
-.PHONY: bundle
-bundle:
+.PHONY: bundle build
+bundle build:
 	poetry run pyinstaller -y --clean ai-assistant-core.spec

@@ -4,13 +4,13 @@ import logging
 from openai import OpenAI
 from openai.types.beta import AssistantStreamEvent, Thread
 from fastapi.testclient import TestClient
-from ai_assistant_core.main import api
+from ai_assistant_core.main import app
 from tests.test_functional.assistant_stream_utils import (
     assistant_stream_events_to_str_response,
 )
 
 
-test_api = TestClient(api)
+test_api = TestClient(app)
 logging.basicConfig(level=logging.DEBUG)
 
 
@@ -19,7 +19,6 @@ def openai_client():
     return OpenAI(
         base_url="http://testserver/assistant/openai/v1",
         http_client=test_api,
-        api_key="sk-proj-sutJboXNveAggyGbKtkET3BlbkFJiTMcqmzDxQpejMeNJbIY",
     )
 
 

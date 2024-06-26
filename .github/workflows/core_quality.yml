@@ -34,7 +34,7 @@ jobs:
 
       - name: Run Flake8
         run: |
-          poetry run flake8 ai_assistant_core tests
+          poetry run flake8 --config=../.flake8 ai_assistant_core tests
 
       - name: Run tests
         env:

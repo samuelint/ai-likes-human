@@ -5,13 +5,13 @@
             "name": "Assistant Core",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/ai_assistant_core/main.py",
+            "program": "${workspaceFolder}/core/ai_assistant_core/main.py",
             "args": [
                 "--port",
                 "8000"
             ],
             "env": {
-                "PYTHONPATH": "${workspaceFolder}"
+                "PYTHONPATH": "${workspaceFolder}/core"
             },
             "console": "integratedTerminal"
         }

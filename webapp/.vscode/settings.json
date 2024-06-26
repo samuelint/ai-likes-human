@@ -1,0 +1,16 @@
+{
+  "typescript.tsdk": "node_modules/.pnpm/typescript@4.9.4/node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "editor.tabSize": 2,
+  "jest.rootPath": ".",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.validate": [
+    "javascript"
+  ],
+  "cSpell.words": [
+    "heroicons",
+    "tailwindcss"
+  ]
+}

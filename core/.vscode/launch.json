@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Assistant Core",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/ai_assistant_core/main.py",
+            "args": [
+                "--port",
+                "8000"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "console": "integratedTerminal"
+        }
+    ]
+}

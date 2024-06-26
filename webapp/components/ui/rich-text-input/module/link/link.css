@@ -1,0 +1,9 @@
+.Theme__link {
+  color: rgb(33, 111, 219);
+  text-decoration: none;
+  pointer-events: initial;
+}
+.Theme__link:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}

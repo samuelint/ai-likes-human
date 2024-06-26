@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "assistant-core"
+version = "0.1.0"
+description = ""
+authors = ["Samuel <samuelint@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "<=3.12.3,>=3.10"
+langchain = "^0.2.2"
+langchain-openai = "^0.1.8"
+python-dotenv = "^1.0.1"
+langgraph = "^0.0.62"
+langserve = {extras = ["server"], version = "^0.2.1"}
+langchain-anthropic = "^0.1.13"
+uvicorn = "^0.30.0"
+pydantic = "^1.10.0"
+langchain-community = "^0.2.1"
+tiktoken = "^0.7.0"
+langchain-openai-api-bridge = "0.3.6"
+beautifulsoup4 = "^4.12.3"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.1"
+pytest-watch = "^4.2.0"
+pytest-asyncio = "^0.23.7"
+flake8 = "^7.0.0"
+pyinstaller = "^6.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

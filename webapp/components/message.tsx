@@ -1,11 +1,12 @@
 import { twMerge } from 'tailwind-merge';
 import { ReactNode } from 'react';
-import { Markdown } from './markdown';
+import { ChatMessageContentDto } from './chat.type';
+import { MessageContent } from './message-content';
 
 
 export interface ChatMessageProps {
   className?: string
-  content?: string
+  content?: ChatMessageContentDto[]
   children?: ReactNode
   type?: 'ai' | 'user'
   actions?: ReactNode
@@ -19,7 +20,7 @@ export function Message({ className, content, children, actions, type }: ChatMes
         type === 'user' && 'bg-blue-500 text-white',
       )}
       >
-        { content && <Markdown>{content}</Markdown>}
+        { content?.map((contentItem, index) => <MessageContent key={index} content={contentItem} /> ) }
         { children }
       </div>
       { actions && <div className={twMerge('w-full flex justify-end relative', 'opacity-0 group-hover:opacity-100 transition-opacity duration-300')}>

@@ -8,7 +8,8 @@ app_name = "core"
 # https://doc.rust-lang.org/rustc/platform-support.html
 system = platform.system().lower()
 system_map = {
-    'darwin': 'apple-darwin'
+    'darwin': 'apple-darwin',
+    'windows': 'pc-windows-msvc',
 }
 system = system_map.get(system, system)
 
@@ -16,7 +17,8 @@ system = system_map.get(system, system)
 # https://doc.rust-lang.org/rustc/platform-support.html
 architecture = platform.machine().lower()
 architecture_map = {
-    'arm64': 'aarch64'
+    'arm64': 'aarch64',
+    'amd64': 'x86_64',
 }
 architecture = architecture_map.get(architecture, architecture)
 

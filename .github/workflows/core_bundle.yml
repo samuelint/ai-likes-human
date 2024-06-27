@@ -15,6 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # os: ["macos-latest"]
         os: ["windows-latest", "ubuntu-latest", "macos-latest"]
 
     steps:
@@ -32,25 +33,27 @@ jobs:
       - run: make bundle
       - uses: actions/upload-artifact@v4
         with:
-          name: bundle-${{ matrix.os }}
+          name: core-${{ matrix.os }}
           path: core/dist/*
 
   bundle_desktop:
     needs: bundle_core
     runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        working-directory: webapp
     strategy:
       fail-fast: false
       matrix:
+        # os: ["macos-latest"]
         os: ["windows-latest", "ubuntu-latest", "macos-latest"]
     steps:
+      - name: Linux Only - Install Extra Libs
+        if: runner.os == 'Linux'
+        shell: bash
+        run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libsoup2.4-dev
       - uses: actions/checkout@v4
       - name: Download bundle artifacts
         uses: actions/download-artifact@v4
         with:
-          name: bundle-${{ matrix.os }}
+          name: core-${{ matrix.os }}
           path: webapp/src-tauri/bin
 
       # PNPM
@@ -65,9 +68,11 @@ jobs:
         with:
           node-version: 20
           cache: "pnpm"
+          cache-dependency-path: "webapp/pnpm-lock.yaml"
 
       - name: Get pnpm store directory
         shell: bash
+        working-directory: webapp
         run: |
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
@@ -80,13 +85,15 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
+        working-directory: webapp
         run: pnpm install
       # PNPM -- END
 
       - name: Bundle
+        working-directory: webapp
         run: pnpm build
 
       - uses: actions/upload-artifact@v4
         with:
-          name: bundle-${{ matrix.os }}
+          name: desktop-${{ matrix.os }}
           path: webapp/src-tauri/target/release/bundle/*

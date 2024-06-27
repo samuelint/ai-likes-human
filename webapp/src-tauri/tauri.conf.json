@@ -7,7 +7,7 @@
     "distDir": "../out"
   },
   "package": {
-    "productName": "super-assistant",
+    "productName": "assistant",
     "version": "0.1.0"
   },
   "tauri": {
@@ -48,7 +48,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.samuelint.super-assistant",
+      "identifier": "com.samuelint.assistant",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -75,7 +75,7 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "AI Likes Human",
+        "title": "Assistant",
         "width": 1024
       }
     ]

@@ -32,6 +32,5 @@ jobs:
       - run: make bundle
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os }}
           if-no-files-found: ignore
           path: dist/*

@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
-    "beforeBuildCommand": "npm run build:webapp",
+    "beforeBuildCommand": "bash ./copy-assets.sh || npm run build:webapp",
     "beforeDevCommand": "npm run dev:webapp",
     "devPath": "http://localhost:3000",
     "distDir": "../out"
@@ -15,11 +15,7 @@
       "all": true,
       "http": {
         "all": true,
-        "request": true,
-        "scope": [
-          "http://**",
-          "https://**"
-        ]
+        "request": true
       },
       "shell": {
         "all": true,
@@ -56,7 +52,6 @@
       "longDescription": "",
       "macOS": {
         "entitlements": null,
-        "exceptionDomain": "localhost",
         "frameworks": [],
         "providerShortName": null,
         "signingIdentity": null

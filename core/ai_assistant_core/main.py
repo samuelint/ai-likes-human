@@ -1,6 +1,5 @@
 import uvicorn
 import argparse
-from dotenv import load_dotenv, find_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
@@ -15,9 +14,9 @@ from langchain_openai_api_bridge.fastapi import (
 )
 
 from ai_assistant_core.assistant_agent_factory import AssistantAgentFactory
+from ai_assistant_core.configuration import Configuration
 
-_ = load_dotenv(find_dotenv())
-
+Configuration.load()
 
 app = FastAPI(
     title="AI Assistant Core",

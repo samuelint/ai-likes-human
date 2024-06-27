@@ -7,14 +7,25 @@
     "distDir": "../out"
   },
   "package": {
-    "productName": "ai likes human",
+    "productName": "super-assistant",
     "version": "0.1.0"
   },
   "tauri": {
     "allowlist": {
-      "all": false,
+      "all": true,
+      "http": {
+        "all": true,
+        "request": true,
+        "scope": [
+          "http://**",
+          "https://**"
+        ]
+      },
       "shell": {
+        "all": true,
+        "execute": true,
         "sidecar": true,
+        "open": true,
         "scope": [
           {
             "name": "binaries/ai-assistant-core",
@@ -33,6 +44,7 @@
       "externalBin": [
         "binaries/ai-assistant-core"
       ],
+      "resources": [],
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
@@ -44,12 +56,11 @@
       "longDescription": "",
       "macOS": {
         "entitlements": null,
-        "exceptionDomain": "",
+        "exceptionDomain": "localhost",
         "frameworks": [],
         "providerShortName": null,
         "signingIdentity": null
       },
-      "resources": [],
       "shortDescription": "",
       "targets": "all",
       "windows": {

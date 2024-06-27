@@ -49,6 +49,7 @@
     "remark-gfm": "^4.0.0",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
+    "tauri-plugin-log-api": "github:tauri-apps/tauri-plugin-log#v1",
     "usehooks-ts": "^3.1.0",
     "zod": "^3.23.8"
   },

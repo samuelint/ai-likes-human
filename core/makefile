@@ -2,7 +2,7 @@
 .PHONY: dev run
 dev run:
 	poetry env use ./.venv/bin/python
-	DEBUG=true poetry run uvicorn ai_assistant_core.main:api --reload
+	DEBUG=true poetry run uvicorn ai_assistant_core.main:app --reload
 
 .PHONY: test
 test:

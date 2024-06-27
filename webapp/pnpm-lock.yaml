@@ -113,6 +113,9 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.3)
+      tauri-plugin-log-api:
+        specifier: github:tauri-apps/tauri-plugin-log#v1
+        version: https://codeload.github.com/tauri-apps/tauri-plugin-log/tar.gz/7b35a594d70ed6ea68573507920f451e8e1cd9c5
       usehooks-ts:
         specifier: ^3.1.0
         version: 3.1.0(react@18.2.0)
@@ -6174,6 +6177,10 @@ packages:
   tar@6.2.1:
     resolution: {integrity: sha512-DZ4yORTwrbTj/7MZYq2w+/ZFdI6OZ/f9SFHR+71gIVUZhOQPHzVCLpvRnPgyaMpfWxxk/4ONva3GQSyNIKRv6A==}
     engines: {node: '>=10'}
+
+  tauri-plugin-log-api@https://codeload.github.com/tauri-apps/tauri-plugin-log/tar.gz/7b35a594d70ed6ea68573507920f451e8e1cd9c5:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-log/tar.gz/7b35a594d70ed6ea68573507920f451e8e1cd9c5}
+    version: 0.0.0
 
   telejson@7.2.0:
     resolution: {integrity: sha512-1QTEcJkJEhc8OnStBx/ILRu5J2p0GjvWsBx56bmZRqnrkdBMUe+nX92jxV+p3dB4CP6PZCdJMQJwCggkNBMzkQ==}
@@ -14212,6 +14219,10 @@ snapshots:
       minizlib: 2.1.2
       mkdirp: 1.0.4
       yallist: 4.0.0
+
+  tauri-plugin-log-api@https://codeload.github.com/tauri-apps/tauri-plugin-log/tar.gz/7b35a594d70ed6ea68573507920f451e8e1cd9c5:
+    dependencies:
+      '@tauri-apps/api': 1.5.6
 
   telejson@7.2.0:
     dependencies:

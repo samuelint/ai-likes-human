@@ -17,7 +17,7 @@ uvicorn = "^0.30.0"
 pydantic = "^1.10.0"
 langchain-community = "^0.2.1"
 tiktoken = "^0.7.0"
-langchain-openai-api-bridge = "0.3.6"
+langchain-openai-api-bridge = "0.3.8"
 beautifulsoup4 = "^4.12.3"
 
 [tool.poetry.group.dev.dependencies]

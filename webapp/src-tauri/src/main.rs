@@ -1,54 +1,78 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use std::process::Command;
-use std::sync::mpsc::{sync_channel, Receiver};
-use std::thread;
-use command_group::CommandGroup;
-use tauri::api::process::Command as TCommand;
-use tauri::WindowEvent;
-use tauri_plugin_log::{LogTarget};
-use utils::{filesys::local_data_dir_path};
+pub mod sidecar_lifecycle_service;
 
-mod utils;
+use std::sync::Mutex;
+use tauri_plugin_log::LogTarget;
+use tauri::{Manager, State, WindowEvent};
+use sidecar_lifecycle_service::SidecarLifeCycleService;
 
-fn start_backend(receiver: Receiver<i32>) {
-  // `new_sidecar()` expects just the filename, NOT the whole path
-  let t = TCommand::new_sidecar("ai-assistant-core")
-    .expect("[Error] Failed to create `ai-assistant-core` binary command");
-  let mut group = Command::from(t).group_spawn().expect("[Error] spawning api server process.");
-  // If anyone knows how to log out stdout msg's from this process drop a comment. Rust is not my language.
-  thread::spawn(move || {
-    loop{
-      let s = receiver.recv();
-      if s.unwrap()==-1 {
-        group.kill().expect("[Error] killing api server process.");
-      }
-    }
-  });
+struct AppState {
+  code_sidecar_mutex: Mutex<SidecarLifeCycleService>,
 }
 
-fn main() {
-  let log = tauri_plugin_log::Builder::default().targets([
-    LogTarget::Folder(local_data_dir_path()),
-    LogTarget::Stdout,
-    LogTarget::Webview,
-  ])
-  .level(log::LevelFilter::Debug);
+#[tauri::command]
+fn start_server(api_manager_state: State<AppState>) -> Result<String, String> {
+  let am = api_manager_state
+      .code_sidecar_mutex
+      .lock()
+      .unwrap()
+      .start();
+  am
+}
 
-  let (tx,rx) = sync_channel(1);
-  start_backend(rx);
+#[tauri::command]
+fn stop_server(api_manager_state: State<AppState>) -> Result<String, String> {
+  let app_state = api_manager_state
+      .code_sidecar_mutex
+      .lock()
+      .unwrap()
+      .stop();
+  app_state
+}
+
+
+fn main() {
+  let core_sidecar = SidecarLifeCycleService::new("core");
+  let state = AppState {
+      code_sidecar_mutex: Mutex::new(core_sidecar),
+  };
+
+  let log_builder = tauri_plugin_log::Builder::default().targets([
+    LogTarget::LogDir,
+    LogTarget::Stdout,
+    LogTarget::Stderr,
+    LogTarget::Webview,
+  ]);
 
   tauri::Builder::default()
-    // Tell the child process to shutdown when app exits
-    .on_window_event(move |event| match event.event() {
-      WindowEvent::Destroyed => {
-        tx.send(-1).expect("[Error] sending msg.");
-        println!("[Event] App closed, shutting down API...");
-      }
-      _ => {}
+    .manage(state)
+    .plugin(log_builder.build())  
+    .setup(move |app| {
+        let app_state: State<AppState> = app.state();
+        app_state.code_sidecar_mutex
+            .lock()
+            .unwrap()
+            .start()
+            .expect("Core Sidecar start failed");
+        Ok(())
     })
-    .plugin(log.build())
+    .on_window_event(move |event| match event.event() {
+        WindowEvent::Destroyed => {
+            let am: State<AppState> = event.window().state();
+            am.code_sidecar_mutex
+                .lock()
+                .unwrap()
+                .stop()
+                .expect("Core Sidecar stop failed");
+        }
+        _ => {}
+    })
+    .invoke_handler(tauri::generate_handler![
+        start_server,
+        stop_server,
+    ])
     .run(tauri::generate_context!())
     .expect("[Error] while running tauri application");
 }

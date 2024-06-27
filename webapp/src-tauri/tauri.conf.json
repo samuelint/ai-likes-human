@@ -28,7 +28,7 @@
         "open": true,
         "scope": [
           {
-            "name": "binaries/ai-assistant-core",
+            "name": "bin/core",
             "sidecar": true
           }
         ]
@@ -42,7 +42,7 @@
         "depends": []
       },
       "externalBin": [
-        "binaries/ai-assistant-core"
+        "bin/core"
       ],
       "resources": [],
       "icon": [
@@ -52,7 +52,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.samuelint.ai-likes-human",
+      "identifier": "com.samuelint.super-assistant",
       "longDescription": "",
       "macOS": {
         "entitlements": null,

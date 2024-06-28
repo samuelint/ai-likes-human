@@ -19,6 +19,7 @@ langchain-community = "^0.2.1"
 tiktoken = "^0.7.0"
 langchain-openai-api-bridge = "0.3.8"
 beautifulsoup4 = "^4.12.3"
+sqlalchemy = "^2.0.31"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.1"

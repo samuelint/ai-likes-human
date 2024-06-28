@@ -10,6 +10,8 @@ system = platform.system().lower()
 system_map = {
     'darwin': 'apple-darwin',
     'windows': 'pc-windows-msvc',
+    'linux': 'unknown-linux-gnu',
+    
 }
 system = system_map.get(system, system)
 

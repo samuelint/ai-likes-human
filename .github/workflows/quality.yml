@@ -1,12 +1,35 @@
-name: Core
+name: Quality
 
 on:
-  push:
   pull_request:
 
 jobs:
-  build:
-    name: Quality
+  webapp_quality:
+    name: Webapp Quality
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: webapp
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Webapp
+        id: prepare-webapp
+        uses: ./.github/actions/prepare_webapp
+        with:
+          working-directory: webapp
+
+      - name: Lint
+        run: |
+          pnpm run lint
+      - name: Tests
+        run: |
+          pnpm run test
+      - name: Build
+        run: |
+          pnpm run build:webapp
+
+  core_quality:
+    name: Core Quality
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -24,14 +47,19 @@ jobs:
           pip install poetry
           poetry install
 
-      - name: Run Flake8
+      - name: Link
         run: |
           poetry run flake8 --config=../.flake8 ai_assistant_core tests
 
-      - name: Run tests
+      - name: Tests
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
         run: |
           poetry run pytest
+
+      - name: Build
+        run: |
+          make bundle
+        

@@ -1,23 +1,30 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
-    "beforeBuildCommand": "npm run build:webapp",
+    "beforeBuildCommand": "bash ./copy-assets.sh || npm run build:webapp",
     "beforeDevCommand": "npm run dev:webapp",
     "devPath": "http://localhost:3000",
     "distDir": "../out"
   },
   "package": {
-    "productName": "ai likes human",
+    "productName": "Assistant",
     "version": "0.1.0"
   },
   "tauri": {
     "allowlist": {
-      "all": false,
+      "all": true,
+      "http": {
+        "all": true,
+        "request": true
+      },
       "shell": {
+        "all": true,
+        "execute": true,
         "sidecar": true,
+        "open": true,
         "scope": [
           {
-            "name": "binaries/ai-assistant-core",
+            "name": "bin/core",
             "sidecar": true
           }
         ]
@@ -31,8 +38,9 @@
         "depends": []
       },
       "externalBin": [
-        "binaries/ai-assistant-core"
+        "bin/core"
       ],
+      "resources": [],
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
@@ -40,16 +48,14 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.samuelint.ai-likes-human",
+      "identifier": "com.samuelint.assistant",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
-        "exceptionDomain": "",
         "frameworks": [],
         "providerShortName": null,
         "signingIdentity": null
       },
-      "resources": [],
       "shortDescription": "",
       "targets": "all",
       "windows": {
@@ -69,8 +75,10 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "AI Likes Human",
-        "width": 1024
+        "title": "Assistant",
+        "width": 1024,
+        "decorations": true,
+        "transparent": true
       }
     ]
   }

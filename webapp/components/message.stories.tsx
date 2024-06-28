@@ -21,30 +21,29 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    content: 'Hello',
+    content: [{ type: 'text', text: { value: 'Hello', annotations: [] } }],
   },
 };
 
 export const User: Story = {
   args: {
-    content: 'Hello',
+    content: [{ type: 'text', text: { value: 'Hello', annotations: [] } }],
     type: 'user',
   },
 };
 
 export const AI: Story = {
   args: {
-    content: 'Hello',
+    content: [{ type: 'text', text: { value: 'Hello', annotations: [] } }],
     type: 'ai',
   },
 };
 
 export const Actions: Story = {
   args: {
-    content:
-      `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat
+    content: [{ type: 'text', text: { value: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat
       Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-      `,
+      `, annotations: [] } }],
     type: 'user',
     actions: <>
       <button><CopyIcon/></button>
@@ -56,7 +55,7 @@ export const Actions: Story = {
 
 export const MarkdownContent: Story = {
   args: {
-    content: `
+    content: [{ type: 'text', text: { value: `
 # h1
 ## h2
 ### h3
@@ -80,7 +79,7 @@ Paragraph
 def my_function():
     pass;
 \`\`\`
-`,
+`, annotations: [] } }],
     type: 'ai',
   },
 };

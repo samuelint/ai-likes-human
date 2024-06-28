@@ -1,17 +1,20 @@
 'use client';
+import OpenAI from 'openai';
 import { useErrorNotification } from '@/app/_components/use-error-notification';
+
 import Chat from '@/components/chat';
 import { Button } from '@/components/ui/button';
-import { useAssistant } from '@ai-sdk/react';
 import { useCallback } from 'react';
-import { useLocalServerLogForward } from '@/lib/use-local-server-log-forward';
+import { useOpenAiAssistant } from './use-openai-assistant';
 
 
 export default function Assistant() {
-  useLocalServerLogForward();
-
-  const { status, messages, setMessages, error, input, submitMessage, handleInputChange } = useAssistant({
-    api: '/api/assistant',
+  const { status, messages, setMessages, error, input, submitMessage, handleInputChange } = useOpenAiAssistant({
+    openai: new OpenAI({
+      baseURL: 'http://localhost:8000/assistant/openai/v1',
+      apiKey: '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',
+      dangerouslyAllowBrowser: true,
+    })
   });
   useErrorNotification(error);
 

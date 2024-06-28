@@ -1,6 +1,5 @@
 import uvicorn
 import argparse
-from dotenv import load_dotenv, find_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
@@ -15,9 +14,9 @@ from langchain_openai_api_bridge.fastapi import (
 )
 
 from ai_assistant_core.assistant_agent_factory import AssistantAgentFactory
+from ai_assistant_core.configuration import Configuration
 
-_ = load_dotenv(find_dotenv())
-
+Configuration.load()
 
 app = FastAPI(
     title="AI Assistant Core",
@@ -25,10 +24,11 @@ app = FastAPI(
     description="AI Assistant Core API",
 )
 
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    # allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["*"],
@@ -49,9 +49,20 @@ async def health():
 
 include_assistant(app=app, assistant_app=assistant_app, prefix="/assistant")
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--port", type=int, default=8000, help="Port number")
-    args = parser.parse_args()
 
-    uvicorn.run(app, host="localhost", port=args.port)
+def start_api_server():
+    try:
+        print("Starting API server...")
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--port", type=int, default=8000, help="Port number")
+        args = parser.parse_args()
+        uvicorn.run(app, host="0.0.0.0", port=args.port, log_level="info")
+        return True
+    except Exception as e:
+        print("Failed to start API server")
+        print(e)
+        return False
+
+
+if __name__ == "__main__":
+    start_api_server()

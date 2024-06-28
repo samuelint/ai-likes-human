@@ -1,4 +1,31 @@
 # -*- mode: python ; coding: utf-8 -*-
+import platform
+
+app_name = "core"
+
+
+# Follow RUST Target Syntax
+# https://doc.rust-lang.org/rustc/platform-support.html
+system = platform.system().lower()
+system_map = {
+    'darwin': 'apple-darwin',
+    'windows': 'pc-windows-msvc',
+    'linux': 'unknown-linux-gnu',
+    
+}
+system = system_map.get(system, system)
+
+# Follow RUST Target Syntax
+# https://doc.rust-lang.org/rustc/platform-support.html
+architecture = platform.machine().lower()
+architecture_map = {
+    'arm64': 'aarch64',
+    'amd64': 'x86_64',
+}
+architecture = architecture_map.get(architecture, architecture)
+
+
+output_name = f"{app_name}-{architecture}-{system}"
 
 
 a = Analysis(
@@ -22,7 +49,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='ai-assistant-core',
+    name=output_name,
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

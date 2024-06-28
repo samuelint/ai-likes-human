@@ -8,6 +8,8 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Bundle
+
 ## UI Library shadcn
 
 This project uses shadcn (https://ui.shadcn.com)

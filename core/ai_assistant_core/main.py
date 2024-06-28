@@ -1,8 +1,11 @@
+from typing import Optional
 import uvicorn
 import argparse
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
+from injector import Injector
+from fastapi_injector import attach_injector
 from langchain_openai_api_bridge.assistant.assistant_app import AssistantApp
 from langchain_openai_api_bridge.assistant.repository import (
     InMemoryMessageRepository,
@@ -12,57 +15,60 @@ from langchain_openai_api_bridge.assistant.repository import (
 from langchain_openai_api_bridge.fastapi import (
     include_assistant,
 )
-
 from ai_assistant_core.assistant_agent_factory import AssistantAgentFactory
-from ai_assistant_core.configuration import Configuration
-
-Configuration.load()
-
-app = FastAPI(
-    title="AI Assistant Core",
-    version="1.0",
-    description="AI Assistant Core API",
+from ai_assistant_core.app_configuration import (
+    AppConfigurationModule,
+    get_app_configuration,
 )
+from ai_assistant_core.configuration.module import LLMConfigurationModule
+from ai_assistant_core.infrastructure.sqlalchemy_module import SqlAlchemyModule
+from ai_assistant_core.configuration import configuration_router
 
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    # allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["*"],
-)
+def create_app(database_url: Optional[str] = None) -> FastAPI:
+    _ = get_app_configuration(database_url=database_url)
 
-assistant_app = AssistantApp(
-    thread_repository_type=InMemoryThreadRepository,
-    message_repository_type=InMemoryMessageRepository,
-    run_repository=InMemoryRunRepository,
-    agent_factory=AssistantAgentFactory,
-)
+    injector = Injector(
+        [AppConfigurationModule(), LLMConfigurationModule(), SqlAlchemyModule()]
+    )
 
+    app = FastAPI(
+        title="AI Assistant Core",
+        version="1.0",
+        description="AI Assistant Core API",
+    )
+    attach_injector(app, injector)
 
-@app.get("/health", response_class=PlainTextResponse)
-async def health():
-    return "healthy"
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        # allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+        expose_headers=["*"],
+    )
 
+    assistant_app = AssistantApp(
+        thread_repository_type=InMemoryThreadRepository,
+        message_repository_type=InMemoryMessageRepository,
+        run_repository=InMemoryRunRepository,
+        agent_factory=AssistantAgentFactory,
+    )
 
-include_assistant(app=app, assistant_app=assistant_app, prefix="/assistant")
+    @app.get("/health", response_class=PlainTextResponse)
+    async def health():
+        return "healthy"
 
+    include_assistant(app=app, assistant_app=assistant_app, prefix="/assistant")
+    app.include_router(configuration_router)
 
-def start_api_server():
-    try:
-        print("Starting API server...")
-        parser = argparse.ArgumentParser()
-        parser.add_argument("--port", type=int, default=8000, help="Port number")
-        args = parser.parse_args()
-        uvicorn.run(app, host="0.0.0.0", port=args.port, log_level="info")
-        return True
-    except Exception as e:
-        print("Failed to start API server")
-        print(e)
-        return False
+    return app
 
 
 if __name__ == "__main__":
-    start_api_server()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--port", type=int, default=8000, help="Port number")
+    args = parser.parse_args()
+
+    app = create_app()
+    uvicorn.run(app, host="localhost", port=args.port)

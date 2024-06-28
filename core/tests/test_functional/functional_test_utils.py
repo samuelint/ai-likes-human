@@ -1,5 +1,15 @@
 from typing import List
+from fastapi.testclient import TestClient
 from openai.types.beta import AssistantStreamEvent
+from ai_assistant_core.main import create_app
+
+database_url = "sqlite:///:memory:?check_same_thread=False"
+
+
+def create_test_client() -> TestClient:
+    app = create_app(database_url=database_url)
+
+    return TestClient(app)
 
 
 def assistant_stream_events_to_str_response(

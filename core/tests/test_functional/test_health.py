@@ -1,7 +1,6 @@
-from fastapi.testclient import TestClient
-from ai_assistant_core.main import app
+from tests.test_functional.functional_test_utils import create_test_client
 
-test_api = TestClient(app)
+test_api = create_test_client()
 
 
 def test_health():

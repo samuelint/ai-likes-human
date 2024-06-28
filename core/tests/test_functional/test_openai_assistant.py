@@ -3,14 +3,14 @@ import pytest
 import logging
 from openai import OpenAI
 from openai.types.beta import AssistantStreamEvent, Thread
-from fastapi.testclient import TestClient
-from ai_assistant_core.main import app
-from tests.test_functional.assistant_stream_utils import (
+from tests.test_functional.functional_test_utils import create_test_client
+
+from tests.test_functional.functional_test_utils import (
     assistant_stream_events_to_str_response,
 )
 
 
-test_api = TestClient(app)
+test_api = create_test_client()
 logging.basicConfig(level=logging.DEBUG)
 
 

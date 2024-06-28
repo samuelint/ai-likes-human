@@ -1,0 +1,47 @@
+name: Reusable steps (AKA composite action)
+description: Demonstrate how to use reusable steps in a workflow
+
+inputs:
+  working-directory:
+    required: false
+    type: string
+    default: webapp
+
+runs:
+  using: "composite"
+  steps:
+    # PNPM
+    - uses: pnpm/action-setup@v4
+      name: Install pnpm
+      with:
+        version: 8
+        run_install: false
+
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: "pnpm"
+        cache-dependency-path: "webapp/pnpm-lock.yaml"
+
+    - name: Get pnpm store directory
+      # Shell must explicitly specify the shell for each step. https://github.com/orgs/community/discussions/18597
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+    - uses: actions/cache@v4
+      name: Setup pnpm cache
+      with:
+        path: ${{ env.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
+
+    - name: Install dependencies
+      # Shell must explicitly specify the shell for each step. https://github.com/orgs/community/discussions/18597
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: pnpm install
+      # PNPM -- END

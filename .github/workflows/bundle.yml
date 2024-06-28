@@ -1,7 +1,6 @@
 name: Bundle
 
 on:
-  pull_request:
   push:
     branches:
       - main
@@ -45,49 +44,16 @@ jobs:
         os: ["ubuntu-latest", "macos-latest"]
         # os: ["windows-latest", "ubuntu-latest", "macos-latest"]
     steps:
+      - uses: actions/checkout@v4
       - name: Linux Only - Install Extra Libs
         if: runner.os == 'Linux'
         shell: bash
         run: sudo apt-get update && sudo apt-get install -y build-essential libgtk-3-dev libssl-dev libsoup2.4-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev
-      - uses: actions/checkout@v4
-      - name: Download bundle artifacts
-        uses: actions/download-artifact@v4
+      - name: Setup Webapp
+        id: prepare-webapp
+        uses: ./.github/actions/prepare_webapp
         with:
-          name: core-${{ matrix.os }}
-          path: webapp/src-tauri/bin
-
-      # PNPM
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
-        with:
-          version: 8
-          run_install: false
-
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "pnpm"
-          cache-dependency-path: "webapp/pnpm-lock.yaml"
-
-      - name: Get pnpm store directory
-        shell: bash
-        working-directory: webapp
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - uses: actions/cache@v4
-        name: Setup pnpm cache
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
-        working-directory: webapp
-        run: pnpm install
-      # PNPM -- END
+          working-directory: webapp
 
       - name: Bundle
         working-directory: webapp
@@ -97,3 +63,4 @@ jobs:
         with:
           name: desktop-${{ matrix.os }}
           path: webapp/src-tauri/target/release/bundle/*
+          retention-days: 1

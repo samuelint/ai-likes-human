@@ -1,16 +1,8 @@
-name: Core Quality
+name: Core
 
 on:
   push:
   pull_request:
-  workflow_call:
-    secrets:
-      OPENAI_API_KEY:
-        required: true
-      ANTHROPIC_API_KEY:
-        required: true
-      SERPER_API_KEY:
-        required: true
 
 jobs:
   build:

@@ -1,0 +1,28 @@
+name: Webapp
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  quality:
+    name: Quality
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: webapp
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Webapp
+        id: prepare-webapp
+        uses: ./.github/actions/prepare_webapp
+        with:
+          working-directory: webapp
+
+      - name: Lint
+        run: |
+          pnpm run lint
+
+      - name: Unit tests
+        run: |
+          pnpm run test

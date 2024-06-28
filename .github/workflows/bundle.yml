@@ -33,6 +33,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: core-${{ matrix.os }}
+          retention-days: 1
           path: core/dist/*
 
   bundle_desktop:
@@ -45,10 +46,17 @@ jobs:
         # os: ["windows-latest", "ubuntu-latest", "macos-latest"]
     steps:
       - uses: actions/checkout@v4
+      - name: Download bundle artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: core-${{ matrix.os }}
+          path: webapp/src-tauri/bin
+
       - name: Linux Only - Install Extra Libs
         if: runner.os == 'Linux'
         shell: bash
         run: sudo apt-get update && sudo apt-get install -y build-essential libgtk-3-dev libssl-dev libsoup2.4-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev
+
       - name: Setup Webapp
         id: prepare-webapp
         uses: ./.github/actions/prepare_webapp

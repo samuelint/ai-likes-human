@@ -11,9 +11,9 @@ interface Props {
 
 export function Section({ title, className, children }: Props) {
   return (
-    <section className='pl-4'>
+    <section className='py-4'>
       <H2 className='text-xl'>{title}</H2>
-      <div className={cn('w-full flex flex-col gap-4', className)}>
+      <div className={cn('w-full flex flex-col gap-4 px-4', className)}>
         { children }
       </div>
     </section>

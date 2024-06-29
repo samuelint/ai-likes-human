@@ -6,7 +6,7 @@ test_api = create_test_client()
 base_route = "/configuration/kv"
 
 
-class TestLLMConfigurationCrud:
+class TestConfigurationKeyValueCrud:
 
     def test_initial_list_contains_no_configurations(self):
         list_response = test_api.get(base_route)
@@ -54,7 +54,7 @@ class TestLLMConfigurationCrud:
             f"{base_route}/{created_configuration_item['key']}"
         )
         assert delete_response.status_code == 200
-        list_response = test_api.get("/configuration")
+        list_response = test_api.get(base_route)
         list_response_body = list_response.json()
         assert list_response.status_code == 200
         assert len(list_response_body) == 0

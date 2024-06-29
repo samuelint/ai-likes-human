@@ -13,7 +13,7 @@ export default function ServerStatus() {
     <Alert variant={error ? 'destructive' : 'success'}>
       { error ? <AlertCircle className="h-4 w-4" /> : <CircleCheck className="h-4 w-4" /> }
 
-      <AlertTitle>Server Status</AlertTitle>
+      <AlertTitle><b>Local</b> Server Status</AlertTitle>
       <AlertDescription>
         { isLoading && <ThreeDotsLoading /> }
         { error && error.message }

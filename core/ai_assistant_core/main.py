@@ -3,7 +3,6 @@ import uvicorn
 import argparse
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import PlainTextResponse
 from injector import Injector
 from fastapi_injector import attach_injector
 from langchain_openai_api_bridge.assistant.assistant_app import AssistantApp
@@ -21,7 +20,7 @@ from ai_assistant_core.app_configuration import (
 )
 from ai_assistant_core.configuration.module import LLMConfigurationModule
 from ai_assistant_core.infrastructure.sqlalchemy_module import SqlAlchemyModule
-from ai_assistant_core.configuration import configuration_router
+from ai_assistant_core.configuration import configuration_kv_router
 
 
 def create_app(database_url: Optional[str] = None) -> FastAPI:
@@ -56,13 +55,13 @@ def create_app(database_url: Optional[str] = None) -> FastAPI:
         agent_factory=AssistantAgentFactory,
     )
 
-    @app.get("/health", response_class=PlainTextResponse)
-    @app.get("/", response_class=PlainTextResponse)
+    @app.get("/health")
+    @app.get("/")
     async def health():
-        return "healthy"
+        return {"status": "ok"}
 
     include_assistant(app=app, assistant_app=assistant_app, prefix="/assistant")
-    app.include_router(configuration_router)
+    app.include_router(configuration_kv_router)
 
     return app
 

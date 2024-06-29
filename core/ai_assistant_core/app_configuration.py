@@ -40,18 +40,10 @@ class AppConfiguration:
         )
 
 
-app_configuration: Union[AppConfiguration, None] = None
-
-
-def get_app_configuration(database_url: Optional[str] = None) -> AppConfiguration:
-    global app_configuration
-
-    if app_configuration is None:
-        app_configuration = AppConfiguration(database_url=database_url)
-
-    return app_configuration
-
-
 class AppConfigurationModule(Module):
+    def __init__(self, database_url: Optional[str] = None):
+        self.database_url = database_url
+
     def configure(self, binder: Binder):
-        binder.bind(AppConfiguration, to=get_app_configuration, scope=singleton)
+        configuration = AppConfiguration(database_url=self.database_url)
+        binder.bind(AppConfiguration, to=configuration, scope=singleton)

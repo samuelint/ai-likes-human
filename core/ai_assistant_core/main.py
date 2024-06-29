@@ -18,7 +18,6 @@ from langchain_openai_api_bridge.fastapi import (
 from ai_assistant_core.assistant_agent_factory import AssistantAgentFactory
 from ai_assistant_core.app_configuration import (
     AppConfigurationModule,
-    get_app_configuration,
 )
 from ai_assistant_core.configuration.module import LLMConfigurationModule
 from ai_assistant_core.infrastructure.sqlalchemy_module import SqlAlchemyModule
@@ -26,10 +25,12 @@ from ai_assistant_core.configuration import configuration_router
 
 
 def create_app(database_url: Optional[str] = None) -> FastAPI:
-    _ = get_app_configuration(database_url=database_url)
-
     injector = Injector(
-        [AppConfigurationModule(), LLMConfigurationModule(), SqlAlchemyModule()]
+        [
+            AppConfigurationModule(database_url=database_url),
+            LLMConfigurationModule(),
+            SqlAlchemyModule(),
+        ]
     )
 
     app = FastAPI(
@@ -56,6 +57,7 @@ def create_app(database_url: Optional[str] = None) -> FastAPI:
     )
 
     @app.get("/health", response_class=PlainTextResponse)
+    @app.get("/", response_class=PlainTextResponse)
     async def health():
         return "healthy"
 

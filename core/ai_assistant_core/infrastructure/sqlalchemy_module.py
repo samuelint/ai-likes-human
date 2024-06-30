@@ -3,7 +3,9 @@ from injector import Module, provider, singleton
 from sqlalchemy import Pool, QueuePool, StaticPool, create_engine
 from sqlalchemy.orm import sessionmaker, Session
 
+
 from ai_assistant_core.app_configuration import AppConfiguration
+from ai_assistant_core.infrastructure.migrator import run_database_migration
 
 from .sqlalchemy import Base
 from urllib.parse import urlparse
@@ -23,9 +25,11 @@ class SqlAlchemyModule(Module):
 
         Base.metadata.bind = engine
         Base.metadata.create_all(engine)
-        session = sessionmaker(autocommit=False, bind=engine)()
 
-        return session
+        with engine.begin() as connection:
+            run_database_migration(connection=connection)
+
+        return sessionmaker(autocommit=False, bind=engine)()
 
     def get_pool_class(self, database_url: str) -> Pool:
         if database_url.startswith("sqlite"):

@@ -23,6 +23,7 @@ sqlalchemy = "^2.0.31"
 injector = "^0.21.0"
 platformdirs = "^4.2.2"
 fastapi-injector = "^0.6.0"
+alembic = "^1.13.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.1"

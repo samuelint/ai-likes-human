@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { apiFetcher } from './api-fetcher';
+import { apiJsonFetcher } from './api-fetcher';
 
 
 interface ApiServerStatus {
@@ -7,7 +7,7 @@ interface ApiServerStatus {
 }
 
 export function useServerStatus () {
-  const { data, error, isLoading } = useSWR<ApiServerStatus>('/health', apiFetcher);
+  const { data, error, isLoading } = useSWR<ApiServerStatus>('/health', apiJsonFetcher);
 
   return {
     data,

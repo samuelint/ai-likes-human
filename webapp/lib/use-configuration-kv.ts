@@ -1,5 +1,6 @@
 import useSWR from 'swr';
-import { apiFetcher } from './api-fetcher';
+import { apiJsonFetch, apiJsonFetcher } from './api-fetcher';
+import { useCallback } from 'react';
 
 
 interface ConfigurationKv {
@@ -8,7 +9,19 @@ interface ConfigurationKv {
 }
 
 export function useConfigurationKV(key: string) {
-  const { data, error, isLoading, mutate } = useSWR<ConfigurationKv>(`/configuration/kv/${key}`, apiFetcher);
+  const url = `/configuration/kv/${key}`;
+  const { data, error, isLoading, mutate: mutateCache } = useSWR<ConfigurationKv>(url, apiJsonFetcher);
+
+  const mutate = useCallback<(newValue: ConfigurationKv) => Promise<void>>(async (newValue) => {
+    if (newValue.key !== key) throw new Error('Key mismatch');
+
+    await apiJsonFetch(url, {
+      method: 'PUT',
+      body: JSON.stringify({ key, value: newValue.value }),
+    });
+
+    mutateCache({ ...data, ...newValue }, { revalidate: false });
+  }, [key, url, mutateCache, data]);
 
   return {
     data,

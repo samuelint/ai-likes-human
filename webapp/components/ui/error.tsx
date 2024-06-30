@@ -5,7 +5,7 @@ interface Props {
 
 export function FormatError({ error }: Props) {
   return error && (
-    <span className='text-destructive'>{error?.message}</span>
+    <span className='p-2 text-xs text-destructive'>{error?.message}</span>
   );
 }
 

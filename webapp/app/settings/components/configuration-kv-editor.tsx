@@ -35,13 +35,13 @@ export function ConfigurationKvEditor({ kv_key }: Props) {
       >
         <fieldset disabled={isLoading || error}>
           <Label htmlFor={kv_key}>{kv_key}</Label>
+          <FormatError error={error} />
           <div className="flex w-full max-w-sm items-center space-x-2">
             <Input name={kv_key} id={kv_key} placeholder={kv_key} defaultValue={data?.value} />
             <Button type="submit">Save</Button>
           </div>
         </fieldset>
       </form>
-      <FormatError error={error} />
     </>
   );
 }

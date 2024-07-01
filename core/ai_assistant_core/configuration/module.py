@@ -4,6 +4,6 @@ from .infra.sqlalchemy_repository import SqlalchemyConfigurationRepository
 from .domain.repository import ConfigurationRepository
 
 
-class LLMConfigurationModule(Module):
+class ConfigurationModule(Module):
     def configure(self, binder: Binder):
         binder.bind(ConfigurationRepository, to=SqlalchemyConfigurationRepository)

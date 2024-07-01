@@ -389,6 +389,17 @@ marshmallow = ">=3.18.0,<4.0.0"
 typing-inspect = ">=0.4.0,<1"
 
 [[package]]
+name = "decoy"
+version = "2.1.1"
+description = "Opinionated mocking library for Python"
+optional = false
+python-versions = ">=3.7,<4.0"
+files = [
+    {file = "decoy-2.1.1-py3-none-any.whl", hash = "sha256:7ddcc08b8ce991f7705cee76fae9061dcb17352e0a1ca2d9a0d4a0306ebd51cd"},
+    {file = "decoy-2.1.1.tar.gz", hash = "sha256:575bdbe81afb4c152cd99a34568a9aa4369461f79d6172c678279c5d5585befe"},
+]
+
+[[package]]
 name = "defusedxml"
 version = "0.7.1"
 description = "XML bomb protection for Python stdlib modules"
@@ -3236,4 +3247,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "<=3.12.3,>=3.10"
-content-hash = "be765986eb88d296a973dee52e0c114f2d3ef4c6188d57d380cd65344a1e4353"
+content-hash = "569214ff76b414d7271cfe70b223bb95bd8148543c52f3117befa41017d26376"

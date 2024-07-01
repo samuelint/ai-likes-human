@@ -18,16 +18,18 @@ from ai_assistant_core.assistant_agent_factory import AssistantAgentFactory
 from ai_assistant_core.app_configuration import (
     AppConfigurationModule,
 )
-from ai_assistant_core.configuration.module import LLMConfigurationModule
+from ai_assistant_core.configuration.module import ConfigurationModule
 from ai_assistant_core.infrastructure.sqlalchemy_module import SqlAlchemyModule
 from ai_assistant_core.configuration import configuration_kv_router
+from ai_assistant_core.llm.module import LLMModule
 
 
 def create_app(database_url: Optional[str] = None) -> FastAPI:
     injector = Injector(
         [
             AppConfigurationModule(database_url=database_url),
-            LLMConfigurationModule(),
+            ConfigurationModule(),
+            LLMModule(),
             SqlAlchemyModule(),
         ]
     )

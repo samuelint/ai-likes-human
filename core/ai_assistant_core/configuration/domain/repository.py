@@ -3,9 +3,6 @@ from .dto import ConfigurationItemDto
 
 
 class ConfigurationRepository(ABC):
-    def __init__(self):
-        pass
-
     @abstractmethod
     def get(self, key: str) -> ConfigurationItemDto:
         pass

@@ -6,6 +6,7 @@ pub mod sidecar_lifecycle_service;
 use std::sync::Mutex;
 use tauri_plugin_log::LogTarget;
 use tauri::{Manager, State, WindowEvent};
+use tauri_plugin_window_state::{AppHandleExt, StateFlags};
 use sidecar_lifecycle_service::SidecarLifeCycleService;
 
 struct AppState {
@@ -49,6 +50,7 @@ fn main() {
   tauri::Builder::default()
     .manage(state)
     .plugin(log_builder.build())  
+    .plugin(tauri_plugin_window_state::Builder::default().build())
     .setup(move |app| {
         let app_state: State<AppState> = app.state();
         app_state.code_sidecar_mutex
@@ -66,6 +68,9 @@ fn main() {
                 .unwrap()
                 .stop()
                 .expect("Core Sidecar stop failed");
+
+            let app_handle: tauri::AppHandle = event.window().app_handle();
+            app_handle.save_window_state(StateFlags::all()).ok();
         }
         _ => {}
     })

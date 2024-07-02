@@ -1,7 +1,7 @@
 import time
 import uuid
 from sqlalchemy import Column, Integer, String, JSON
-
+from sqlalchemy.orm import mapped_column
 from ai_assistant_core.infrastructure.sqlalchemy import Base
 from openai.types.beta import Thread
 
@@ -9,7 +9,7 @@ from openai.types.beta import Thread
 class ThreadModel(Base):
     __tablename__ = "openai_thread"
 
-    id = Column(
+    id = mapped_column(
         String(36),
         primary_key=True,
         default=lambda: str(uuid.uuid4().hex)[:36],

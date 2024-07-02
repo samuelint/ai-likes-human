@@ -9,8 +9,15 @@ from ai_assistant_core.llm.infrastructure.anthropic_llm_factory import (
 class TestIsCompatible:
 
     @pytest.fixture
-    def instance(self) -> AnthropicLLMFactory:
-        return AnthropicLLMFactory()
+    def api_key_service(self, decoy: Decoy) -> ApiKeyService:
+        service = decoy.mock(cls=ApiKeyService)
+        decoy.when(service.get_anthropic_api_key()).then_return("")
+
+        return service
+
+    @pytest.fixture
+    def instance(self, api_key_service: ApiKeyService) -> AnthropicLLMFactory:
+        return AnthropicLLMFactory(api_key_service=api_key_service)
 
     def test_is_compatible_with_anthropic(self, instance: AnthropicLLMFactory):
         assert instance.is_compatible("anthropic")

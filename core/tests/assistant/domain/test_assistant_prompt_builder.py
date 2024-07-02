@@ -1,4 +1,4 @@
-from ai_assistant_core.assistant_prompt_builder import (
+from ai_assistant_core.assistant.domain.assistant_prompt_builder import (
     AssistantPromptBuilder,
 )
 

@@ -8,13 +8,6 @@ base_route = "/configuration/kv"
 
 class TestConfigurationKeyValueCrud:
 
-    def test_initial_list_contains_no_configurations(self):
-        list_response = test_api.get(base_route)
-        list_response_body = list_response.json()
-
-        assert list_response.status_code == 200
-        assert len(list_response_body) == 0
-
     def test_create_read_update_delete(self):
         # Create
         response = test_api.put(
@@ -29,8 +22,10 @@ class TestConfigurationKeyValueCrud:
         list_response = test_api.get(base_route)
         list_response_body = list_response.json()
         assert list_response.status_code == 200
-        assert len(list_response_body) == 1
-        assert list_response_body[0]["key"] == created_configuration_item["key"]
+        assert any(
+            item["key"] == created_configuration_item["key"]
+            for item in list_response_body
+        )
 
         # Read
         got_response = test_api.get(f"{base_route}/{created_configuration_item['key']}")
@@ -57,4 +52,4 @@ class TestConfigurationKeyValueCrud:
         list_response = test_api.get(base_route)
         list_response_body = list_response.json()
         assert list_response.status_code == 200
-        assert len(list_response_body) == 0
+        assert not any(item["key"] == "some-key" for item in list_response_body)

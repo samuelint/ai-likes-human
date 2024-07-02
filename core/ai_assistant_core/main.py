@@ -30,10 +30,7 @@ def create_app(database_url: Optional[str] = None) -> FastAPI:
     app = FastAPI(
         title="AI Assistant Core",
         version="1.0",
-        description="AI Assistant Core API",
     )
-    attach_injector(app, injector)
-
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
@@ -41,6 +38,8 @@ def create_app(database_url: Optional[str] = None) -> FastAPI:
         allow_headers=["*"],
         expose_headers=["*"],
     )
+
+    attach_injector(app, injector)
 
     bind_assistant_routes(app=app, injector=injector)
     app.include_router(configuration_kv_router)

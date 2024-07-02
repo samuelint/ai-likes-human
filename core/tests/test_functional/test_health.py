@@ -5,6 +5,7 @@ test_api = create_test_client()
 
 def test_health():
     response = test_api.get("/health")
+    body = response.json()
 
     assert response.status_code == 200
-    assert response.text == "healthy"
+    assert body["status"] == "ok"

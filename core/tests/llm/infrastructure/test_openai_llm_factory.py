@@ -7,8 +7,15 @@ from ai_assistant_core.llm.infrastructure.openai_llm_factory import OpenAILLMFac
 class TestIsCompatible:
 
     @pytest.fixture
-    def instance(self) -> OpenAILLMFactory:
-        return OpenAILLMFactory()
+    def api_key_service(self, decoy: Decoy) -> ApiKeyService:
+        service = decoy.mock(cls=ApiKeyService)
+        decoy.when(service.get_openai_api_key()).then_return("")
+
+        return service
+
+    @pytest.fixture
+    def instance(self, api_key_service: ApiKeyService) -> OpenAILLMFactory:
+        return OpenAILLMFactory(api_key_service=api_key_service)
 
     def test_is_compatible_with_openai(self, instance: OpenAILLMFactory):
         assert instance.is_compatible("openai")

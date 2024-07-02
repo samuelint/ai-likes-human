@@ -11,6 +11,7 @@ from ai_assistant_core.app_configuration import (
 )
 from ai_assistant_core.assistant import AssistantModule, bind_assistant_routes
 from ai_assistant_core.configuration.module import ConfigurationModule
+from ai_assistant_core.health.route import bind_health_routes
 from ai_assistant_core.infrastructure.sqlalchemy_module import SqlAlchemyModule
 from ai_assistant_core.configuration import configuration_kv_router
 from ai_assistant_core.llm.module import LLMModule
@@ -41,13 +42,9 @@ def create_app(database_url: Optional[str] = None) -> FastAPI:
 
     attach_injector(app, injector)
 
+    bind_health_routes(app=app)
     bind_assistant_routes(app=app, injector=injector)
     app.include_router(configuration_kv_router)
-
-    @app.get("/health")
-    @app.get("/")
-    async def health():
-        return {"status": "ok"}
 
     return app
 

@@ -8,7 +8,10 @@ class ApiKeyService:
         self.configuration_repo = configuration_repo
 
     def get_openai_api_key(self) -> str:
-        return self.configuration_repo.get("OPENAI_API_KEY").value
+        return self.get("OPENAI_API_KEY")
 
     def get_anthropic_api_key(self) -> str:
-        return self.configuration_repo.get("ANTHROPIC_API_KEY").value
+        return self.get("ANTHROPIC_API_KEY")
+
+    def get(self, key: str) -> str:
+        return self.configuration_repo.get(key).value

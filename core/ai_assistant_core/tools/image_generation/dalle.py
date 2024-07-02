@@ -1,21 +1,22 @@
-import os
-from typing import Union
-from langchain_core.tools import tool
+from injector import inject
 from langchain_community.utilities.dalle_image_generator import DallEAPIWrapper
+from langchain_core.tools import BaseTool, StructuredTool
+
+from ai_assistant_core.llm.domain.api_key_service import ApiKeyService
 
 
-dall_e_client: Union[DallEAPIWrapper, None] = None
+@inject
+class DallEToolFactory:
+    def __init__(self, api_key_service: ApiKeyService) -> None:
+        api_key = api_key_service.get_openai_api_key()
+        self.dalle_client = DallEAPIWrapper(api_key=api_key, model="dall-e-3")
 
+    def generate_image(self, query: str) -> str:
+        return self.dalle_client.run(query)
 
-def _get_dall_e_client():
-    global dall_e_client
-    if dall_e_client is None:
-        dall_e_client = DallEAPIWrapper(openai_api_key=os.getenv("OPENAI_API_KEY"))
-    return dall_e_client
-
-
-@tool
-def dall_e_tool(query: str) -> str:
-    """Generate an image using DALL-E. Returns image URL"""
-    dall_e = _get_dall_e_client()
-    return dall_e.run(query)
+    def create(self) -> BaseTool:
+        return StructuredTool.from_function(
+            func=self.generate_image,
+            name="dall_e",
+            description="Generate an image using DALL-E.",
+        )

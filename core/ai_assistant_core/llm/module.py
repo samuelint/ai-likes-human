@@ -1,4 +1,4 @@
-from injector import Injector, Module, multiprovider
+from injector import Module, multiprovider
 
 from ai_assistant_core.llm.domain.base_llm_factory import BaseLLMFactory
 from ai_assistant_core.llm.infrastructure.anthropic_llm_factory import (
@@ -9,5 +9,7 @@ from ai_assistant_core.llm.infrastructure.openai_llm_factory import OpenAILLMFac
 
 class LLMModule(Module):
     @multiprovider
-    def provide_llm_factories(self, injector: Injector) -> list[BaseLLMFactory]:
-        return [injector.get(OpenAILLMFactory), injector.get(AnthropicLLMFactory)]
+    def provide_llm_factories(
+        self, openai_factory: OpenAILLMFactory, anthropic_factory: AnthropicLLMFactory
+    ) -> list[BaseLLMFactory]:
+        return [openai_factory, anthropic_factory]

@@ -1,9 +1,7 @@
 # flake8: noqa
 from langchain_core.prompts import PipelinePromptTemplate, PromptTemplate
-from langchain.output_parsers import ResponseSchema, StructuredOutputParser
-from ai_assistant_core.prompts.confidence_level import (
-    confidence_percent_response_schema,
-)
+from langchain.output_parsers import ResponseSchema
+
 
 role_template = """\
 #role 
@@ -33,20 +31,13 @@ text_response = ResponseSchema(
 
 
 class AssistantPromptBuilder:
-    def __init__(self, person_name=None, confidence_percentage=True):
+    def __init__(
+        self,
+        person_name=None,
+    ):
         self.person_name = person_name
-        self.confidence_percentage = confidence_percentage
-
-    def build_output_parser(self) -> StructuredOutputParser:
-        response_schemas = [text_response]
-        if self.confidence_percentage:
-            response_schemas.append(confidence_percent_response_schema)
-
-        return StructuredOutputParser.from_response_schemas(response_schemas)
 
     def build_system_prompt(self) -> str:
-        # output_parser = self.build_output_parser()
-        # format_instructions = output_parser.get_format_instructions()
         system_prompt = PromptTemplate.from_template(system_prompt_template)
 
         pipeline_prompt_template = PipelinePromptTemplate(

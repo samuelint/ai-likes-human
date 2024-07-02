@@ -1,9 +1,14 @@
 name: Bundle
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types:
+      - created
+
+# on:
+#   push:
+#     branches:
+#       - main
 
 jobs:
   bundle_core:

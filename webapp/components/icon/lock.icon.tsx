@@ -1,4 +1,4 @@
-import { LockClosedIcon } from '@heroicons/react/24/solid';
+import { Lock } from 'lucide-react';
 
 
-export { LockClosedIcon as LockIcon };
+export { Lock as LockIcon };

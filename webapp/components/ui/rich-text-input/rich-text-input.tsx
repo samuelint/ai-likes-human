@@ -18,7 +18,7 @@ import { OnMarkdownChangePlugin } from './module/on-change';
 import { ListNodes, ListPlugin, listTheme } from './module/list';
 import { LinkNodes, LinkPlugin, linkTheme } from './module/link';
 import { ExposeKeyboardEvent } from './module/keyboard-events';
-import { twMerge } from 'tailwind-merge';
+import { cn } from '@/lib/utils';
 
 
 export type InputState = SerializedEditorState;
@@ -61,7 +61,7 @@ export default function RichTextInput({ input, placeholder, onChange, onError, d
   return (
     <LexicalComposer initialConfig={initialConfig}>
       <RichTextPlugin
-        contentEditable={<ContentEditable disabled={disabled} className={twMerge('w-full rounded p-2 bg-white', className)} />}
+        contentEditable={<ContentEditable disabled={disabled} className={cn('w-full rounded p-2 bg-white', className)} />}
         placeholder={<div className='absolute left-6 pointer-events-none text-gray-400'>{placeholder}</div>}
         ErrorBoundary={LexicalErrorBoundary}
       />

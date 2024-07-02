@@ -28,8 +28,9 @@ export default function NewMessage({ placeholder = 'Type your message...', input
   };
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="bg-gray-100 dark:bg-gray-800 p-4 gap-2 flex items-center">
+    <form ref={formRef} onSubmit={handleSubmit} className="relative border rounded-xl p-4 gap-2 flex items-center">
       <RichTextInput
+        className='focus:outline-none'
         disabled={disabled}
         editable
         placeholder={placeholder}

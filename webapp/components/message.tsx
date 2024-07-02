@@ -17,7 +17,7 @@ export function Message({ className, content, children, actions, type }: ChatMes
     <div className={twMerge('group', className)}>
       <div className={twMerge(
         'flex flex-col gap-2 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 dark:text-white',
-        type === 'user' && 'bg-blue-500 text-white',
+        type === 'user' && 'bg-slate-100',
       )}
       >
         { content?.map((contentItem, index) => <MessageContent key={index} content={contentItem} /> ) }

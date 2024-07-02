@@ -1,0 +1,7 @@
+# Alembic Migrator
+
+## Create a new migration script
+
+`alembic revision -m "YOUR MIGRATION NAME"`
+or
+`make add-migration m="YOUR MIGRATION NAME"`

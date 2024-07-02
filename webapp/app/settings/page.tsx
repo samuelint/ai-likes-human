@@ -4,10 +4,12 @@ import { Section } from '../../components/section';
 import { H1 } from '../../components/h1';
 import ServerStatus from './components/server-status';
 import { ConfigurationKvEditor } from './components/configuration-kv-editor';
-import { isInDesktopApp } from '@/lib/is-in-desktop-app';
+import { useIsInDesktopApp } from '@/lib/is-in-desktop-app';
 
 
 export default function Settings() {
+  const isInDesktopAppFn = useIsInDesktopApp();
+
   return (
     <div>
       <H1>Settings</H1>
@@ -18,7 +20,7 @@ export default function Settings() {
       </Section>
       <Section title="Status">
         <ServerStatus />
-        { isInDesktopApp() && <LocalServerSettings /> }
+        { isInDesktopAppFn() && <LocalServerSettings /> }
       </Section>
     </div>
   );

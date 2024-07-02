@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup as Soup
 
 @tool("url_content_loader")
 def url_content_loader_tool(url: str) -> dict:
-    """Load url content"""
+    """Load content from url"""
 
     loader = RecursiveUrlLoader(
         url=url,

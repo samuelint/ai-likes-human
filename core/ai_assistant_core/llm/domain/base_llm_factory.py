@@ -6,7 +6,7 @@ from langchain_core.language_models import BaseChatModel
 class BaseLLMFactory(ABC):
 
     @abstractmethod
-    def isCompatible(self, vendor: str) -> bool:
+    def is_compatible(self, vendor: str) -> bool:
         pass
 
     @abstractmethod

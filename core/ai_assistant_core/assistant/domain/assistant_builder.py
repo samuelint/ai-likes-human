@@ -1,4 +1,4 @@
-from ai_assistant_core.assistant_prompt_builder import AssistantPromptBuilder
+from .assistant_prompt_builder import AssistantPromptBuilder
 from langchain_core.language_models import BaseChatModel
 
 

@@ -7,15 +7,15 @@ from ai_assistant_core.llm.domain.api_key_service import ApiKeyService
 from ..domain.base_llm_factory import BaseLLMFactory
 
 
+@inject
 class OpenAILLMFactory(BaseLLMFactory):
 
-    @inject
     def __init__(self, api_key_service: ApiKeyService) -> None:
         super().__init__()
 
         self.api_key_service = api_key_service
 
-    def isCompatible(self, vendor: str) -> bool:
+    def is_compatible(self, vendor: str) -> bool:
         return vendor.lower() == "openai"
 
     def create(

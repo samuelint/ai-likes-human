@@ -1,4 +1,4 @@
-from injector import Binder, Module
+from injector import Injector, Module, multiprovider
 
 from ai_assistant_core.llm.domain.base_llm_factory import BaseLLMFactory
 from ai_assistant_core.llm.infrastructure.anthropic_llm_factory import (
@@ -8,7 +8,6 @@ from ai_assistant_core.llm.infrastructure.openai_llm_factory import OpenAILLMFac
 
 
 class LLMModule(Module):
-    def configure(self, binder: Binder):
-        binder.multibind(
-            list[BaseLLMFactory], to=[OpenAILLMFactory, AnthropicLLMFactory]
-        )
+    @multiprovider
+    def provide_llm_factories(self, injector: Injector) -> list[BaseLLMFactory]:
+        return [injector.get(OpenAILLMFactory), injector.get(AnthropicLLMFactory)]

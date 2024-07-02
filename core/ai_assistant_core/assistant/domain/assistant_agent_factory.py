@@ -1,5 +1,5 @@
 from injector import inject
-from ai_assistant_core.assistant_builder import AssistantBuilder
+from .assistant_builder import AssistantBuilder
 from ai_assistant_core.llm.domain.llm_factory import LLMFactory
 from langchain_openai_api_bridge.core.agent_factory import AgentFactory, CreateAgentDto
 from langgraph.graph.graph import CompiledGraph

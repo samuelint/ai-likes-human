@@ -11,10 +11,10 @@ class TestIsCompatible:
         return OpenAILLMFactory()
 
     def test_is_compatible_with_openai(self, instance: OpenAILLMFactory):
-        assert instance.isCompatible("openai")
+        assert instance.is_compatible("openai")
 
     def test_is_not_compatible_with_not_openai(self, instance: OpenAILLMFactory):
-        assert instance.isCompatible("anthropic") is False
+        assert instance.is_compatible("anthropic") is False
 
 
 class TestCreate:

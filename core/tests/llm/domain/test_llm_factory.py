@@ -22,7 +22,7 @@ class SomeChatModelA:
 
 
 class LLMFactoryA(BaseLLMFactory):
-    def isCompatible(self, vendor: str) -> bool:
+    def is_compatible(self, vendor: str) -> bool:
         return vendor.lower() == "a"
 
     def create(

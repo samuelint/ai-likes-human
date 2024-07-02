@@ -5,19 +5,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from injector import Injector
 from fastapi_injector import attach_injector
-from langchain_openai_api_bridge.assistant.assistant_app import AssistantApp
-from langchain_openai_api_bridge.assistant.repository import (
-    InMemoryMessageRepository,
-    InMemoryRunRepository,
-    InMemoryThreadRepository,
-)
-from langchain_openai_api_bridge.fastapi import (
-    include_assistant,
-)
-from ai_assistant_core.assistant_agent_factory import AssistantAgentFactory
+
 from ai_assistant_core.app_configuration import (
     AppConfigurationModule,
 )
+from ai_assistant_core.assistant import AssistantModule, bind_assistant_routes
 from ai_assistant_core.configuration.module import ConfigurationModule
 from ai_assistant_core.infrastructure.sqlalchemy_module import SqlAlchemyModule
 from ai_assistant_core.configuration import configuration_kv_router
@@ -30,6 +22,7 @@ def create_app(database_url: Optional[str] = None) -> FastAPI:
             AppConfigurationModule(database_url=database_url),
             ConfigurationModule(),
             LLMModule(),
+            AssistantModule(),
             SqlAlchemyModule(),
         ]
     )
@@ -49,20 +42,13 @@ def create_app(database_url: Optional[str] = None) -> FastAPI:
         expose_headers=["*"],
     )
 
-    assistant_app = AssistantApp(
-        thread_repository_type=InMemoryThreadRepository,
-        message_repository_type=InMemoryMessageRepository,
-        run_repository=InMemoryRunRepository,
-        agent_factory=AssistantAgentFactory,
-    )
+    bind_assistant_routes(app=app, injector=injector)
+    app.include_router(configuration_kv_router)
 
     @app.get("/health")
     @app.get("/")
     async def health():
         return {"status": "ok"}
-
-    include_assistant(app=app, assistant_app=assistant_app, prefix="/assistant")
-    app.include_router(configuration_kv_router)
 
     return app
 

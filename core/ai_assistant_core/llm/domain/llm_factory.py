@@ -18,7 +18,7 @@ class LLMFactory:
         vendor, model = self.__extract_vendor_model(vendor_model)
 
         for factory in self.factories:
-            if factory.isCompatible(vendor):
+            if factory.is_compatible(vendor=vendor):
                 return factory.create(
                     model=model,
                     max_tokens=max_tokens,

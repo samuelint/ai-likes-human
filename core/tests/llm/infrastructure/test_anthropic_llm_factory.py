@@ -13,10 +13,10 @@ class TestIsCompatible:
         return AnthropicLLMFactory()
 
     def test_is_compatible_with_anthropic(self, instance: AnthropicLLMFactory):
-        assert instance.isCompatible("anthropic")
+        assert instance.is_compatible("anthropic")
 
     def test_is_not_compatible_with_not_anthropic(self, instance: AnthropicLLMFactory):
-        assert instance.isCompatible("openai") is False
+        assert instance.is_compatible("openai") is False
 
 
 class TestCreate:

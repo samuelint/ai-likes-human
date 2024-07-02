@@ -1,6 +1,7 @@
 import BrandLink from './brand.link';
 import SettingLink from './settings.link';
 import PrivacyToggle from './privacy-toggle';
+import StatusIndicator from './status-indicator';
 
 
 export default function Header() {
@@ -11,6 +12,7 @@ export default function Header() {
           <BrandLink />
         </div>
         <div className='flex items-center gap-4'>
+          <StatusIndicator />
           <PrivacyToggle />
           <SettingLink />
         </div>

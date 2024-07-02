@@ -1,3 +1,4 @@
+export PYTHONPATH=$(shell pwd)
 
 .PHONY: dev run
 dev run:
@@ -14,7 +15,7 @@ test-watch:
 
 .PHONY: lint
 lint:
-	poetry run flake8 ai-assistant-core tests
+	poetry run flake8 ai_assistant_core tests
 
 .PHONY: bundle build
 bundle build:

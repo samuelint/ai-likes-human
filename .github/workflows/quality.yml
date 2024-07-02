@@ -47,9 +47,9 @@ jobs:
           pip install poetry
           poetry install
 
-      - name: Link
+      - name: Lint
         run: |
-          poetry run flake8 --config=../.flake8 ai_assistant_core tests
+          make lint
 
       - name: Tests
         env:
@@ -57,9 +57,8 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
         run: |
-          poetry run pytest
+          make test
 
       - name: Build
         run: |
           make bundle
-        

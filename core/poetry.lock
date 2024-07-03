@@ -1279,13 +1279,13 @@ tiktoken = ">=0.7,<1"
 
 [[package]]
 name = "langchain-openai-api-bridge"
-version = "0.5.2"
+version = "0.6.0"
 description = "A bridge to use Langchain output as an OpenAI-compatible API."
 optional = false
 python-versions = "<3.13,>=3.10"
 files = [
-    {file = "langchain_openai_api_bridge-0.5.2-py3-none-any.whl", hash = "sha256:a982aa393be6e72a617be39dba69c16385975475706772e88ddef05019631e9e"},
-    {file = "langchain_openai_api_bridge-0.5.2.tar.gz", hash = "sha256:3f26a2a9a8f68d0a6a8e22971db73426ed2b2419eba1fb47110cd97afa218057"},
+    {file = "langchain_openai_api_bridge-0.6.0-py3-none-any.whl", hash = "sha256:4433294a6a26fd565c6179cf2d1776655ee14bb94a58174b4060709efcfb56d3"},
+    {file = "langchain_openai_api_bridge-0.6.0.tar.gz", hash = "sha256:887b621a7b42ae523c9d11eca348155c0eaff08bd0aeda461f2f51e2fd069b1d"},
 ]
 
 [package.dependencies]
@@ -3362,4 +3362,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "71831ce46dba26e5ea7f7f18c89e308e7d4152d07c6666cb98e1fb380ac31fae"
+content-hash = "4281c8833ec760d892f6cf3bf541264a95ba15512b2dfa2c182d952cbb590e9d"

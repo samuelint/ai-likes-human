@@ -5,8 +5,8 @@ from sqlalchemy import Column, ForeignKey, Integer, String, JSON
 from sqlalchemy.orm import mapped_column
 from ai_assistant_core.infrastructure.sqlalchemy import Base
 from openai.types.beta.threads.message import Message, Attachment
-from langchain_openai_api_bridge.assistant.adapter.openai_message_factory import (
-    create_message_content,
+from langchain_openai_api_bridge.assistant.adapter.openai_message_content_adapter import (
+    to_openai_message_content_list,
     deserialize_message_content,
 )
 from openai.types.beta.threads import (
@@ -62,7 +62,7 @@ class ThreadMessageModel(Base):
     ) -> Self:
 
         inner_content = [
-            block.dict() for block in create_message_content(content=content)
+            block.dict() for block in to_openai_message_content_list(content=content)
         ]
 
         return ThreadMessageModel(
@@ -80,10 +80,15 @@ class ThreadMessageModel(Base):
         deserialized_content = [
             deserialize_message_content(block) for block in self.content
         ]
+        attachments = (
+            None
+            if self.attachments is None
+            else [Attachment.parse_obj(block) for block in self.attachments]
+        )
         return Message(
             id=self.id,
             assistant_id=self.assistant_id,
-            # attachments=[Attachment(**c) for c in self.attachments],
+            attachments=attachments,
             content=deserialized_content,
             created_at=self.created_at,
             metadata=self.metadata_,

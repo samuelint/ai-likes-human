@@ -1,45 +1,17 @@
 import time
-from typing import Iterable, List, Literal, Optional, Self, Type, Union
+from typing import Iterable, List, Literal, Optional, Self, Union
 import uuid
-from openai import BaseModel
 from sqlalchemy import Column, ForeignKey, Integer, String, JSON
 from sqlalchemy.orm import mapped_column
 from ai_assistant_core.infrastructure.sqlalchemy import Base
-from openai.types.beta.threads.message import Message, MessageContent, Attachment
+from openai.types.beta.threads.message import Message, Attachment
+from langchain_openai_api_bridge.assistant.adapter.openai_message_factory import (
+    create_message_content,
+    deserialize_message_content,
+)
 from openai.types.beta.threads import (
     MessageContentPartParam,
-    TextContentBlock,
-    ImageFileContentBlock,
-    ImageURLContentBlock,
-    Text,
 )
-
-
-# use langchain_openai_bridge version when released
-def create_message_content(
-    content: Union[str, Iterable[MessageContentPartParam]] = ""
-) -> List[MessageContent]:
-    if isinstance(content, str):
-        inner_content = [
-            TextContentBlock(text=Text(value=content, annotations=[]), type="text")
-        ]
-    else:
-        inner_content = content
-
-    return inner_content
-
-
-# use langchain_openai_bridge version when released
-def deserialize_message_content(data: dict) -> MessageContent:
-    type_to_model: dict[str, Type[BaseModel]] = {
-        "image_file": ImageFileContentBlock,
-        "image_url": ImageURLContentBlock,
-        "text": TextContentBlock,
-    }
-
-    content_type = data["type"]
-    model_cls = type_to_model[content_type]
-    return model_cls.parse_obj(data)
 
 
 class ThreadMessageModel(Base):

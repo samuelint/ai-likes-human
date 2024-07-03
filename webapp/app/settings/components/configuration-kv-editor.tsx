@@ -4,14 +4,17 @@ import { Button } from '@/components/ui/button';
 import { FormatError } from '@/components/ui/error';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useToast } from '@/components/ui/use-toast';
 import { useConfigurationKV } from '@/lib/use-configuration-kv';
 
 
 interface Props {
+  label?: string
   kv_key: string
 }
 
-export function ConfigurationKvEditor({ kv_key }: Props) {
+export function ConfigurationKvEditor({ label, kv_key }: Props) {
+  const { toast } = useToast();
   const { data, error, isLoading, mutate } = useConfigurationKV(kv_key);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
@@ -23,8 +26,15 @@ export function ConfigurationKvEditor({ kv_key }: Props) {
     const entries = Object.fromEntries(formData.entries());
     const newValue = entries[kv_key] as string;
 
-    mutate({ key: kv_key, value: newValue });
+    mutate({ key: kv_key, value: newValue })
+      .then(() => toast({ title: `${label ?? kv_key} Saved` }))
+      .catch((e) => toast({
+        title: `${label ?? kv_key} Saved`,
+        description: e.message,
+        variant: 'destructive',
+      }));
   };
+
 
   return (
     <>
@@ -34,7 +44,7 @@ export function ConfigurationKvEditor({ kv_key }: Props) {
         className="grid w-full max-w-sm items-center gap-1.5"
       >
         <fieldset disabled={isLoading || error}>
-          <Label htmlFor={kv_key}>{kv_key}</Label>
+          <Label htmlFor={kv_key}>{label || kv_key}</Label>
           <FormatError error={error} />
           <div className="flex w-full max-w-sm items-center space-x-2">
             <Input name={kv_key} id={kv_key} placeholder={kv_key} defaultValue={data?.value} />

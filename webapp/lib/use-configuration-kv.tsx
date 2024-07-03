@@ -19,8 +19,8 @@ export function useConfigurationKV(key: string) {
       method: 'PUT',
       body: JSON.stringify({ key, value: newValue.value }),
     });
-
     mutateCache({ ...data, ...newValue }, { revalidate: false });
+
   }, [key, url, mutateCache, data]);
 
   return {

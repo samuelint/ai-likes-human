@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useOpenaiClient } from './openai-client';
 
 
@@ -13,14 +13,27 @@ type MessageDelta = OpenAI.Beta.Threads.Messages.MessageDelta;
 
 interface Props {
     assistantId?: string;
+    threadId?: string;
+    model?: string;
 }
-export function useOpenAiAssistant({ assistantId = '' }: Props = {}) {
+export function useOpenAiAssistant({ assistantId = '', threadId: argsThreadId, model = 'openai:gpt-3.5-turbo' }: Props = {}) {
   const [messages, setMessages] = useState<Message[]>([ ]);
   const [input, setInput] = useState('');
-  const [threadId, setThreadId] = useState<string | undefined>(undefined);
+  const [threadId, setThreadId] = useState<string | undefined>(argsThreadId);
   const [status, setStatus] = useState<AssistantStatus>('awaiting_message');
   const [error, setError] = useState<undefined | Error>(undefined);
   const openai = useOpenaiClient();
+
+  // useEffect(() => {
+  //   if (!argsThreadId) return;
+
+  //   const fetchMessages = async () => {
+  //     const newMessages = await openai.beta.threads.messages.list(argsThreadId);
+  //     setMessages(newMessages.data);
+  //   };
+  //   fetchMessages();
+
+  // }, [openai.beta.threads.messages, argsThreadId]);
 
   const handleInputChange = (
     event:
@@ -53,7 +66,7 @@ export function useOpenAiAssistant({ assistantId = '' }: Props = {}) {
       ]);
 
       await new Promise<void>((resolve, rejects) => openai.beta.threads.runs.stream(local_threadId, {
-        model: 'openai:gpt-3.5-turbo',
+        model,
         assistant_id: assistantId,
       })
         .on('messageCreated', (message: Message) => setMessages(messages => [...messages, message]))

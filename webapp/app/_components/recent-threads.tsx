@@ -1,4 +1,5 @@
 'use client';
+import { CreateNewThread } from '@/components/create-new-thread';
 import { ThreadsPreviewCollection } from '@/components/threads-preview-collection';
 import { useRecentThreads } from '@/lib/use-recent-threads';
 
@@ -8,7 +9,9 @@ export default function RecentThreads() {
 
   return (
     <section className='w-full p-2'>
-      <ThreadsPreviewCollection error={error} isLoading={isLoading} threads={data} />
+      <ThreadsPreviewCollection error={error} isLoading={isLoading} threads={data} >
+        <CreateNewThread />
+      </ThreadsPreviewCollection>
     </section>
   );
 }

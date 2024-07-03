@@ -13,6 +13,9 @@ export default function Settings() {
   return (
     <div>
       <H1>Settings</H1>
+      <Section title="User">
+        <ConfigurationKvEditor label='Name' kv_key="USERNAME"/>
+      </Section>
       <Section title="API Keys">
         <ConfigurationKvEditor kv_key="OPENAI_API_KEY"/>
         <ConfigurationKvEditor kv_key="ANTHROPIC_API_KEY"/>

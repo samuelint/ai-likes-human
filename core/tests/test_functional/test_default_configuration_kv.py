@@ -31,3 +31,11 @@ class TestDefaultConfigurationKeyValue:
         assert response.status_code == 200
         assert response_body["key"] == "SERPER_API_KEY"
         assert response_body["value"] == ""
+
+    def test_contains_empty_USERNAME(self):
+        response = test_api.get(f"{base_route}/USERNAME")
+        response_body = response.json()
+
+        assert response.status_code == 200
+        assert response_body["key"] == "USERNAME"
+        assert response_body["value"] == ""

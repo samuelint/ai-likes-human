@@ -6,7 +6,7 @@ import { cleanup, findByText, render, screen, waitFor } from '@testing-library/r
 import userEvent from '@testing-library/user-event';
 import { useOpenAiAssistant } from './use-openai-assistant';
 import { buildOpenAiApiFetchMock, CreateMessageMock, CreateRunMock, CreateThreadMock, ErrorMock } from '@/lib/openai-fetch-mock';
-import { useOpenaiClient } from './use-openai-client';
+import { useOpenaiClient } from './openai-client';
 
 
 jest.mock('./use-openai-client');

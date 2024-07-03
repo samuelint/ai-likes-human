@@ -1,16 +1,6 @@
-// import { z } from 'zod';
-
-import { Message, MessageContent } from '@/app/_components/use-openai-assistant';
+import { Message, MessageContent } from '@/lib/use-openai-assistant';
 
 
-// export const ChatMessageSchema = z.object({
-//   id: z.string(),
-//   role: z.string(),
-//   createdAt: z.number().optional(),
-//   content: z.any(),
-// });
-
-// export type ChatMessageDto = z.infer<typeof ChatMessageSchema>;
 export type ChatMessageDto = Message;
 export type ChatMessageContentDto = MessageContent;
 

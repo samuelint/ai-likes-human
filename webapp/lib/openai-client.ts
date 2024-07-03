@@ -11,6 +11,10 @@ interface Props {
   openai: OpenAI
 }
 
+export function getOpenaiClient({ openai }: Props = { openai: default_openai }) {
+  return openai;
+}
+
 export function useOpenaiClient({ openai }: Props = { openai: default_openai }) {
   return openai;
 }

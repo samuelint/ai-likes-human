@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 
 import { useState } from 'react';
-import { useOpenaiClient } from './use-openai-client';
+import { useOpenaiClient } from './openai-client';
 
 
 export type AssistantStatus = 'in_progress' | 'awaiting_message';

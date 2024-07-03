@@ -2,10 +2,9 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 
-import { Toaster } from '@/components/ui/toaster';
-import Header from './_components/header';
 import appConfig from '@/app.config';
 import { cn } from '@/lib/utils';
+import { MainLayout } from './main-layout';
 
 
 const inter = Inter({ subsets: ['latin'] });
@@ -23,13 +22,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={cn(inter.className, 'h-screen w-screen')}>
-        <div className='fixed w-full'>
-          <Header />
-        </div>
-        <div className='w-full h-full pt-10'>
+        <MainLayout>
           {children}
-        </div>
-        <Toaster />
+        </MainLayout>
       </body>
     </html>
   );

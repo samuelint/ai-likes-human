@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useOpenaiClient } from './openai-client';
 
 
@@ -24,16 +24,25 @@ export function useOpenAiAssistant({ assistantId = '', threadId: argsThreadId, m
   const [error, setError] = useState<undefined | Error>(undefined);
   const openai = useOpenaiClient();
 
-  // useEffect(() => {
-  //   if (!argsThreadId) return;
+  const setUnknownError = useCallback((e: unknown) => {
+    if (e instanceof Error) setError(e);
+    else setError(new Error(`${e}`));
+  }, []);
 
-  //   const fetchMessages = async () => {
-  //     const newMessages = await openai.beta.threads.messages.list(argsThreadId);
-  //     setMessages(newMessages.data);
-  //   };
-  //   fetchMessages();
+  useEffect(() => {
+    if (!argsThreadId) return;
 
-  // }, [openai.beta.threads.messages, argsThreadId]);
+    const fetchMessages = async () => {
+      try {
+        const newMessages = await openai.beta.threads.messages.list(argsThreadId);
+        setMessages(newMessages.data);
+      } catch (e) {
+        setUnknownError(e);
+      }
+    };
+    fetchMessages();
+
+  }, [openai.beta.threads.messages, argsThreadId, setUnknownError]);
 
   const handleInputChange = (
     event:
@@ -87,8 +96,7 @@ export function useOpenAiAssistant({ assistantId = '', threadId: argsThreadId, m
       );
 
     } catch (e) {
-      if (e instanceof Error) setError(e);
-      else setError(new Error(`${e}`));
+      setUnknownError(e);
     }
     finally {
       setStatus('awaiting_message');

@@ -1,22 +1,24 @@
 import '@testing-library/jest-dom';
 import 'openai/shims/node';
 import OpenAI from 'openai';
+import { when } from 'jest-when';
 import { cleanup, findByText, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useOpenAiAssistant } from './use-openai-assistant';
 import { buildOpenAiApiFetchMock, CreateMessageMock, CreateRunMock, CreateThreadMock, ErrorMock } from '@/lib/openai-fetch-mock';
+import { useOpenaiClient } from './use-openai-client';
 
 
+jest.mock('./use-openai-client');
 describe('stream data stream', () => {
   const fetch = jest.fn();
   const TestComponent = () => {
-    const { status, messages, error, append } = useOpenAiAssistant({
-      openai: new OpenAI({
-        apiKey: 'abc',
-        fetch,
-        dangerouslyAllowBrowser: true,
-      })
-    });
+    when(useOpenaiClient).mockReturnValue(new OpenAI({
+      apiKey: 'abc',
+      fetch,
+      dangerouslyAllowBrowser: true,
+    }));
+    const { status, messages, error, append } = useOpenAiAssistant();
 
     return (
       <div>

@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
+import { useOpenaiClient } from './use-openai-client';
 
 
 export type AssistantStatus = 'in_progress' | 'awaiting_message';
@@ -12,19 +13,15 @@ type MessageDelta = OpenAI.Beta.Threads.Messages.MessageDelta;
 
 interface Props {
     assistantId?: string;
-    openai?: OpenAI;
 }
-export function useOpenAiAssistant({ assistantId = '', openai: openai_arg }: Props = {}) {
+export function useOpenAiAssistant({ assistantId = '' }: Props = {}) {
   const [messages, setMessages] = useState<Message[]>([ ]);
   const [input, setInput] = useState('');
   const [threadId, setThreadId] = useState<string | undefined>(undefined);
   const [status, setStatus] = useState<AssistantStatus>('awaiting_message');
   const [error, setError] = useState<undefined | Error>(undefined);
-  const openai_ref = useRef(openai_arg ?? new OpenAI({
-    dangerouslyAllowBrowser: true,
-  }));
+  const openai = useOpenaiClient();
 
-  const openai = openai_ref.current;
   const handleInputChange = (
     event:
       | React.ChangeEvent<HTMLInputElement>

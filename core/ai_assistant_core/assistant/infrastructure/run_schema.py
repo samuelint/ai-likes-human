@@ -1,5 +1,5 @@
 import time
-from typing import List, Optional
+from typing import List, Optional, Self
 import uuid
 from sqlalchemy import Boolean, Column, Integer, Float, String, JSON, ForeignKey
 from sqlalchemy.orm import mapped_column
@@ -20,7 +20,7 @@ class RunModel(Base):
     )
     created_at = Column(Integer, default=lambda: int(time.time()))
     assistant_id = Column(String)
-    thread_id = mapped_column(String, ForeignKey("openai_thread.id"))
+    thread_id = mapped_column(String, ForeignKey("openai_thread.id"), index=True)
     model = Column(String)
     status = Column(String)
     instructions = Column(String)
@@ -30,7 +30,24 @@ class RunModel(Base):
     top_p = Column(Float, nullable=True)
     metadata_ = Column("metadata", JSON, nullable=True)
 
-    def from_dto(
+    @staticmethod
+    def from_dto(run: Run) -> Self:
+        return RunModel.from_args(
+            assistant_id=run.assistant_id,
+            thread_id=run.thread_id,
+            model=run.model,
+            status=run.status,
+            instructions=run.instructions,
+            parallel_tool_calls=run.parallel_tool_calls,
+            tools=run.tools,
+            required_action=run.required_action.dict() if run.required_action else None,
+            temperature=run.temperature,
+            top_p=run.top_p,
+            metadata=run.metadata,
+        )
+
+    @staticmethod
+    def from_args(
         assistant_id: str,
         thread_id: str,
         model: str,
@@ -42,7 +59,7 @@ class RunModel(Base):
         metadata: Optional[object] = None,
         temperature: Optional[float] = None,
         top_p: Optional[float] = None,
-    ) -> "RunModel":
+    ) -> Self:
         return RunModel(
             assistant_id=assistant_id,
             thread_id=thread_id,

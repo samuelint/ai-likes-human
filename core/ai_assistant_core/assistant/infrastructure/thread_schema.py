@@ -16,12 +16,11 @@ class ThreadModel(Base):
     )
     created_at = Column(Integer, default=lambda: int(time.time()))
     metadata_ = Column("metadata", JSON, nullable=True)
-    object = Column(String, default="thread")
 
     def to_dto(self) -> Thread:
         return Thread(
             id=self.id,
             created_at=self.created_at,
             metadata=self.metadata_,
-            object=self.object,
+            object="thread",
         )

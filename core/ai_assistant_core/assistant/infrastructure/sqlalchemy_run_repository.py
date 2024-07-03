@@ -29,7 +29,7 @@ class SqlalchemyRunRepository(RunRepository):
         temperature: Optional[float] = None,
         top_p: Optional[float] = None,
     ) -> Run:
-        model_ = RunModel.from_dto(
+        model_ = RunModel.from_args(
             assistant_id=assistant_id,
             thread_id=thread_id,
             status=status,
@@ -51,12 +51,10 @@ class SqlalchemyRunRepository(RunRepository):
     def update(self, run: Run) -> Run:
         model_ = self.db.query(RunModel).filter(RunModel.id == run.id).first()
         if model_:
-            model_.instructions = run.instructions
-            model_.required_action = run.required_action
-            model_.parallel_tool_calls = run.parallel_tool_calls
-            model_.metadata_ = run.metadata
-            model_.temperature = run.temperature
-            model_.top_p = run.top_p
+            model_to_change = RunModel.from_dto(run)
+            for attr in model_to_change.__dict__.keys():
+                if attr != "_sa_instance_state":
+                    setattr(model_, attr, getattr(model_to_change, attr))
             self.db.commit()
             self.db.refresh(model_)
 

@@ -12,7 +12,7 @@ export default function Assistant() {
   const { status, messages, setMessages, error, input, submitMessage, handleInputChange } = useOpenAiAssistant({
     openai: new OpenAI({
       baseURL: 'http://localhost:8000/assistant/openai/v1',
-      apiKey: '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',
+      apiKey: '<any>', // OpenAI lib expects an API key, but the api key is defined in backend
       dangerouslyAllowBrowser: true,
     })
   });

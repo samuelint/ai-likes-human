@@ -1,9 +1,10 @@
-from typing import Optional
+from typing import Literal, Optional
 from injector import inject
 from langchain_openai_api_bridge.assistant import (
     ThreadRepository,
 )
 from openai.types.beta import Thread, ThreadDeleted
+from openai.pagination import SyncCursorPage
 from sqlalchemy.orm import Session
 
 from .thread_schema import ThreadModel
@@ -38,6 +39,18 @@ class SqlalchemyThreadRepository(ThreadRepository):
             self.db.refresh(model)
 
         return model.to_dto()
+
+    def list(
+        self,
+        after: str = None,
+        before: str = None,
+        limit: int = None,
+        order: Literal["asc", "desc"] = None,
+    ) -> SyncCursorPage[Thread]:
+        result = self.db.query(ThreadModel).order_by(ThreadModel.created_at.asc()).all()
+        threads = [model.to_dto() for model in result]
+
+        return SyncCursorPage(data=threads)
 
     def retreive(self, thread_id: str) -> Thread:
         model = self.db.query(ThreadModel).filter(ThreadModel.id == thread_id).first()

@@ -1,7 +1,10 @@
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import Header from '@/app/_components/header';
+import { Inter } from 'next/font/google';
 
+
+export const inter = Inter({ subsets: ['latin'] });
 
 export function MainLayout({
   children,

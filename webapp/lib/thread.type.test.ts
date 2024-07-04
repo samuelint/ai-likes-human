@@ -21,7 +21,7 @@ describe('toThreadPreview', () => {
     });
   });
 
-  it('no metadata title should be Undefined', () => {
+  it('no metadata title should be empty', () => {
     const thread = {
       id: '123',
       created_at: 123456789,
@@ -32,7 +32,7 @@ describe('toThreadPreview', () => {
     expect(result).toEqual({
       id: '123',
       created_at: new Date(123456789 * 1000),
-      title: 'Undefined'
+      title: ''
     });
   });
 });

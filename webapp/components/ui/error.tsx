@@ -7,7 +7,7 @@ interface Props {
 
 export function ErrorDetails({ error }: Props) {
   return error && (
-    <Alert variant="destructive">
+    <Alert variant="destructive" className='px-4 py-2'>
       <AlertDescription>
         {error?.message}
       </AlertDescription>

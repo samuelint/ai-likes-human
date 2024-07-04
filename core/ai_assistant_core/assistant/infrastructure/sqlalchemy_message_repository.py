@@ -75,7 +75,7 @@ class SqlalchemyMessageRepository(MessageRepository):
         result = (
             self.db.query(ThreadMessageModel)
             .filter_by(thread_id=thread_id)
-            .order_by(ThreadMessageModel.created_at.asc())
+            .order_by(ThreadMessageModel.created_at.desc())
             .all()
         )
         return [model.to_dto() for model in result]

@@ -12,6 +12,6 @@ export function toThreadPreview(thread: Thread): ThreadPreviewDto {
     id: thread.id,
     created_at: new Date(thread.created_at * 1000),
     // @ts-expect-error - Metadata (from lib) is not typed
-    title: thread.metadata?.['title'] ?? 'Undefined'
+    title: thread.metadata?.['title'] ?? ''
   };
 }

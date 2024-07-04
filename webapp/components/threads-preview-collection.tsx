@@ -20,15 +20,15 @@ interface Props {
 
 export function ThreadsPreviewCollection({ error, threads, isLoading, className, children }: Props) {
   return (
-    <div className={cn('w-full flex flex-col items-center gap-1', className)}>
+    <div className={cn('w-full flex flex-col items-center gap-1 overflow-y-auto', className)}>
       <div className='w-full flex justify-start gap-4'>
         {children}
         { threads?.map((thread) => (
           <ThreadPreview key={thread.id} thread={thread} />
         ))}
+        { error && <ErrorDetails error={error}/>}
       </div>
       { isLoading && <ThreeDotsLoading/> }
-      { error && <ErrorDetails error={error}/>}
     </div>
   );
 }

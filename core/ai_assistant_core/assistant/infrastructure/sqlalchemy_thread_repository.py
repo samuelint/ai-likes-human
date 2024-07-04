@@ -47,7 +47,9 @@ class SqlalchemyThreadRepository(ThreadRepository):
         limit: int = None,
         order: Literal["asc", "desc"] = None,
     ) -> SyncCursorPage[Thread]:
-        result = self.db.query(ThreadModel).order_by(ThreadModel.created_at.asc()).all()
+        result = (
+            self.db.query(ThreadModel).order_by(ThreadModel.created_at.desc()).all()
+        )
         threads = [model.to_dto() for model in result]
 
         return SyncCursorPage(data=threads)

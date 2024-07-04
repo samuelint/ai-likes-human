@@ -1,4 +1,5 @@
 import { type ThreadPreviewDto } from '@/lib/thread.type';
+import moment from 'moment';
 import Link from 'next/link';
 import { buttonVariants } from './ui/button';
 import { cn } from '@/lib/utils';
@@ -13,7 +14,7 @@ export function ThreadPreview({ thread }: Props) {
   return (
     <Link href={`/thread/${id}`} className={cn(buttonVariants({ variant: 'outline' }), 'flex flex-col items-start')}>
       <span className=''>{title}</span>
-      <span className='text-xs text-slate-400'>{created_at?.toLocaleDateString('en')}</span>
+      <span className='text-xs text-slate-400'>{moment(created_at).fromNow()}</span>
     </Link>
   );
 }

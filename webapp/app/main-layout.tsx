@@ -16,7 +16,7 @@ export function MainLayout({
       <div className='fixed w-full'>
         <Header />
       </div>
-      <div className='w-full h-full pt-10'>
+      <div className='w-full h-full pt-10 overflow-hidden'>
         {children}
       </div>
       <Toaster />

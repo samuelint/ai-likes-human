@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 
-import { useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useOpenaiClient } from './openai-client';
 
 
 export type AssistantStatus = 'in_progress' | 'awaiting_message';
@@ -12,19 +13,37 @@ type MessageDelta = OpenAI.Beta.Threads.Messages.MessageDelta;
 
 interface Props {
     assistantId?: string;
-    openai?: OpenAI;
+    threadId?: string;
+    model?: string;
 }
-export function useOpenAiAssistant({ assistantId = '', openai: openai_arg }: Props = {}) {
+export function useOpenAiAssistant({ assistantId = '', threadId: argsThreadId, model = 'openai:gpt-3.5-turbo' }: Props = {}) {
   const [messages, setMessages] = useState<Message[]>([ ]);
   const [input, setInput] = useState('');
-  const [threadId, setThreadId] = useState<string | undefined>(undefined);
+  const [threadId, setThreadId] = useState<string | undefined>(argsThreadId);
   const [status, setStatus] = useState<AssistantStatus>('awaiting_message');
   const [error, setError] = useState<undefined | Error>(undefined);
-  const openai_ref = useRef(openai_arg ?? new OpenAI({
-    dangerouslyAllowBrowser: true,
-  }));
+  const openai = useOpenaiClient();
 
-  const openai = openai_ref.current;
+  const setUnknownError = useCallback((e: unknown) => {
+    if (e instanceof Error) setError(e);
+    else setError(new Error(`${e}`));
+  }, []);
+
+  useEffect(() => {
+    if (!argsThreadId) return;
+
+    const fetchMessages = async () => {
+      try {
+        const newMessages = await openai.beta.threads.messages.list(argsThreadId);
+        setMessages(newMessages.data);
+      } catch (e) {
+        setUnknownError(e);
+      }
+    };
+    fetchMessages();
+
+  }, [openai.beta.threads.messages, argsThreadId, setUnknownError]);
+
   const handleInputChange = (
     event:
       | React.ChangeEvent<HTMLInputElement>
@@ -56,7 +75,7 @@ export function useOpenAiAssistant({ assistantId = '', openai: openai_arg }: Pro
       ]);
 
       await new Promise<void>((resolve, rejects) => openai.beta.threads.runs.stream(local_threadId, {
-        model: 'openai:gpt-3.5-turbo',
+        model,
         assistant_id: assistantId,
       })
         .on('messageCreated', (message: Message) => setMessages(messages => [...messages, message]))
@@ -77,8 +96,7 @@ export function useOpenAiAssistant({ assistantId = '', openai: openai_arg }: Pro
       );
 
     } catch (e) {
-      if (e instanceof Error) setError(e);
-      else setError(new Error(`${e}`));
+      setUnknownError(e);
     }
     finally {
       setStatus('awaiting_message');

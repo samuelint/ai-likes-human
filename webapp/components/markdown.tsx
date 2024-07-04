@@ -1,7 +1,8 @@
+'use client';
 import LibMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { Prism } from 'react-syntax-highlighter';
+import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
 
 interface Props {
@@ -46,7 +47,7 @@ export function Markdown({ children }: Props) {
 
           return match ? (
           // @ts-expect-error - Error from library
-            <SyntaxHighlighter
+            <Prism
               {...rest}
               PreTag="div"
               // eslint-disable-next-line react/no-children-prop

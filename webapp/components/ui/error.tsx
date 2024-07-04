@@ -1,11 +1,17 @@
+import { Alert, AlertDescription } from './alert';
+
 
 interface Props {
   error?: Error
 }
 
-export function FormatError({ error }: Props) {
+export function ErrorDetails({ error }: Props) {
   return error && (
-    <span className='p-2 text-xs text-destructive'>{error?.message}</span>
+    <Alert variant="destructive" className='px-4 py-2'>
+      <AlertDescription>
+        {error?.message}
+      </AlertDescription>
+    </Alert>
   );
 }
 

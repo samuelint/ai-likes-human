@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { FormatError } from '@/components/ui/error';
+import { ErrorDetails } from '@/components/ui/error';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
@@ -45,7 +45,7 @@ export function ConfigurationKvEditor({ label, kv_key }: Props) {
       >
         <fieldset disabled={isLoading || error}>
           <Label htmlFor={kv_key}>{label || kv_key}</Label>
-          <FormatError error={error} />
+          <ErrorDetails error={error} />
           <div className="flex w-full max-w-sm items-center space-x-2">
             <Input name={kv_key} id={kv_key} placeholder={kv_key} defaultValue={data?.value} />
             <Button type="submit">Save</Button>

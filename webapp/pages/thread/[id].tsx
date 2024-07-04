@@ -13,7 +13,7 @@ export default function Page() {
     <MainLayout>
       <main className="h-full flex flex-col">
         <RecentThreads />
-        <AssistantThread threadId={`${id}`} />
+        { id && typeof id === 'string' && <AssistantThread threadId={id} /> }
       </main>
     </MainLayout>
   );

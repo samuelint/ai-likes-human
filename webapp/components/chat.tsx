@@ -15,7 +15,7 @@ interface Props extends ChatNewMessageProps {
 export default function Chat({ messages, isLoading, children, ...props }: Props) {
   return (
     <div role='presentation' className='h-full flex flex-col'>
-      <div className="flex flex-col h-full overflow-y-auto py-4 px-12 sm:px-28 lg:px-72 xl:px-96">
+      <div className="flex flex-col h-full overflow-y-auto py-4 px-12 sm:px-28 md:px-32 xl:px-80">
         {children}
         <div className="space-y-4">
           { messages.map((message) => {
@@ -29,7 +29,7 @@ export default function Chat({ messages, isLoading, children, ...props }: Props)
           { isLoading && <ThreeDotsLoading className="bg-blue-900 dark:bg-blue-50" /> }
         </div>
       </div>
-      <div className='mt-auto py-4 px-12 sm:px-28 lg:px-72 xl:px-96'>
+      <div className='mt-auto py-4 px-12 sm:px-28 md:px-32 xl:px-80'>
         <NewMessage {...props} />
       </div>
     </div>

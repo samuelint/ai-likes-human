@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { apiJsonFetcher } from './api-fetcher';
+import { fetchApiJson } from './api-fetcher';
 
 
 interface ApiServerStatus {
@@ -11,7 +11,7 @@ interface Props {
 }
 
 export function useServerStatus ({ refreshInterval = 1000 }: Props = {}) {
-  const { data, error, isLoading } = useSWR<ApiServerStatus>('/health', apiJsonFetcher, { refreshInterval });
+  const { data, error, isLoading } = useSWR<ApiServerStatus>('/health', fetchApiJson, { refreshInterval });
 
   return {
     data,

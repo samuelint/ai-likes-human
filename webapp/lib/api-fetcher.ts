@@ -1,12 +1,26 @@
 import appConfig from '@/app.config';
 
 
-export function apiJsonFetch(url: string, init?: RequestInit): Promise<Response> {
-  return fetch(`${appConfig.api_url}${url}`, { ...init, headers: { ...init?.headers, 'Content-Type': 'application/json' } });
+interface CreateApiJsonFetcherArgs {
+  queryParams?: Record<string, string>
 }
 
-export async function apiJsonFetcher(url: string) {
-  const response = await apiJsonFetch(url);
+export function fetchApi(path: string, init?: RequestInit) {
+  return fetch(`${appConfig.api_url}${path}`, init);
+}
 
-  return await response.json();
+export async function fetchApiJson(path: string, init?: RequestInit) {
+  const result = await fetchApi(path, { ...init, headers: { ...init?.headers, 'Content-Type': 'application/json' } });
+
+  return await result.json();
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function createApiJsonFetcher(args: CreateApiJsonFetcherArgs = {}): (path: string) => Promise<any> {
+  if (args?.queryParams) {
+    const searchParams = new URLSearchParams(args.queryParams);
+    return (path) => fetchApiJson(`${path}?${searchParams.toString()}`);
+  } else {
+    return (path) => fetchApiJson(path);
+  }
 }

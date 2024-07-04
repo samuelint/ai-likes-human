@@ -8,12 +8,12 @@ interface Props {
   onClick?: () => void
 }
 
-export function CreateNewThread({ className, onClick }: Props) {
+export function NewThread({ className, onClick }: Props) {
   return (
     <Button
       variant='outline'
       onClick={onClick}
-      className={cn('flex flex-col items-start', className)}
+      className={cn('flex flex-col items-start border-dashed', className)}
     >
       <Plus className='w-10 h-10'/>
     </Button>

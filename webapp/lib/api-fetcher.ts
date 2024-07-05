@@ -11,6 +11,9 @@ export function fetchApi(path: string, init?: RequestInit) {
 
 export async function fetchApiJson(path: string, init?: RequestInit) {
   const result = await fetchApi(path, { ...init, headers: { ...init?.headers, 'Content-Type': 'application/json' } });
+  if (!result.ok) {
+    throw new Error(await result.text());
+  }
 
   return await result.json();
 }

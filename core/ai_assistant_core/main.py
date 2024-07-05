@@ -15,7 +15,7 @@ from ai_assistant_core.app_configuration import (
     AppConfigurationModule,
 )
 from ai_assistant_core.configuration import ConfigurationModule
-from ai_assistant_core.llm import LLMModule
+from ai_assistant_core.llm import LLMModule, configuration_local_model_router
 from ai_assistant_core.tools import ToolsModule
 
 
@@ -48,6 +48,7 @@ def create_app(database_url: Optional[str] = None) -> FastAPI:
     bind_health_routes(app=app)
     bind_assistant_routes(app=app, injector=injector)
     app.include_router(configuration_kv_router)
+    app.include_router(configuration_local_model_router)
 
     return app
 

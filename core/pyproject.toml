@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "assistant-core"
+name = "ai-assistant-core"
 version = "0.1.0"
 description = ""
 authors = ["Samuel <samuelint@gmail.com>"]
@@ -14,20 +14,24 @@ langgraph = "^0.0.62"
 langserve = {extras = ["server"], version = "^0.2.1"}
 langchain-anthropic = "^0.1.13"
 uvicorn = "^0.30.0"
-pydantic = "^1.10.0"
 langchain-community = "^0.2.1"
 tiktoken = "^0.7.0"
-langchain-openai-api-bridge = "0.6.1"
+langchain-openai-api-bridge = "0.6.2"
 beautifulsoup4 = "^4.12.3"
 sqlalchemy = "^2.0.31"
 injector = "^0.21.0"
 platformdirs = "^4.2.2"
 fastapi-injector = "^0.6.0"
 alembic = "^1.13.2"
+llama-cpp-python = "^0.2.81"
+huggingface-hub = "^0.23.4"
+starlette-context = "^0.3.6"
+pydantic-settings = "^2.3.4"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^7.0.0"
 pyinstaller = "^6.8.0"
+polyfactory = "^2.16.0"
 
 [tool.poetry.group.test]
 [tool.poetry.group.test.dependencies]
@@ -35,6 +39,11 @@ pytest = "^8.2.1"
 pytest-watch = "^4.2.0"
 pytest-asyncio = "^0.23.7"
 decoy = "^2.1.1"
+
+[[tool.poetry.source]]
+name = "llama-cpp-python"
+url = "https://abetlen.github.io/llama-cpp-python/whl/metal"
+priority = 'secondary'
 
 [build-system]
 requires = ["poetry-core"]

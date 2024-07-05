@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 
 class ConfigurationItemDto(BaseModel):
-    id: Optional[int]
+    id: Optional[int] = None
     key: str
     value: str
 

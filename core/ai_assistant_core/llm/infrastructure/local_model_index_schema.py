@@ -1,5 +1,5 @@
 from typing import Self
-from sqlalchemy import JSON, Column, String
+from sqlalchemy import Column, String
 from sqlalchemy.orm import mapped_column
 
 from ai_assistant_core.infrastructure.sqlalchemy import Base
@@ -18,10 +18,10 @@ class LocalModelIndexModel(Base):
         primary_key=True,
     )
     type = Column(String)
-    local_files = Column(JSON, nullable=True)
+    local_path = Column(String, nullable=True)
 
     repo_id = Column(String, nullable=True)
-    remote_files = Column(JSON, nullable=True)
+    remote_path = Column(String, nullable=True)
 
     @staticmethod
     def from_dto(
@@ -31,15 +31,15 @@ class LocalModelIndexModel(Base):
             return LocalModelIndexModel(
                 name=dto.name,
                 type=dto.type,
-                local_files=dto.local_files,
+                local_path=dto.local_path,
             )
         elif isinstance(dto, HuggingFaceLLMModelIndex):
             return LocalModelIndexModel(
                 name=dto.name,
                 type=dto.type,
                 repo_id=dto.repo_id,
-                local_files=dto.local_files,
-                remote_files=dto.remote_files,
+                local_path=dto.local_path,
+                remote_path=dto.remote_path,
             )
         else:
             raise ValueError(f"Unsupported LLMModelIndex type: {type(dto)}")
@@ -49,15 +49,15 @@ class LocalModelIndexModel(Base):
             return FileLLMModelIndex(
                 name=self.name,
                 type=self.type,
-                local_files=self.local_files,
+                local_path=self.local_path,
             )
         elif self.type == "huggingface":
             return HuggingFaceLLMModelIndex(
                 name=self.name,
                 type=self.type,
                 repo_id=self.repo_id,
-                local_files=self.local_files,
-                remote_files=self.remote_files,
+                local_path=self.local_path,
+                remote_path=self.remote_path,
             )
         else:
             raise ValueError(f"Unsupported model type: {self.type}")

@@ -19,21 +19,6 @@ class LLMModule(Module):
             LocalLLMModelIndexRepository, to=SqlAlchemyLocalLLMModelIndexRepository
         )
 
-    # @multiprovider
-    # def provide_model_settings(self) -> dict[str, ModelSettings]:
-    #     return {
-    #         "llama3": ModelSettings(
-    #             model="meta-llama/Meta-Llama-3-8B",
-    #             model_alias="llama-7b",
-    #             hf_model_repo_id="meta-llama/Meta-Llama-3-8B",
-    #         ),
-    #         "phi3": ModelSettings(
-    #             model="microsoft/Phi-3-mini-4k-instruct",
-    #             model_alias="llama-7b",
-    #             hf_model_repo_id="microsoft/Phi-3-mini-4k-instruct",
-    #         ),
-    #     }
-
     @multiprovider
     def provide_llm_factories(
         self,

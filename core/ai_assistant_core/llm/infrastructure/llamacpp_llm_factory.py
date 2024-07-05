@@ -59,7 +59,7 @@ class LlamaCPPFactory(BaseLLMFactory):
 
         model_settings = [
             self.model_settings_factory.create(
-                local_files=model_info.local_files, model_alias=model_info.name
+                local_path=model_info.local_path, model_alias=model_info.name
             )
             for model_info in local_models
         ]

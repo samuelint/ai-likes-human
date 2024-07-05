@@ -1,3 +1,4 @@
+import { ModelCard } from '@/components/model-card';
 import { Section } from '@/components/section';
 import { ErrorDetails } from '@/components/ui/error';
 import { ThreeDotsLoading } from '@/components/ui/loading';
@@ -12,12 +13,7 @@ export default function LocalModelsSection() {
       { error && <ErrorDetails error={error} /> }
       { isLoading && <ThreeDotsLoading /> }
       { data?.map((model) => (
-        <div key={model.name}>
-          <div>{model.name}</div>
-          <div>{model.type}</div>
-          <div>{model.local_files.q4_gguf_filepath}</div>
-          <div>{model.local_files.fp16_gguf_filepath}</div>
-        </div>
+        <ModelCard className='w-3/12' key={model.name} model={model.name} vendor={model.type} metadata={{ path: model.local_path }} />
       )) }
     </Section>
   );

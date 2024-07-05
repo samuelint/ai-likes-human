@@ -1,22 +1,14 @@
 from dataclasses import dataclass
-from typing import Optional
 from llama_cpp import Literal, Union
 
 LocalModelType = Literal["huggingface", "local"]
 
 
 @dataclass
-class LLMModelFileDto:
-    q4_gguf_filepath: Optional[str]
-    fp16_gguf_filepath: Optional[str]
-
-
-@dataclass
 class NewFileLLMModel:
     name: str
-    type: Literal["huggingface"]
-
-    files: LLMModelFileDto
+    type: Literal["local"]
+    local_path: str
 
 
 @dataclass
@@ -25,7 +17,7 @@ class NewHuggingFaceLLMModel:
     type: Literal["huggingface"]
     repo_id: str
 
-    remote_files: LLMModelFileDto
+    remote_path: str
 
 
 NewLLMModel = Union[NewFileLLMModel, NewHuggingFaceLLMModel]
@@ -35,18 +27,17 @@ NewLLMModel = Union[NewFileLLMModel, NewHuggingFaceLLMModel]
 class FileLLMModelIndex:
     name: str
     type: Literal["local"]
-
-    local_files: LLMModelFileDto
+    local_path: str
 
 
 @dataclass
 class HuggingFaceLLMModelIndex:
     name: str
     type: Literal["huggingface"]
-    repo_id: str
+    local_path: str
 
-    remote_files: LLMModelFileDto
-    local_files: LLMModelFileDto
+    repo_id: str
+    remote_path: str
 
 
 LLMModelIndex = Union[FileLLMModelIndex, HuggingFaceLLMModelIndex]

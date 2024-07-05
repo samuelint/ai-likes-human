@@ -9,7 +9,6 @@ from ai_assistant_core.llm.infrastructure.llamacpp_model_settings_factory import
     LlamaCppModelSettingsFactory,
 )
 from tests.llm.domain.__dto_factories__ import (
-    LLMModelFileDtoFactory,
     LLMModelIndexFactory,
 )
 
@@ -30,9 +29,7 @@ class TestIsCompatible:
 class TestCreate:
     @pytest.fixture
     def phi3_model_index(self) -> FileLLMModelIndex:
-        local_files = LLMModelFileDtoFactory.build(q4_gguf_filepath="./q4.gguf")
-
-        return LLMModelIndexFactory.build(name="phi3", local_files=local_files)
+        return LLMModelIndexFactory.build(name="phi3", local_path="./q4.gguf")
 
     @pytest.fixture
     def local_model_service(
@@ -47,7 +44,7 @@ class TestCreate:
     def model_settings_factory(self, decoy: Decoy) -> LlamaCppModelSettingsFactory:
         service = decoy.mock(cls=LlamaCppModelSettingsFactory)
         decoy.when(
-            service.create(local_files=matchers.Anything(), model_alias="phi3")
+            service.create(local_path=matchers.Anything(), model_alias="phi3")
         ).then_return(ModelSettings(model="./q4.gguf", model_alias="phi3", n_ctx=800))
 
         return service

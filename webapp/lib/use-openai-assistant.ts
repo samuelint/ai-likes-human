@@ -97,6 +97,11 @@ export function useOpenAiAssistant({ assistantId = '', threadId: argsThreadId, m
 
     } catch (e) {
       setUnknownError(e);
+      setMessages(messages => {
+        return [
+          ...messages.slice(0, messages.length - 1),
+        ];
+      });
     }
     finally {
       setStatus('awaiting_message');

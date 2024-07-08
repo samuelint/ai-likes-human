@@ -5,6 +5,7 @@ import ApiKeysSection from './_components/api-keys.section';
 import GeneralSection from './_components/general.section';
 import LocalModelsSection from './_components/local-models.section';
 import StatusSection from './_components/status.section';
+import AdvancedSection from './_components/advanced.section';
 
 
 export default function Settings() {
@@ -16,6 +17,7 @@ export default function Settings() {
       <H1>Settings</H1>
       <GeneralSection />
       <ApiKeysSection />
+      <AdvancedSection />
       { showLocalModelsSection && <LocalModelsSection />}
       <StatusSection />
     </div>

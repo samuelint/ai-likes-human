@@ -26,7 +26,7 @@ class LLMModule(Module):
     @provider
     @singleton
     def provide_llama_proxy(self, factory: LlamaCppProxyFactory) -> LlamaProxy:
-        return factory.create_llama_proxy()
+        return factory.get_llama_proxy()
 
     @multiprovider
     def provide_llm_factories(

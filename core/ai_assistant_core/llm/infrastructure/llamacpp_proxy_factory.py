@@ -1,12 +1,17 @@
-from injector import inject
+from typing import Optional
+from injector import inject, singleton
 from llama_cpp.server.settings import ModelSettings
 from llama_cpp.server.app import LlamaProxy
 
 from ai_assistant_core.llm.domain.local_model_service import LocalLLMModelService
 
 
+@inject
+@singleton
 class LlamaCppProxyFactory:
-    @inject
+
+    llama_proxy_singleton: Optional[LlamaProxy] = None
+
     def __init__(self, local_model_service: LocalLLMModelService) -> None:
         self.local_model_service = local_model_service
 
@@ -38,3 +43,10 @@ class LlamaCppProxyFactory:
         ]
 
         return LlamaProxy(models=model_settings)
+
+    def get_llama_proxy(self) -> LlamaProxy:
+        """Return the LlamaProxy singleton instance"""
+        if self.llama_proxy_singleton is None:
+            self.llama_proxy_singleton = self.create_llama_proxy()
+
+        return self.llama_proxy_singleton

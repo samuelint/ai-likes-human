@@ -5,8 +5,9 @@ import { ConfigurationKvEditor } from './configuration-kv-editor';
 export default function GeneralSection() {
   return (
     <Section title="General">
-      <ConfigurationKvEditor label='LLM Model' kv_key="DEFAULT_LLM_MODEL"/>
       <ConfigurationKvEditor label='Name' kv_key="USERNAME"/>
+      <ConfigurationKvEditor label='LLM Model' kv_key="DEFAULT_LLM_MODEL"/>
+      <ConfigurationKvEditor label='Default LLM Temperature' kv_key="DEFAULT_LLM_TEMPERATURE"/>
     </Section>
   );
 }

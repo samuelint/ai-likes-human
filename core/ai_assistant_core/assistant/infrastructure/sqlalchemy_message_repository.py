@@ -149,3 +149,9 @@ class SqlalchemyMessageRepository(MessageRepository):
             self.db.commit()
 
         return model_
+
+    def delete_with_thread_id(self, thread_id: str):
+        self.db.query(ThreadMessageModel).filter(thread_id == thread_id).delete(
+            synchronize_session=False
+        )
+        self.db.commit()

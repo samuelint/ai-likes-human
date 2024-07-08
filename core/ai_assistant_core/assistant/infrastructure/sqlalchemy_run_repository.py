@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Literal, Optional
 from injector import inject
 from sqlalchemy.orm import Session
 from langchain_openai_api_bridge.assistant import (
@@ -6,7 +6,7 @@ from langchain_openai_api_bridge.assistant import (
 )
 from openai.types.beta.threads import Run
 from openai.types.beta.threads.run import RequiredAction, RunStatus, AssistantTool
-
+from openai.pagination import SyncCursorPage
 from ai_assistant_core.assistant.infrastructure.run_schema import RunModel
 
 
@@ -66,6 +66,30 @@ class SqlalchemyRunRepository(RunRepository):
             return None
         return model_.to_dto()
 
+    def list(
+        self,
+        thread_id: str,
+    ) -> Run:
+        result = (
+            self.db.query(RunModel)
+            .filter_by(thread_id=thread_id)
+            .order_by(RunModel.created_at.asc())
+            .all()
+        )
+        return [model.to_dto() for model in result]
+
+    def listByPage(
+        self,
+        thread_id: str,
+        after: str = None,
+        before: str = None,
+        limit: int = None,
+        order: Literal["asc", "desc"] = None,
+    ) -> SyncCursorPage[Run]:
+        runs = self.list(thread_id=thread_id)
+
+        return SyncCursorPage(data=runs)
+
     def delete(self, run: Optional[Run], run_id: Optional[str]) -> None:
         id = run.id if run else run_id
         model_ = self.db.query(RunModel).filter(RunModel.id == id).first()
@@ -74,3 +98,9 @@ class SqlalchemyRunRepository(RunRepository):
             self.db.commit()
 
         return model_
+
+    def delete_with_thread_id(self, thread_id: str) -> None:
+        self.db.query(RunModel).filter(RunModel.thread_id == thread_id).delete(
+            synchronize_session=False
+        )
+        self.db.commit()

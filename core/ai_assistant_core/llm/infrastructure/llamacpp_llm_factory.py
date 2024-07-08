@@ -4,7 +4,7 @@ from injector import inject
 from langchain_core.language_models import BaseChatModel
 
 from ai_assistant_core.llm.domain.local_model_service import LocalLLMModelService
-from ai_assistant_core.llm.infrastructure.llama_cpp_chat_model import LlamaCppChatModel
+from langchain_llamacpp_chat_model import LlamaProxyChatModel
 
 from ..domain.base_llm_factory import BaseLLMFactory
 from llama_cpp.server.app import LlamaProxy
@@ -30,9 +30,9 @@ class LlamaCPPFactory(BaseLLMFactory):
         self,
         model: str,
         max_tokens: Optional[int] = None,
-        temperature: Optional[float] = 0.7,
+        temperature: Optional[float] = 0,
     ) -> BaseChatModel:
-        return LlamaCppChatModel(
+        return LlamaProxyChatModel(
             llama_proxy=self.llama_proxy,
             model_name=model,
             max_tokens=max_tokens,

@@ -6,7 +6,7 @@ authors = ["Samuel <samuelint@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.13"
+python = ">=3.9,<3.13"
 langchain = "^0.2.2"
 langchain-openai = "^0.1.8"
 python-dotenv = "^1.0.1"
@@ -16,7 +16,7 @@ langchain-anthropic = "^0.1.13"
 uvicorn = "^0.30.0"
 langchain-community = "^0.2.1"
 tiktoken = "^0.7.0"
-langchain-openai-api-bridge = "0.6.2"
+langchain-openai-api-bridge = "0.6.4"
 beautifulsoup4 = "^4.12.3"
 sqlalchemy = "^2.0.31"
 injector = "^0.21.0"
@@ -27,6 +27,7 @@ llama-cpp-python = "^0.2.81"
 huggingface-hub = "^0.23.4"
 starlette-context = "^0.3.6"
 pydantic-settings = "^2.3.4"
+langchain-llamacpp-chat-model = "0.2.0"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^7.0.0"

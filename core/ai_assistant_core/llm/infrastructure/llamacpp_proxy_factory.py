@@ -20,6 +20,7 @@ class LlamaCppProxyFactory:
             n_batch=512,  # Should be between 1 and n_ctx, consider the amount of RAM.
             offload_kqv=True,  # Equivalent of f16_kv=True
             n_gpu_layers=-1,  # -1 is all on GPU
+            chat_format="chatml-function-calling",
             verbose=False,
         )
 

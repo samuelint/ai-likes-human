@@ -956,6 +956,25 @@ files = [
 ]
 
 [[package]]
+name = "importlib-metadata"
+version = "8.0.0"
+description = "Read metadata from Python packages"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "importlib_metadata-8.0.0-py3-none-any.whl", hash = "sha256:15584cf2b1bf449d98ff8a6ff1abef57bf20f3ac6454f431736cd3e660921b2f"},
+    {file = "importlib_metadata-8.0.0.tar.gz", hash = "sha256:188bd24e4c346d3f0a933f275c2fec67050326a856b9a359881d7c2a697e8812"},
+]
+
+[package.dependencies]
+zipp = ">=0.5"
+
+[package.extras]
+doc = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
+perf = ["ipython"]
+test = ["flufl.flake8", "importlib-resources (>=1.3)", "jaraco.test (>=5.4)", "packaging", "pyfakefs", "pytest (>=6,!=8.1.*)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-mypy", "pytest-perf (>=0.9.2)", "pytest-ruff (>=0.2.1)"]
+
+[[package]]
 name = "iniconfig"
 version = "2.0.0"
 description = "brain-dead simple config-ini parsing"
@@ -1219,6 +1238,25 @@ PyYAML = ">=5.3"
 tenacity = ">=8.1.0,<8.4.0 || >8.4.0,<9.0.0"
 
 [[package]]
+name = "langchain-llamacpp-chat-model"
+version = "0.2.0"
+description = ""
+optional = false
+python-versions = "<4.0,>=3.9"
+files = [
+    {file = "langchain_llamacpp_chat_model-0.2.0-py3-none-any.whl", hash = "sha256:fcc062a9d230635faa10394d66974bb3bb5974dd28403e995b2ece7a0eb906a1"},
+    {file = "langchain_llamacpp_chat_model-0.2.0.tar.gz", hash = "sha256:23c0fc7f028e9ab7d014d559a7d9216125b50ef972f86efcc9b8207316e09abe"},
+]
+
+[package.dependencies]
+langchain-openai = ">=0.1.14,<0.2.0"
+llama-cpp-python = ">=0.2.81,<0.3.0"
+
+[package.extras]
+langchain = ["langchain (>=0.2.6,<0.3.0)"]
+langchain-serve = ["anyio (>=4.4.0,<5.0.0)", "fastapi (>=0.111.0,<0.112.0)", "pydantic-settings (>=2.3.4,<3.0.0)", "sse-starlette (>=2.1.2,<3.0.0)", "starlette-context (>=0.3.6,<0.4.0)"]
+
+[[package]]
 name = "langchain-openai"
 version = "0.1.14"
 description = "An integration package connecting OpenAI and LangChain"
@@ -1236,22 +1274,21 @@ tiktoken = ">=0.7,<1"
 
 [[package]]
 name = "langchain-openai-api-bridge"
-version = "0.6.2"
+version = "0.6.4"
 description = "A bridge to use Langchain output as an OpenAI-compatible API."
 optional = false
-python-versions = "<3.13,>=3.10"
+python-versions = "<4.0,>=3.9"
 files = [
-    {file = "langchain_openai_api_bridge-0.6.2-py3-none-any.whl", hash = "sha256:e54b088ff2cd61cdd46d0eef4f541460f96c8ab707a554ee536a8a5d588e0825"},
-    {file = "langchain_openai_api_bridge-0.6.2.tar.gz", hash = "sha256:4ed4b99613655bdc67b1d33b57c19c56e120f5aa472f6bdb4744f625d593fa4d"},
+    {file = "langchain_openai_api_bridge-0.6.4-py3-none-any.whl", hash = "sha256:eb0175d73efbab76dad8e2ca096ca53c44cb45dad373844243ce97d4c5f10712"},
+    {file = "langchain_openai_api_bridge-0.6.4.tar.gz", hash = "sha256:239c924559688e282cc0c16c6d351fd3f416ffe2e0aa63ab03afde085bb27609"},
 ]
 
 [package.dependencies]
-fastapi = ">=0.111.0,<0.112.0"
-langchain = ">=0.2.2,<0.3.0"
-langchain-openai = ">=0.1.8,<0.2.0"
-langgraph = ">=0.0.62,<0.0.63"
 openai = ">=1.35.1,<2.0.0"
-python-dotenv = ">=1.0.1,<2.0.0"
+
+[package.extras]
+langchain = ["langchain (>=0.2.6,<0.3.0)", "langchain-openai (>=0.1.8,<0.2.0)", "langgraph (>=0.0.62,<0.0.63)"]
+langchain-serve = ["fastapi (>=0.111.0,<0.112.0)", "python-dotenv (>=1.0.1,<2.0.0)"]
 
 [[package]]
 name = "langchain-text-splitters"
@@ -1308,13 +1345,13 @@ server = ["fastapi (>=0.90.1,<1)", "sse-starlette (>=1.3.0,<2.0.0)"]
 
 [[package]]
 name = "langsmith"
-version = "0.1.83"
+version = "0.1.84"
 description = "Client library to connect to the LangSmith LLM Tracing and Evaluation Platform."
 optional = false
 python-versions = "<4.0,>=3.8.1"
 files = [
-    {file = "langsmith-0.1.83-py3-none-any.whl", hash = "sha256:f54d8cd8479b648b6339f3f735d19292c3516d080f680933ecdca3eab4b67ed3"},
-    {file = "langsmith-0.1.83.tar.gz", hash = "sha256:5cdd947212c8ad19adb992c06471c860185a777daa6859bb47150f90daf64bf3"},
+    {file = "langsmith-0.1.84-py3-none-any.whl", hash = "sha256:01f3c6390dba26c583bac8dd0e551ce3d0509c7f55cad714db0b5c8d36e4c7ff"},
+    {file = "langsmith-0.1.84.tar.gz", hash = "sha256:5220c0439838b9a5bd320fd3686be505c5083dcee22d2452006c23891153bea1"},
 ]
 
 [package.dependencies]
@@ -2006,31 +2043,32 @@ windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
 name = "pyinstaller"
-version = "6.8.0"
+version = "6.9.0"
 description = "PyInstaller bundles a Python application and all its dependencies into a single package."
 optional = false
 python-versions = "<3.13,>=3.8"
 files = [
-    {file = "pyinstaller-6.8.0-py3-none-macosx_10_13_universal2.whl", hash = "sha256:5ff6bc2784c1026f8e2f04aa3760cbed41408e108a9d4cf1dd52ee8351a3f6e1"},
-    {file = "pyinstaller-6.8.0-py3-none-manylinux2014_aarch64.whl", hash = "sha256:39ac424d2ee2457d2ab11a5091436e75a0cccae207d460d180aa1fcbbafdd528"},
-    {file = "pyinstaller-6.8.0-py3-none-manylinux2014_i686.whl", hash = "sha256:355832a3acc7de90a255ecacd4b9f9e166a547a79c8905d49f14e3a75c1acdb9"},
-    {file = "pyinstaller-6.8.0-py3-none-manylinux2014_ppc64le.whl", hash = "sha256:6303c7a009f47e6a96ef65aed49f41e36ece8d079b9193ca92fe807403e5fe80"},
-    {file = "pyinstaller-6.8.0-py3-none-manylinux2014_s390x.whl", hash = "sha256:2b71509468c811968c0b5decb5bbe85b6292ea52d7b1f26313d2aabb673fa9a5"},
-    {file = "pyinstaller-6.8.0-py3-none-manylinux2014_x86_64.whl", hash = "sha256:ff31c5b99e05a4384bbe2071df67ec8b2b347640a375eae9b40218be2f1754c6"},
-    {file = "pyinstaller-6.8.0-py3-none-musllinux_1_1_aarch64.whl", hash = "sha256:000c36b13fe4cd8d0d8c2bc855b1ddcf39867b5adf389e6b5ca45b25fa3e619d"},
-    {file = "pyinstaller-6.8.0-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:fe0af018d7d5077180e3144ada89a4da5df8d07716eb7e9482834a56dc57a4e8"},
-    {file = "pyinstaller-6.8.0-py3-none-win32.whl", hash = "sha256:d257f6645c7334cbd66f38a4fac62c3ad614cc46302b2b5d9f8cc48c563bce0e"},
-    {file = "pyinstaller-6.8.0-py3-none-win_amd64.whl", hash = "sha256:81cccfa9b16699b457f4788c5cc119b50f3cd4d0db924955f15c33f2ad27a50d"},
-    {file = "pyinstaller-6.8.0-py3-none-win_arm64.whl", hash = "sha256:1c3060a263758cf7f0144ab4c016097b20451b2469d468763414665db1bb743d"},
-    {file = "pyinstaller-6.8.0.tar.gz", hash = "sha256:3f4b6520f4423fe19bcc2fd63ab7238851ae2bdcbc98f25bc5d2f97cc62012e9"},
+    {file = "pyinstaller-6.9.0-py3-none-macosx_10_13_universal2.whl", hash = "sha256:5ced2e83acf222b936ea94abc5a5cc96588705654b39138af8fb321d9cf2b954"},
+    {file = "pyinstaller-6.9.0-py3-none-manylinux2014_aarch64.whl", hash = "sha256:f18a3d551834ef8fb7830d48d4cc1527004d0e6b51ded7181e78374ad6111846"},
+    {file = "pyinstaller-6.9.0-py3-none-manylinux2014_i686.whl", hash = "sha256:f2fc568de3d6d2a176716a3fc9f20da06d351e8bea5ddd10ecb5659fce3a05b0"},
+    {file = "pyinstaller-6.9.0-py3-none-manylinux2014_ppc64le.whl", hash = "sha256:a0f378f64ad0655d11ade9fde7877e7573fd3d5066231608ce7dfa9040faecdd"},
+    {file = "pyinstaller-6.9.0-py3-none-manylinux2014_s390x.whl", hash = "sha256:7bf0c13c5a8560c89540746ae742f4f4b82290e95a6b478374d9f34959fe25d6"},
+    {file = "pyinstaller-6.9.0-py3-none-manylinux2014_x86_64.whl", hash = "sha256:da994aba14c5686db88796684de265a8665733b4df09b939f7ebdf097d18df72"},
+    {file = "pyinstaller-6.9.0-py3-none-musllinux_1_1_aarch64.whl", hash = "sha256:4e3e50743c091a06e6d01c59bdd6d03967b453ee5384a9e790759be4129db4a4"},
+    {file = "pyinstaller-6.9.0-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:b041be2fe78da47a269604d62c940d68c62f9a3913bdf64af4123f7689d47099"},
+    {file = "pyinstaller-6.9.0-py3-none-win32.whl", hash = "sha256:2bf4de17a1c63c0b797b38e13bfb4d03b5ee7c0a68e28b915a7eaacf6b76087f"},
+    {file = "pyinstaller-6.9.0-py3-none-win_amd64.whl", hash = "sha256:43709c70b1da8441a730327a8ed362bfcfdc3d42c1bf89f3e2b0a163cc4e7d33"},
+    {file = "pyinstaller-6.9.0-py3-none-win_arm64.whl", hash = "sha256:f15c1ef11ed5ceb32447dfbdab687017d6adbef7fc32aa359d584369bfe56eda"},
+    {file = "pyinstaller-6.9.0.tar.gz", hash = "sha256:f4a75c552facc2e2a370f1e422b971b5e5cdb4058ff38cea0235aa21fc0b378f"},
 ]
 
 [package.dependencies]
 altgraph = "*"
+importlib-metadata = {version = ">=4.6", markers = "python_version < \"3.10\""}
 macholib = {version = ">=1.8", markers = "sys_platform == \"darwin\""}
 packaging = ">=22.0"
 pefile = {version = ">=2022.5.30", markers = "sys_platform == \"win32\""}
-pyinstaller-hooks-contrib = ">=2024.6"
+pyinstaller-hooks-contrib = ">=2024.7"
 pywin32-ctypes = {version = ">=0.2.1", markers = "sys_platform == \"win32\""}
 setuptools = ">=42.0.0"
 
@@ -2050,6 +2088,7 @@ files = [
 ]
 
 [package.dependencies]
+importlib-metadata = {version = ">=4.6", markers = "python_version < \"3.10\""}
 packaging = ">=22.0"
 setuptools = ">=42.0.0"
 
@@ -2665,6 +2704,7 @@ files = [
 
 [package.dependencies]
 anyio = ">=3.4.0,<5"
+typing-extensions = {version = ">=3.10.0", markers = "python_version < \"3.10\""}
 
 [package.extras]
 full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart (>=0.0.7)", "pyyaml"]
@@ -2685,13 +2725,13 @@ starlette = "*"
 
 [[package]]
 name = "tenacity"
-version = "8.4.2"
+version = "8.5.0"
 description = "Retry code until it succeeds"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "tenacity-8.4.2-py3-none-any.whl", hash = "sha256:9e6f7cf7da729125c7437222f8a522279751cdfbe6b67bfe64f75d3a348661b2"},
-    {file = "tenacity-8.4.2.tar.gz", hash = "sha256:cd80a53a79336edba8489e767f729e4f391c896956b57140b5d7511a64bbd3ef"},
+    {file = "tenacity-8.5.0-py3-none-any.whl", hash = "sha256:b594c2a5945830c267ce6b79a166228323ed52718f30302c1359836112346687"},
+    {file = "tenacity-8.5.0.tar.gz", hash = "sha256:8bc6c0c8a09b31e6cad13c47afbed1a567518250a9a171418582ed8d9c20ca78"},
 ]
 
 [package.extras]
@@ -3455,7 +3495,22 @@ files = [
 idna = ">=2.0"
 multidict = ">=4.0"
 
+[[package]]
+name = "zipp"
+version = "3.19.2"
+description = "Backport of pathlib-compatible object wrapper for zip files"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "zipp-3.19.2-py3-none-any.whl", hash = "sha256:f091755f667055f2d02b32c53771a7a6c8b47e1fdbc4b72a8b9072b3eef8015c"},
+    {file = "zipp-3.19.2.tar.gz", hash = "sha256:bf1dcf6450f873a13e952a29504887c89e6de7506209e5b1bcc3460135d4de19"},
+]
+
+[package.extras]
+doc = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
+test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more-itertools", "pytest (>=6,!=8.1.*)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-ignore-flaky", "pytest-mypy", "pytest-ruff (>=0.2.1)"]
+
 [metadata]
 lock-version = "2.0"
-python-versions = ">=3.10,<3.13"
-content-hash = "9970508187ccde0e966b2e4c03c52fe73b98bda944d452225210d6fd816c6a8b"
+python-versions = ">=3.9,<3.13"
+content-hash = "e05f302957915218a8faf7d8284936b6920be0ed357561210d2958160acb1f86"

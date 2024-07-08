@@ -1,22 +1,20 @@
 from ai_assistant_core.assistant.domain.agents.default.prompt import (
-    AssistantPromptBuilder,
+    build_system_prompt,
 )
 
 
 class TestSystemPromptTest:
     def test_person_name(self):
         # When building system prompt
-        result = AssistantPromptBuilder(person_name="John").build_system_prompt()
+        result = build_system_prompt(user_name="John")
 
         # Then prompt contains input
-        assert "You are John personal assistant." in result
+        assert "The user name is John." in result
 
     def test_no_person_name(self):
         # Given no person name
-        builder = AssistantPromptBuilder()
-
         # When building system prompt
-        result = builder.build_system_prompt()
+        result = build_system_prompt()
 
         # Then None is the person name
-        assert "You are None personal assistant." in result
+        assert "The user name is unknown." in result

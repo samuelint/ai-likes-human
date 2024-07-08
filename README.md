@@ -51,20 +51,16 @@ Let's try to fix that by creating a personal assistant running locally on user c
 ## Roadmap
 
 - V0 - Foundation for what's next
-    - Easy to deploy - Installed as a regular app (no need of docker or install third parties). Everything works out of the box (mac, windows, linux).
+    - Easy to deploy - Installed as a regular app, IT JUST WORKS (no need to install third parties). Everything works out of the box (mac, windows, linux). Using the power of Tauri
     - Access to Local LLM (LLamaCPP)
     - Access to hosted LLM (OpenAI, Anthropic, Groq, etc...)
-    - Conversations history
+    - Local Conversations history
+    - Local embedding
     - Take computer screenshots as context
     - Simple (do not look like a plane control board)
+    - Run LangGraph agents within the app.
 - V1
-    - Terminal Client
-        - Talk to personallized LLM from any terminal windows (client to the app localhost server)
-    - Curated & useful AI agents (using LangGraph)
-    Use POC:
-        - Resume maker
-        - Headshot maker
-        - Code Generator
+    - **Curated** agents (only want usefull and working stuff)
 
 ## License
 

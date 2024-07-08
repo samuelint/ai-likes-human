@@ -1,4 +1,4 @@
-from injector import Binder, Module, singleton
+from injector import Binder, Module, provider, singleton
 from langchain_openai_api_bridge.assistant import (
     ThreadRepository,
     MessageRepository,
@@ -6,6 +6,10 @@ from langchain_openai_api_bridge.assistant import (
 )
 from langchain_openai_api_bridge.core import AgentFactory
 
+from ai_assistant_core.assistant.domain.user_info_service import (
+    UserInfo,
+    UserInfoService,
+)
 from ai_assistant_core.assistant.infrastructure.sqlalchemy_message_repository import (
     SqlalchemyMessageRepository,
 )
@@ -24,3 +28,7 @@ class AssistantModule(Module):
         binder.bind(MessageRepository, to=SqlalchemyMessageRepository, scope=singleton)
         binder.bind(RunRepository, to=SqlalchemyRunRepository, scope=singleton)
         binder.bind(AgentFactory, to=AssistantAgentFactory)
+
+    @provider
+    def provide_user_info(self, service: UserInfoService) -> UserInfo:
+        return service.get()

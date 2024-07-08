@@ -4,6 +4,11 @@
 
 A personalized AI assistant framework
 
+
+https://github.com/samuelint/ai-assistant/assets/5473142/50c44730-1fc7-40d8-9681-78e772fb9bc1
+
+
+
 ## Project Structure
 
 Project is currently in a mono repo. This structure simplify the integration of the `core` backend into the standalone desktop app.

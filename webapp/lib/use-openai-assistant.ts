@@ -15,8 +15,9 @@ interface Props {
     assistantId?: string;
     threadId?: string;
     model?: string;
+    temperature?: number;
 }
-export function useOpenAiAssistant({ assistantId = '', threadId: argsThreadId, model = 'openai:gpt-3.5-turbo' }: Props = {}) {
+export function useOpenAiAssistant({ assistantId = '', threadId: argsThreadId, model = 'openai:gpt-3.5-turbo', temperature }: Props = {}) {
   const [messages, setMessages] = useState<Message[]>([ ]);
   const [input, setInput] = useState('');
   const [threadId, setThreadId] = useState<string | undefined>(argsThreadId);
@@ -77,6 +78,7 @@ export function useOpenAiAssistant({ assistantId = '', threadId: argsThreadId, m
       await new Promise<void>((resolve, rejects) => openai.beta.threads.runs.stream(local_threadId, {
         model,
         assistant_id: assistantId,
+        temperature,
       })
         .on('messageCreated', (message: Message) => setMessages(messages => [...messages, message]))
         .on('messageDelta', (_delta: MessageDelta, snapshot: Message) => setMessages(messages => {

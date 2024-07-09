@@ -12,7 +12,7 @@ export interface ChatMessageProps {
   actions?: ReactNode
 }
 
-export function Message({ className, content, children, actions, type }: ChatMessageProps) {
+export function Message({ className, content, actions, type, children }: ChatMessageProps) {
   return (
     <div className={twMerge('group', className)}>
       <div className={twMerge(

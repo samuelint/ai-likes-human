@@ -12,9 +12,10 @@ export interface ChatNewMessageProps {
   disabled?: boolean
   onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void
   onSubmit?: OnSubmit
+  children?: React.ReactNode
 }
 
-export default function NewMessage({ placeholder = 'Type your message...', input, disabled, onChange, onSubmit }: ChatNewMessageProps) {
+export default function NewMessage({ placeholder = 'Type your message...', input, disabled, onChange, onSubmit, children }: ChatNewMessageProps) {
   const formRef = useRef<HTMLFormElement | null>(null);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
@@ -40,7 +41,10 @@ export default function NewMessage({ placeholder = 'Type your message...', input
           if (event === 'Submit') programmaticSubmit();
         }}
       />
-      <SendButton type="submit" />
+      <div className='flex flex-col gap-1'>
+        <SendButton type="submit" />
+        { children }
+      </div>
     </form>
   );
 }

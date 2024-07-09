@@ -25,6 +25,7 @@ export default function AssistantThread({ threadId }: Props) {
       input={input}
       onChange={handleInputChange}
       onSubmit={submitMessage}
+      details={<span className='text-slate-400 text-xs'>{model}</span>}
     />
   );
 }

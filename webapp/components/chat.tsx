@@ -10,9 +10,10 @@ interface Props extends ChatNewMessageProps {
   messages: ChatMessageDto[]
   isLoading?: boolean
   children?: ReactNode
+  details?: ReactNode
 }
 
-export default function Chat({ messages, isLoading, children, ...props }: Props) {
+export default function Chat({ messages, isLoading, children, details, ...props }: Props) {
   return (
     <div role='presentation' className='h-full flex flex-col'>
       <div className="flex flex-col h-full overflow-y-auto py-4 px-12 sm:px-28 md:px-32 xl:px-80">
@@ -30,6 +31,7 @@ export default function Chat({ messages, isLoading, children, ...props }: Props)
         </div>
       </div>
       <div className='mt-auto py-4 px-12 sm:px-28 md:px-32 xl:px-80'>
+        { details && <div className='flex w-full justify-end'>{details}</div> }
         <NewMessage {...props} />
       </div>
     </div>

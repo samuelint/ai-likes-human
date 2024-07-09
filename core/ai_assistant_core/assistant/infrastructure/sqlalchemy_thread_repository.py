@@ -49,14 +49,27 @@ class SqlalchemyThreadRepository(ThreadRepository):
         order: Literal["asc", "desc"] = None,
     ) -> SyncCursorPage[Thread]:
         query = self.db.query(ThreadModel)
+
         if after:
-            query = query.filter(ThreadModel.id > after)
+            after_created_at = (
+                self.db.query(ThreadModel.created_at)
+                .filter(ThreadModel.id == after)
+                .scalar()
+            )
+            query = query.filter(ThreadModel.created_at > after_created_at)
         if before:
-            query = query.filter(ThreadModel.id < before)
-        if order == "desc":
-            query = query.order_by(ThreadModel.created_at.desc())
-        else:
+            before_created_at = (
+                self.db.query(ThreadModel.created_at)
+                .filter(ThreadModel.id == before)
+                .scalar()
+            )
+            query = query.filter(ThreadModel.created_at < before_created_at)
+
+        if order == "asc":
             query = query.order_by(ThreadModel.created_at.asc())
+        else:
+            query = query.order_by(ThreadModel.created_at.desc())
+
         if limit is not None:
             query = query.limit(limit)
 
@@ -65,9 +78,6 @@ class SqlalchemyThreadRepository(ThreadRepository):
 
         return SyncCursorPage(
             data=threads,
-            order=order,
-            next_after=models[-1].created_at if models else None,
-            next_before=models[0].created_at if models else None,
         )
 
     def retreive(self, thread_id: str) -> Thread:

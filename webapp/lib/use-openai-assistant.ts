@@ -14,14 +14,14 @@ type MessageDelta = OpenAI.Beta.Threads.Messages.MessageDelta;
 
 interface Props {
     assistantId?: string;
-    threadId?: string;
+    threadId: string;
     model?: string;
     temperature?: number;
+    initialInput?: string;
 }
-export function useOpenAiAssistant({ assistantId = '', threadId: argsThreadId, model = 'openai:gpt-3.5-turbo', temperature }: Props = {}) {
-  const [messages, setMessages] = useState<Message[]>([ ]);
-  const [input, setInput] = useState('');
-  const [threadId, setThreadId] = useState<string | undefined>(argsThreadId);
+export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai:gpt-3.5-turbo', temperature, initialInput }: Props) {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState(initialInput ?? '');
   const [status, setStatus] = useState<AssistantStatus>('awaiting_message');
   const [error, setError] = useState<undefined | Error>(undefined);
   const streamRef = useRef<AssistantStream | null>(null);
@@ -34,12 +34,9 @@ export function useOpenAiAssistant({ assistantId = '', threadId: argsThreadId, m
   }, []);
 
   useEffect(() => {
-    setThreadId(argsThreadId);
-    if (!argsThreadId) return;
-
     const fetchMessages = async () => {
       try {
-        const newMessages = await openai.beta.threads.messages.list(argsThreadId);
+        const newMessages = await openai.beta.threads.messages.list(threadId);
         setMessages(newMessages.data);
       } catch (e) {
         setUnknownError(e);
@@ -47,7 +44,7 @@ export function useOpenAiAssistant({ assistantId = '', threadId: argsThreadId, m
     };
     fetchMessages();
 
-  }, [openai.beta.threads.messages, argsThreadId, setUnknownError]);
+  }, [openai.beta.threads.messages, threadId, setUnknownError]);
 
   const handleInputChange = (
     event:
@@ -57,33 +54,15 @@ export function useOpenAiAssistant({ assistantId = '', threadId: argsThreadId, m
     setInput(event.target.value);
   };
 
-  const append = async (
-    message: CreateMessage,
-  ) => {
+  const streamRun = useCallback(async () => {
     try {
       setStatus('in_progress');
-
-      let local_threadId = threadId;
-      if (!local_threadId) {
-        const thread = await openai.beta.threads.create();
-        local_threadId = thread.id;
-        setThreadId(local_threadId);
-      }
-
-      const created_message = await openai.beta.threads.messages.create(
-        local_threadId,
-        message
-      );
-      setMessages(messages => [
-        ...messages,
-        created_message,
-      ]);
 
       abortControlerRef.current = new AbortController();
       const signal = abortControlerRef.current.signal;
 
       await new Promise<void>((resolve, rejects) => {
-        streamRef.current = openai.beta.threads.runs.stream(local_threadId, {
+        streamRef.current = openai.beta.threads.runs.stream(threadId, {
           model,
           assistant_id: assistantId,
           temperature,
@@ -115,11 +94,39 @@ export function useOpenAiAssistant({ assistantId = '', threadId: argsThreadId, m
       });
     }
     finally {
-      setInput('');
       streamRef.current = null;
       setStatus('awaiting_message');
     }
-  };
+  }, [assistantId, messages, model, openai.beta.threads.runs, setUnknownError, temperature, threadId]);
+
+  useEffect(() => {
+    if (messages.at(-1)?.role === 'user') {
+      streamRun();
+    }
+  }, [messages, streamRun]);
+
+
+  const append = useCallback(async (
+    message?: CreateMessage,
+  ) => {
+    setInput('');
+
+    try {
+      if (message) {
+        const created_message = await openai.beta.threads.messages.create(
+          threadId,
+          message
+        );
+        setMessages(messages => [
+          ...messages,
+          created_message,
+        ]);
+      }
+    } catch (e) {
+      setUnknownError(e);
+    }
+
+  }, [openai.beta.threads.messages, threadId, setUnknownError]);
 
   const abort = useCallback(() => {
     if (abortControlerRef.current) {
@@ -127,6 +134,7 @@ export function useOpenAiAssistant({ assistantId = '', threadId: argsThreadId, m
       abortControlerRef.current = null;
     }
   }, []);
+
 
   const submitMessage = async (
     event?: React.FormEvent<HTMLFormElement>,

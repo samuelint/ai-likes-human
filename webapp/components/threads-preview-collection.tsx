@@ -21,7 +21,7 @@ interface Props<TThread extends ThreadPreviewComponentDto = ThreadPreviewCompone
 
 export function ThreadsPreviewCollection<TThread extends ThreadPreviewComponentDto = ThreadPreviewComponentDto>({ error, threads, isLoading, className, children, onDelete }: Props<TThread>) {
   return (
-    <div className={cn('w-full flex flex-col items-center gap-1 overflow-y-auto', className)}>
+    <div className={cn('w-full flex flex-col items-center gap-1 overflow-y-auto pb-4', className)}>
       <div className='w-full flex justify-start gap-4'>
         {children}
         { threads?.map((thread) => (

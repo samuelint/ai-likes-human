@@ -8,7 +8,7 @@ import { useThreadRuns } from '@/lib/use-thread-runs';
 
 
 interface Props {
-  threadId?: string
+  threadId: string
 }
 
 export default function AssistantThread({ threadId }: Props) {

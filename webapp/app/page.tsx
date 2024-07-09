@@ -1,4 +1,4 @@
-import AssistantThread from './_components/assistant-thread';
+import NewThreadPrompt from './_components/new-thread-prompt';
 import RecentThreads from './_components/recent-threads';
 
 
@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <main className="h-full flex flex-col">
       <RecentThreads />
-      <AssistantThread />
+      <NewThreadPrompt />
     </main>
   );
 }

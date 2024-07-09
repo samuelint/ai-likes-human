@@ -13,16 +13,17 @@ import { useOpenaiClient } from './openai-client';
 
 
 jest.mock('./openai-client');
-describe('new-thread', () => {
+describe('new-conversation', () => {
   const fetch = jest.fn();
   const TestComponent = () => {
+    const threadId = 'thread_abc123';
     when(useOpenaiClient).mockReturnValue(new OpenAI({
       apiKey: 'abc',
       fetch,
       dangerouslyAllowBrowser: true,
     }));
 
-    const { status, messages, error, append } = useOpenAiAssistant();
+    const { status, messages, error, append } = useOpenAiAssistant({ threadId });
 
     return (
       <div>

@@ -7,13 +7,14 @@ import RecentThreads from '@/app/_components/recent-threads';
 
 export default function Page() {
   const router = useRouter();
-  const { id } = router.query;
+
+  const id = typeof router.query.id === 'string' ? router.query.id : undefined;
 
   return (
     <MainLayout>
       <main className="h-full flex flex-col">
         <RecentThreads />
-        { id && typeof id === 'string' && <AssistantThread threadId={id} /> }
+        { id && <AssistantThread threadId={id} /> }
       </main>
     </MainLayout>
   );

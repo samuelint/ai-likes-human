@@ -31,6 +31,7 @@ export function useOpenAiAssistant({ assistantId = '', threadId: argsThreadId, m
   }, []);
 
   useEffect(() => {
+    setThreadId(argsThreadId);
     if (!argsThreadId) return;
 
     const fetchMessages = async () => {

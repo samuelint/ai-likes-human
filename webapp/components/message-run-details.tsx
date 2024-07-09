@@ -11,20 +11,17 @@ interface Props {
 }
 
 export function MessageRunDetailsTooltip({ run, children }: Props) {
-  return run && (
-    <TooltipProvider delayDuration={400}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          { children }
-        </TooltipTrigger>
-        <TooltipContent side='bottom'>
-          <div className='flex flex-col font-light text-slate-600 text-xs select-none'>
-            <span>{ run.model }</span>
-            <span>{ toFromNowFormattedDate(run.created_at) }</span>
-          </div>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-
-  );
+  return (<TooltipProvider delayDuration={400}>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        { children }
+      </TooltipTrigger>
+      { run && <TooltipContent side='bottom'>
+        <div className='flex flex-col font-light text-slate-600 text-xs select-none'>
+          <span>{ run.model }</span>
+          <span>{ toFromNowFormattedDate(run.created_at) }</span>
+        </div>
+      </TooltipContent>}
+    </Tooltip>
+  </TooltipProvider>);
 }

@@ -21,7 +21,7 @@ export default function Chat({ messages, byIdRuns = {}, isLoading, children, det
 
   return (
     <div role='presentation' className='h-full flex flex-col overflow-auto'>
-      <div className="flex flex-col h-full overflow-y-auto py-4 px-12 sm:px-28 md:px-32 xl:px-80">
+      <div className="flex flex-col h-full overflow-y-auto py-4 px-2 md:px-20 lg:px-32">
         {children}
         <div className="space-y-6">
           { messages.map((message) => {
@@ -36,7 +36,7 @@ export default function Chat({ messages, byIdRuns = {}, isLoading, children, det
           { isLoading && <ThreeDotsLoading className="bg-blue-900 dark:bg-blue-50" /> }
         </div>
       </div>
-      <div className='mt-auto py-4 px-12 sm:px-28 md:px-32 xl:px-80'>
+      <div className='mt-auto py-4 px-2 md:px-20 lg:px-32'>
         <NewMessage isLoading={isLoading} {...props}>
           { details && <div className='flex w-full justify-end'>{details}</div> }
         </NewMessage>

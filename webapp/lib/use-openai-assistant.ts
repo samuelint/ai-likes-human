@@ -1,7 +1,8 @@
 import OpenAI from 'openai';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useOpenaiClient } from './openai-client';
+import { AssistantStream } from 'openai/lib/AssistantStream.mjs';
 
 
 export type AssistantStatus = 'in_progress' | 'awaiting_message';
@@ -23,6 +24,8 @@ export function useOpenAiAssistant({ assistantId = '', threadId: argsThreadId, m
   const [threadId, setThreadId] = useState<string | undefined>(argsThreadId);
   const [status, setStatus] = useState<AssistantStatus>('awaiting_message');
   const [error, setError] = useState<undefined | Error>(undefined);
+  const streamRef = useRef<AssistantStream | null>(null);
+  const abortControlerRef = useRef<AbortController | null>(null);
   const openai = useOpenaiClient();
 
   const setUnknownError = useCallback((e: unknown) => {
@@ -76,27 +79,32 @@ export function useOpenAiAssistant({ assistantId = '', threadId: argsThreadId, m
         created_message,
       ]);
 
-      await new Promise<void>((resolve, rejects) => openai.beta.threads.runs.stream(local_threadId, {
-        model,
-        assistant_id: assistantId,
-        temperature,
-      })
-        .on('messageCreated', (message: Message) => setMessages(messages => [...messages, message]))
-        .on('messageDelta', (_delta: MessageDelta, snapshot: Message) => setMessages(messages => {
-          return [
-            ...messages.slice(0, messages.length - 1),
-            snapshot
-          ];
-        }))
-        .on('messageDone', (message: Message) => {
-          return [
-            ...messages.slice(0, messages.length - 1),
-            message
-          ];
-        })
-        .on('error', (error) => rejects(error))
-        .on('end', () => resolve())
-      );
+      abortControlerRef.current = new AbortController();
+      const signal = abortControlerRef.current.signal;
+
+      await new Promise<void>((resolve, rejects) => {
+        streamRef.current = openai.beta.threads.runs.stream(local_threadId, {
+          model,
+          assistant_id: assistantId,
+          temperature,
+        }, { signal })
+          .on('messageCreated', (message: Message) => setMessages(messages => [...messages, message]))
+          .on('messageDelta', (_delta: MessageDelta, snapshot: Message) => setMessages(messages => {
+            return [
+              ...messages.slice(0, messages.length - 1),
+              snapshot
+            ];
+          }))
+          .on('messageDone', (message: Message) => {
+            return [
+              ...messages.slice(0, messages.length - 1),
+              message
+            ];
+          })
+          .on('error', (error) => rejects(error))
+          .on('abort', () => resolve())
+          .on('end', () => resolve());
+      });
 
     } catch (e) {
       setUnknownError(e);
@@ -107,9 +115,18 @@ export function useOpenAiAssistant({ assistantId = '', threadId: argsThreadId, m
       });
     }
     finally {
+      setInput('');
+      streamRef.current = null;
       setStatus('awaiting_message');
     }
   };
+
+  const abort = useCallback(() => {
+    if (abortControlerRef.current) {
+      abortControlerRef.current.abort();
+      abortControlerRef.current = null;
+    }
+  }, []);
 
   const submitMessage = async (
     event?: React.FormEvent<HTMLFormElement>,
@@ -123,5 +140,5 @@ export function useOpenAiAssistant({ assistantId = '', threadId: argsThreadId, m
     append({ role: 'user', content: input });
   };
 
-  return { input, setInput, messages, setMessages, threadId, error, status, submitMessage, handleInputChange, append };
+  return { input, setInput, messages, setMessages, threadId, error, status, submitMessage, handleInputChange, append, abort };
 }

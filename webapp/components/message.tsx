@@ -20,7 +20,7 @@ export function Message({ className, content, actions, type, children }: ChatMes
         type === 'user' && 'bg-slate-100',
       )}
       >
-        { content?.map((contentItem, index) => <MessageContent key={index} content={contentItem} /> ) }
+        <MessageContent content={content} />
         { children }
       </div>
       { actions && <div className={twMerge('w-full flex justify-end relative', 'opacity-0 group-hover:opacity-100 transition-opacity duration-300')}>

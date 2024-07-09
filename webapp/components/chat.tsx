@@ -14,6 +14,7 @@ interface Props extends ChatNewMessageProps {
   isLoading?: boolean
   children?: ReactNode
   details?: ReactNode
+  onAbort?: () => void
 }
 
 export default function Chat({ messages, byIdRuns = {}, isLoading, children, details, ...props }: Props) {
@@ -36,7 +37,7 @@ export default function Chat({ messages, byIdRuns = {}, isLoading, children, det
         </div>
       </div>
       <div className='mt-auto py-4 px-12 sm:px-28 md:px-32 xl:px-80'>
-        <NewMessage {...props}>
+        <NewMessage isLoading={isLoading} {...props}>
           { details && <div className='flex w-full justify-end'>{details}</div> }
         </NewMessage>
       </div>

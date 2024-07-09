@@ -61,6 +61,7 @@ export function useOpenAiAssistant({ assistantId = '', threadId: argsThreadId, m
     message: CreateMessage,
   ) => {
     try {
+      setInput('');
       setStatus('in_progress');
 
       let local_threadId = threadId;
@@ -115,7 +116,6 @@ export function useOpenAiAssistant({ assistantId = '', threadId: argsThreadId, m
       });
     }
     finally {
-      setInput('');
       streamRef.current = null;
       setStatus('awaiting_message');
     }

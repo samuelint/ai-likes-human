@@ -1,9 +1,9 @@
 import { type ThreadPreviewDto } from '@/lib/thread.type';
 import { cn } from '@/lib/utils';
-import moment from 'moment';
 import Link from 'next/link';
 import { buttonVariants } from './ui/button';
 import { ThreadPreviewContextMenu } from './thread-preview-context-menu';
+import { toFromNowFormattedDate } from '@/lib/date';
 
 
 export type ThreadPreviewComponentDto = Pick<ThreadPreviewDto, 'id' | 'title' | 'created_at'>;
@@ -21,7 +21,7 @@ export function ThreadPreview<TThread extends ThreadPreviewComponentDto = Thread
     <ThreadPreviewContextMenu onDelete={() => onDelete && onDelete(thread)}>
       <Link href={`/thread/${id}`} className={cn(buttonVariants({ variant: isActive ? 'secondary' : 'outline' }), 'flex flex-col items-start')}>
         <span className=''>{title}</span>
-        <span className='text-xs text-slate-400'>{moment(created_at).fromNow()}</span>
+        <span className='text-xs text-slate-400'>{toFromNowFormattedDate(created_at)}</span>
       </Link>
     </ThreadPreviewContextMenu>
   );

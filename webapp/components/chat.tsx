@@ -22,7 +22,7 @@ export default function Chat({ messages, byIdRuns = {}, isLoading, children, det
     <div role='presentation' className='h-full flex flex-col overflow-auto'>
       <div className="flex flex-col h-full overflow-y-auto py-4 px-12 sm:px-28 md:px-32 xl:px-80">
         {children}
-        <div className="space-y-4">
+        <div className="space-y-6">
           { messages.map((message) => {
             const run = message.run_id ? byIdRuns[message.run_id] : null;
             if (isAiMessage(message)) {

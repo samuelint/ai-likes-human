@@ -19,7 +19,7 @@ interface Props extends ChatNewMessageProps {
 export default function Chat({ messages, byIdRuns = {}, isLoading, children, details, ...props }: Props) {
 
   return (
-    <div role='presentation' className='h-full flex flex-col'>
+    <div role='presentation' className='h-full flex flex-col overflow-auto'>
       <div className="flex flex-col h-full overflow-y-auto py-4 px-12 sm:px-28 md:px-32 xl:px-80">
         {children}
         <div className="space-y-4">

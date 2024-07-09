@@ -43,6 +43,52 @@ class TestDelete:
 
         assert retreive_run is None
 
+    def test_deleting_a_thread_does_not_affect_other_threads_runs(
+        self, openai_client: OpenAI
+    ):
+        thread1 = openai_client.beta.threads.create()
+        thread2 = openai_client.beta.threads.create()
+        openai_client.beta.threads.runs.create(
+            assistant_id="assistant1",
+            thread_id=thread1.id,
+            model="openai:any",
+            stream=False,
+        )
+        run2 = openai_client.beta.threads.runs.create(
+            assistant_id="assistant1",
+            thread_id=thread2.id,
+            model="openai:any",
+            stream=False,
+        )
+
+        openai_client.beta.threads.delete(thread_id=thread1.id)
+
+        retreive_run = openai_client.beta.threads.runs.list(thread_id=thread2.id).data
+
+        assert len(retreive_run) == 1
+        assert retreive_run[0].id == run2.id
+
+    def test_deleting_a_thread_does_not_affect_other_threads_messages(
+        self, openai_client: OpenAI
+    ):
+        thread1 = openai_client.beta.threads.create()
+        thread2 = openai_client.beta.threads.create()
+        openai_client.beta.threads.messages.create(
+            thread_id=thread1.id, content="hello", role="user"
+        )
+        message_thread2 = openai_client.beta.threads.messages.create(
+            thread_id=thread2.id, content="salut", role="user"
+        )
+
+        openai_client.beta.threads.delete(thread_id=thread1.id)
+
+        retreive_messages = openai_client.beta.threads.messages.list(
+            thread_id=thread2.id
+        ).data
+
+        assert len(retreive_messages) == 1
+        assert retreive_messages[-1].id == message_thread2.id
+
     def test_messages_associated_with_thread_are_deleted(self, openai_client: OpenAI):
 
         thread = openai_client.beta.threads.create()

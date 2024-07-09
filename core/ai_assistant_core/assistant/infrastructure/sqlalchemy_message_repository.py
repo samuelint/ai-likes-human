@@ -24,7 +24,7 @@ class SqlalchemyMessageRepository(MessageRepository):
         self,
         thread_id: str,
         role: Literal["user", "assistant"],
-        content: Union[str, Iterable[MessageContentPartParam]],
+        content: Union[str, Iterable[MessageContentPartParam], None] = None,
         status: Literal["in_progress", "incomplete", "completed"] = "completed",
         assistant_id: Optional[str] = None,
         attachments: Optional[List[Attachment]] = None,

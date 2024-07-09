@@ -19,8 +19,9 @@ class SqlalchemyThreadRepository(ThreadRepository):
     def create(
         self,
         metadata: Optional[object] = None,
+        created_at: Optional[int] = None,
     ) -> Thread:
-        model = ThreadModel(metadata_=metadata)
+        model = ThreadModel(metadata_=metadata, created_at=created_at)
         self.db.add(model)
         self.db.commit()
         self.db.refresh(model)
@@ -47,12 +48,27 @@ class SqlalchemyThreadRepository(ThreadRepository):
         limit: int = None,
         order: Literal["asc", "desc"] = None,
     ) -> SyncCursorPage[Thread]:
-        result = (
-            self.db.query(ThreadModel).order_by(ThreadModel.created_at.desc()).all()
-        )
-        threads = [model.to_dto() for model in result]
+        query = self.db.query(ThreadModel)
+        if after:
+            query = query.filter(ThreadModel.id > after)
+        if before:
+            query = query.filter(ThreadModel.id < before)
+        if order == "desc":
+            query = query.order_by(ThreadModel.created_at.desc())
+        else:
+            query = query.order_by(ThreadModel.created_at.asc())
+        if limit is not None:
+            query = query.limit(limit)
 
-        return SyncCursorPage(data=threads)
+        models = query.all()
+        threads = [model.to_dto() for model in models]
+
+        return SyncCursorPage(
+            data=threads,
+            order=order,
+            next_after=models[-1].created_at if models else None,
+            next_before=models[0].created_at if models else None,
+        )
 
     def retreive(self, thread_id: str) -> Thread:
         model = self.db.query(ThreadModel).filter(ThreadModel.id == thread_id).first()

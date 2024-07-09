@@ -8,6 +8,6 @@ export function CreateNewThread() {
   const createThread = useCreateThread({ redirect: true });
 
   return (
-    <NewThread onClick={createThread} />
+    <NewThread onClick={() => createThread()} />
   );
 }

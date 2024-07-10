@@ -3,6 +3,8 @@ import OpenAI from 'openai';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useOpenaiClient } from './openai-client';
 import { AssistantStream } from 'openai/lib/AssistantStream.mjs';
+import { useImageAttachments } from './use-image-attachments';
+import { createUserMessage } from './service/message-factory';
 
 
 export type AssistantStatus = 'in_progress' | 'awaiting_message';
@@ -10,6 +12,7 @@ export type Message = OpenAI.Beta.Threads.Messages.Message;
 export type MessageContent = OpenAI.Beta.Threads.Messages.MessageContent;
 export type CreateMessage = OpenAI.Beta.Threads.Messages.MessageCreateParams;
 type MessageDelta = OpenAI.Beta.Threads.Messages.MessageDelta;
+
 
 
 interface Props {
@@ -22,6 +25,7 @@ interface Props {
 export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai:gpt-3.5-turbo', temperature, initialInput }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState(initialInput ?? '');
+  const { imageAttachments, removeImageAttachment, addImageAttachments, setImageAttachments } = useImageAttachments();
   const [status, setStatus] = useState<AssistantStatus>('awaiting_message');
   const [error, setError] = useState<undefined | Error>(undefined);
   const streamRef = useRef<AssistantStream | null>(null);
@@ -110,6 +114,7 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai
     message?: CreateMessage,
   ) => {
     setInput('');
+    setImageAttachments([]);
 
     try {
       if (message) {
@@ -126,7 +131,7 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai
       setUnknownError(e);
     }
 
-  }, [openai.beta.threads.messages, threadId, setUnknownError]);
+  }, [setImageAttachments, openai.beta.threads.messages, threadId, setUnknownError]);
 
   const abort = useCallback(() => {
     if (abortControlerRef.current) {
@@ -145,8 +150,24 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai
       return;
     }
 
-    append({ role: 'user', content: input });
+    append(createUserMessage({ input, imageAttachments }));
   };
 
-  return { input, setInput, messages, setMessages, threadId, error, status, submitMessage, handleInputChange, append, abort };
+  return {
+    input,
+    setInput,
+    messages,
+    setMessages,
+    threadId,
+    error,
+    status,
+    submitMessage,
+    handleInputChange,
+    append,
+    abort,
+    imageAttachments,
+    addImageAttachments,
+    setImageAttachments,
+    removeImageAttachment,
+  };
 }

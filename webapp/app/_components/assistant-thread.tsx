@@ -5,6 +5,7 @@ import { useCurrentModel } from '@/lib/use-current-model';
 import { useLlmTemperature } from '@/lib/use-llm-temperature';
 import { useOpenAiAssistant } from '@/lib/use-openai-assistant';
 import { useThreadRuns } from '@/lib/use-thread-runs';
+import NewAssistantMessage from './new-assistant-message';
 
 
 interface Props {
@@ -14,7 +15,7 @@ interface Props {
 export default function AssistantThread({ threadId }: Props) {
   const { data: model } = useCurrentModel();
   const { data: temperature } = useLlmTemperature();
-  const { status, messages, error, input, submitMessage, handleInputChange, abort } = useOpenAiAssistant({ threadId, model, temperature });
+  const { status, messages, error, input, submitMessage, handleInputChange, abort, addImageAttachments, imageAttachments, removeImageAttachment } = useOpenAiAssistant({ threadId, model, temperature });
   const { data: byIdRuns } = useThreadRuns({ threadId });
 
   useErrorNotification(error);
@@ -26,11 +27,18 @@ export default function AssistantThread({ threadId }: Props) {
       messages={messages}
       byIdRuns={byIdRuns}
       isLoading={isLoading}
-      input={input}
-      onChange={handleInputChange}
-      onSubmit={submitMessage}
-      onAbort={abort}
-      details={<span className='text-slate-400 text-xs'>{model}</span>}
-    />
+    >
+      <NewAssistantMessage
+        isLoading={isLoading}
+        model={model}
+        abort={abort}
+        submitMessage={submitMessage}
+        input={input}
+        handleInputChange={handleInputChange}
+        imageAttachments={imageAttachments}
+        addImageAttachments={addImageAttachments}
+        removeImageAttachment={removeImageAttachment}
+      />
+    </Chat>
   );
 }

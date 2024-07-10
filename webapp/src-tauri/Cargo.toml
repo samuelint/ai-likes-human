@@ -24,6 +24,11 @@ tauri-plugin-log = { git = "https://github.com/tauri-apps/plugins-workspace", br
 tauri-plugin-window-state = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
 serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "1.6.8", features = [ "api-all", "process-command-api"] }
+xcap = "=0.0.1"
+base64 = "0.22.1"
+image = "=0.24.9"
+rayon = "1.10.0"
+fast_image_resize = "4.0.0"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.

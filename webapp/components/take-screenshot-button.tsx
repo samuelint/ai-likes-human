@@ -13,6 +13,7 @@ export function TakeScreenshotButton({ className, onClick }: Props) {
   return (
     <Button
       variant='ghost'
+      type='button'
       onClick={onClick}
       className={cn('p-2', className)}
     >

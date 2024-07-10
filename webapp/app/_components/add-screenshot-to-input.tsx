@@ -4,24 +4,27 @@ import { TakeScreenshotButton } from '@/components/take-screenshot-button';
 import { useToast } from '@/components/ui/use-toast';
 import { useCallback } from 'react';
 import { invoke } from '@tauri-apps/api/tauri';
+import { AddImageAttachments } from '@/lib/image-attachment.type';
 
 
 interface Props {
-
+  addImageAttachments: AddImageAttachments
 }
 
-export function AddScreenshotToInput({ }: Props) {
+export function AddScreenshotToInput({ addImageAttachments }: Props) {
   const { toast } = useToast();
 
-
   const addScreenshotToInput = useCallback(() => {
-    invoke<string[]>('capture_screen', { name: 'Next.js' })
+    invoke<string[]>('capture_screen')
       .then((result) => {
-        console.log(result);
+        const imageAttachments = result
+          .map((value) => `data:image/webp;base64,${value}`)
+          .map((base64, index) => ({ title: `${index}`, base64 }));
+        addImageAttachments(imageAttachments);
         toast({
           title: 'Add screenshot added as context',
           description: (<>
-            { result.map((value, index) => <img key={index} src={`data:image/png;base64,${value}`} alt="Base64 Image" />) }
+            { imageAttachments.map((value) => <img key={value.title} src={value.base64} alt={value.title} />) }
           </>)
         });
       })
@@ -34,7 +37,7 @@ export function AddScreenshotToInput({ }: Props) {
       });
 
 
-  }, [toast]);
+  }, [toast, addImageAttachments]);
 
   return (
     <TakeScreenshotButton onClick={addScreenshotToInput} />

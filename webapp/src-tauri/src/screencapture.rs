@@ -11,7 +11,7 @@ pub fn capture_screen() -> Vec<String> {
     let image = monitor.capture_image().unwrap();
 
     let mut png_data = std::io::Cursor::new(Vec::new());
-    image.write_to(&mut png_data, ImageOutputFormat::Png).unwrap();
+    image.write_to(&mut png_data, ImageOutputFormat::WebP).unwrap();
     let b64 = general_purpose::STANDARD.encode(png_data.into_inner());
     b64_images.push(b64);
   }

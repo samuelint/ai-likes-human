@@ -2,6 +2,7 @@ import OpenAI from 'openai';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useOpenaiClient } from './openai-client';
+import { ImageAttachment } from '@/lib/image-attachment.type';
 import { AssistantStream } from 'openai/lib/AssistantStream.mjs';
 
 
@@ -10,6 +11,7 @@ export type Message = OpenAI.Beta.Threads.Messages.Message;
 export type MessageContent = OpenAI.Beta.Threads.Messages.MessageContent;
 export type CreateMessage = OpenAI.Beta.Threads.Messages.MessageCreateParams;
 type MessageDelta = OpenAI.Beta.Threads.Messages.MessageDelta;
+
 
 
 interface Props {
@@ -22,6 +24,7 @@ interface Props {
 export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai:gpt-3.5-turbo', temperature, initialInput }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState(initialInput ?? '');
+  const [imageAttachments, setImageAttachments] = useState<ImageAttachment[]>([]);
   const [status, setStatus] = useState<AssistantStatus>('awaiting_message');
   const [error, setError] = useState<undefined | Error>(undefined);
   const streamRef = useRef<AssistantStream | null>(null);
@@ -145,8 +148,18 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai
       return;
     }
 
-    append({ role: 'user', content: input });
+    const content = [input];
+
+    imageAttachments.forEach((imageAttachment) => {
+      content.push(`![${imageAttachment.title}](${imageAttachment.base64})`);
+    });
+
+    append({ role: 'user', content: content.join('\n') });
   };
 
-  return { input, setInput, messages, setMessages, threadId, error, status, submitMessage, handleInputChange, append, abort };
+  const addImageAttachments = (newImageAttachments: ImageAttachment[]) => {
+    setImageAttachments(imageAttachments => [...imageAttachments, ...newImageAttachments]);
+  };
+
+  return { input, setInput, messages, setMessages, threadId, error, status, submitMessage, handleInputChange, append, abort, imageAttachments, addImageAttachments, setImageAttachments };
 }

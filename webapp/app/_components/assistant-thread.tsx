@@ -15,7 +15,7 @@ interface Props {
 export default function AssistantThread({ threadId }: Props) {
   const { data: model } = useCurrentModel();
   const { data: temperature } = useLlmTemperature();
-  const { status, messages, error, input, submitMessage, handleInputChange, abort } = useOpenAiAssistant({ threadId, model, temperature });
+  const { status, messages, error, input, submitMessage, handleInputChange, abort, addImageAttachments } = useOpenAiAssistant({ threadId, model, temperature });
   const { data: byIdRuns } = useThreadRuns({ threadId });
 
   useErrorNotification(error);
@@ -31,7 +31,7 @@ export default function AssistantThread({ threadId }: Props) {
       onChange={handleInputChange}
       onSubmit={submitMessage}
       onAbort={abort}
-      tools={<Tools/>}
+      tools={<Tools addImageAttachments={addImageAttachments} />}
       details={<span className='text-slate-400 text-xs'>{model}</span>}
     />
   );

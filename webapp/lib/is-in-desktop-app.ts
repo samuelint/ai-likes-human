@@ -1,5 +1,5 @@
 'use client';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 
 export function useIsInDesktopAppFn() {
@@ -9,5 +9,12 @@ export function useIsInDesktopAppFn() {
 }
 
 export function useIsInDesktopApp() {
-  return useIsInDesktopAppFn()();
+  const isInDesktopAppFn = useIsInDesktopAppFn();
+  const [isInDesktopApp, setIsInDesktopApp] = useState(false);
+
+  useEffect(() => {
+    setIsInDesktopApp(isInDesktopAppFn());
+  }, [isInDesktopAppFn]);
+
+  return isInDesktopApp;
 }

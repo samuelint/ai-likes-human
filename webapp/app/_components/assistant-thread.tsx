@@ -5,6 +5,7 @@ import { useCurrentModel } from '@/lib/use-current-model';
 import { useLlmTemperature } from '@/lib/use-llm-temperature';
 import { useOpenAiAssistant } from '@/lib/use-openai-assistant';
 import { useThreadRuns } from '@/lib/use-thread-runs';
+import { Tools } from './tools';
 
 
 interface Props {
@@ -30,6 +31,7 @@ export default function AssistantThread({ threadId }: Props) {
       onChange={handleInputChange}
       onSubmit={submitMessage}
       onAbort={abort}
+      tools={<Tools/>}
       details={<span className='text-slate-400 text-xs'>{model}</span>}
     />
   );

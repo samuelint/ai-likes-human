@@ -2,12 +2,14 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 pub mod sidecar_lifecycle_service;
+pub mod screencapture;
 
 use std::sync::Mutex;
 use tauri_plugin_log::LogTarget;
 use tauri::{Manager, State, WindowEvent};
 use tauri_plugin_window_state::{AppHandleExt, StateFlags};
 use sidecar_lifecycle_service::SidecarLifeCycleService;
+use screencapture::capture_screen;
 
 struct AppState {
   code_sidecar_mutex: Mutex<SidecarLifeCycleService>,
@@ -32,7 +34,6 @@ fn stop_server(api_manager_state: State<AppState>) -> Result<String, String> {
       .stop();
   app_state
 }
-
 
 fn main() {
   let core_sidecar = SidecarLifeCycleService::new("core");
@@ -77,6 +78,7 @@ fn main() {
     .invoke_handler(tauri::generate_handler![
         start_server,
         stop_server,
+        capture_screen,
     ])
     .run(tauri::generate_context!())
     .expect("[Error] while running tauri application");

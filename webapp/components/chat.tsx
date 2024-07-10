@@ -14,10 +14,11 @@ interface Props extends ChatNewMessageProps {
   isLoading?: boolean
   children?: ReactNode
   details?: ReactNode
+  tools?: ReactNode
   onAbort?: () => void
 }
 
-export default function Chat({ messages, byIdRuns = {}, isLoading, children, details, ...props }: Props) {
+export default function Chat({ messages, byIdRuns = {}, isLoading, children, details, tools, ...props }: Props) {
 
   return (
     <div role='presentation' className='h-full flex flex-col overflow-auto'>
@@ -37,7 +38,7 @@ export default function Chat({ messages, byIdRuns = {}, isLoading, children, det
         </div>
       </div>
       <div className='mt-auto py-4 px-2 md:px-20 lg:px-32'>
-        <NewMessage isLoading={isLoading} {...props}>
+        <NewMessage isLoading={isLoading} tools={tools} {...props}>
           { details && <div className='flex w-full justify-end'>{details}</div> }
         </NewMessage>
       </div>

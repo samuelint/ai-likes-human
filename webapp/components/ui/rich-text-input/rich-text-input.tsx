@@ -62,7 +62,7 @@ export default function RichTextInput({ input, placeholder, onChange, onError, d
     <LexicalComposer initialConfig={initialConfig}>
       <RichTextPlugin
         contentEditable={<ContentEditable disabled={disabled} className={cn('w-full rounded p-2 bg-white', className)} />}
-        placeholder={<div className='absolute left-6 pointer-events-none text-gray-400'>{placeholder}</div>}
+        placeholder={<div className='absolute left-0 pointer-events-none text-gray-400'>{placeholder}</div>}
         ErrorBoundary={LexicalErrorBoundary}
       />
 

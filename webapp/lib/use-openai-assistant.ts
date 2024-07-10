@@ -2,9 +2,9 @@ import OpenAI from 'openai';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useOpenaiClient } from './openai-client';
-import { ImageAttachment } from '@/lib/image-attachment.type';
 import { AssistantStream } from 'openai/lib/AssistantStream.mjs';
-import { MessageContentPartParam } from 'openai/resources/beta/threads/messages.mjs';
+import { useImageAttachments } from './use-image-attachments';
+import { createUserMessage } from './service/message-factory';
 
 
 export type AssistantStatus = 'in_progress' | 'awaiting_message';
@@ -25,7 +25,7 @@ interface Props {
 export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai:gpt-3.5-turbo', temperature, initialInput }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState(initialInput ?? '');
-  const [imageAttachments, setImageAttachments] = useState<ImageAttachment[]>([]);
+  const { imageAttachments, removeImageAttachment, addImageAttachments, setImageAttachments } = useImageAttachments();
   const [status, setStatus] = useState<AssistantStatus>('awaiting_message');
   const [error, setError] = useState<undefined | Error>(undefined);
   const streamRef = useRef<AssistantStream | null>(null);
@@ -131,7 +131,7 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai
       setUnknownError(e);
     }
 
-  }, [openai.beta.threads.messages, threadId, setUnknownError]);
+  }, [setImageAttachments, openai.beta.threads.messages, threadId, setUnknownError]);
 
   const abort = useCallback(() => {
     if (abortControlerRef.current) {
@@ -150,21 +150,7 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai
       return;
     }
 
-    const content: Array<MessageContentPartParam> = [{ type: 'text', text: input }];
-
-    imageAttachments.forEach((imageAttachment) => {
-      content.push({ type: 'image_url', image_url: { url: imageAttachment.base64, detail: 'low' } });
-    });
-
-    append({ role: 'user', content });
-  };
-
-  const addImageAttachments = (newImageAttachments: ImageAttachment[]) => {
-    setImageAttachments(imageAttachments => [...imageAttachments, ...newImageAttachments]);
-  };
-
-  const removeImageAttachment = (imageAttachment: ImageAttachment) => {
-    setImageAttachments(imageAttachments => imageAttachments.filter(img => img !== imageAttachment));
+    append(createUserMessage({ input, imageAttachments }));
   };
 
   return {

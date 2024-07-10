@@ -8,13 +8,13 @@ import { Dictionary } from 'lodash';
 
 
 interface Props {
-  messages: ChatMessageDto[]
+  messages?: ChatMessageDto[]
   byIdRuns?: Dictionary<Run>
   isLoading?: boolean
   children?: ReactNode
 }
 
-export default function Chat({ messages, byIdRuns = {}, isLoading, children }: Props) {
+export default function Chat({ messages = [], byIdRuns = {}, isLoading, children }: Props) {
 
   return (
     <div role='presentation' className='h-full flex flex-col overflow-auto'>

@@ -5,9 +5,7 @@ import { useCurrentModel } from '@/lib/use-current-model';
 import { useLlmTemperature } from '@/lib/use-llm-temperature';
 import { useOpenAiAssistant } from '@/lib/use-openai-assistant';
 import { useThreadRuns } from '@/lib/use-thread-runs';
-import { Tools } from './tools';
-import NewMessage from '@/components/new-message';
-import { ImageAttachment } from '@/components/image-attachment';
+import NewAssistantMessage from './new-assistant-message';
 
 
 interface Props {
@@ -30,23 +28,17 @@ export default function AssistantThread({ threadId }: Props) {
       byIdRuns={byIdRuns}
       isLoading={isLoading}
     >
-      <NewMessage
+      <NewAssistantMessage
         isLoading={isLoading}
-        onAbort={abort}
-        onSubmit={submitMessage}
+        model={model}
+        abort={abort}
+        submitMessage={submitMessage}
         input={input}
-        onChange={handleInputChange}
-        leftContent={<Tools addImageAttachments={addImageAttachments} />}
-        rightContent={
-          <div className='flex w-full justify-end'>
-            <span className='text-slate-400 text-xs'>{model}</span>
-          </div>
-        }
-      >
-        { imageAttachments.map((imageAttachment) => (
-          <ImageAttachment key={imageAttachment.title} image={imageAttachment} onRemoveClick={removeImageAttachment} />
-        )) }
-      </NewMessage>
+        handleInputChange={handleInputChange}
+        imageAttachments={imageAttachments}
+        addImageAttachments={addImageAttachments}
+        removeImageAttachment={removeImageAttachment}
+      />
     </Chat>
   );
 }

@@ -1,7 +1,7 @@
 import { Markdown } from './markdown';
 import { ChatMessageContentDto } from './chat.type';
 import { useMemo } from 'react';
-import { Base64Image } from './base64-image';
+import { ExpandableImage } from './image';
 
 
 export interface ChatMessageProps {
@@ -18,7 +18,7 @@ export function MessageContent({ content }: ChatMessageProps) {
     <>
       { markdown }
       { hasAttachments ? <div className='border-t border-gray-300 py-4'>
-        { images.map((image, index) => <Base64Image key={index} base64={image.image_url.url} alt={`${index}`} />) }
+        { images.map((image, index) => <ExpandableImage key={index} url={image.image_url.url} alt={`${index}`} />) }
       </div> : null}
     </>
   );

@@ -17,7 +17,7 @@ interface Props {
 export default function AssistantThread({ threadId }: Props) {
   const { data: model } = useCurrentModel();
   const { data: temperature } = useLlmTemperature();
-  const { status, messages, error, input, submitMessage, handleInputChange, abort, addImageAttachments, imageAttachments } = useOpenAiAssistant({ threadId, model, temperature });
+  const { status, messages, error, input, submitMessage, handleInputChange, abort, addImageAttachments, imageAttachments, removeImageAttachment } = useOpenAiAssistant({ threadId, model, temperature });
   const { data: byIdRuns } = useThreadRuns({ threadId });
 
   useErrorNotification(error);
@@ -44,7 +44,7 @@ export default function AssistantThread({ threadId }: Props) {
         }
       >
         { imageAttachments.map((imageAttachment) => (
-          <ImageAttachment key={imageAttachment.title} image={imageAttachment} />
+          <ImageAttachment key={imageAttachment.title} image={imageAttachment} onRemoveClick={removeImageAttachment} />
         )) }
       </NewMessage>
     </Chat>

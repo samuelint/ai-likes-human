@@ -1,17 +1,27 @@
-import { ImageAttachment as Image } from '@/lib/image-attachment.type';
-import { Base64Image } from './base64-image';
-import { Card } from './ui/card';
+import { ImageAttachment as ImageDto } from '@/lib/image-attachment.type';
+import { ExpandableImage } from './image';
+import { Button } from './ui/button';
+import { CircleXIcon } from 'lucide-react';
 
 
 interface Props {
-  image: Image
+  image: ImageDto
   className?: string
+  onRemoveClick?: (image: ImageDto) => void
 }
 
-export function ImageAttachment({ image, className }: Props) {
+export function ImageAttachment({ image, className, onRemoveClick }: Props) {
   return (
-    <Card>
-      <Base64Image className={className} base64={image.base64} alt={image.title} />
-    </Card>
+    <div className='relative rounded-xl border border-slate-600 overflow-hidden'>
+      <ExpandableImage className={className} url={image.base64} alt={image.title} />
+      { onRemoveClick && <Button
+        variant='ghost'
+        className='absolute top-1 left-1 p-1 rounded-full bg-white/50 h-fit w-fit'
+        onClick={() => onRemoveClick(image)}
+      >
+        <CircleXIcon/>
+      </Button>}
+
+    </div>
   );
 }

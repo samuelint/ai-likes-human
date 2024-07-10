@@ -64,7 +64,7 @@ export default function NewMessage({ placeholder = 'Type your message...', input
         </div>
       </div>
       {hasChildren && (
-        <div className='w-full flex justify-start border-t border-gray-300 pt-2'>
+        <div className='w-full flex justify-start border-t border-gray-300 pt-2 gap-2'>
           {children}
         </div>
       )}

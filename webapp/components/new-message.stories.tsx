@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import NewMessage from './new-message';
 import { Button } from './ui/button';
 import { LaptopMinimal } from 'lucide-react';
+import { Card } from './ui/card';
 
 
 const meta = {
@@ -38,7 +39,7 @@ export const Children: Story = {
     isLoading: false,
     leftContent: <Button className='p-1' variant='ghost'><LaptopMinimal/></Button>,
     rightContent: <span className='text-xs'>Right Content</span>,
-    children: <div>Attachments</div>
+    children: [<Card key={0}>Attachments 1</Card>, <Card key={1}>Attachments 2</Card>],
   },
 };
 

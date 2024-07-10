@@ -114,6 +114,7 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai
     message?: CreateMessage,
   ) => {
     setInput('');
+    setImageAttachments([]);
 
     try {
       if (message) {
@@ -162,5 +163,25 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai
     setImageAttachments(imageAttachments => [...imageAttachments, ...newImageAttachments]);
   };
 
-  return { input, setInput, messages, setMessages, threadId, error, status, submitMessage, handleInputChange, append, abort, imageAttachments, addImageAttachments, setImageAttachments };
+  const removeImageAttachment = (imageAttachment: ImageAttachment) => {
+    setImageAttachments(imageAttachments => imageAttachments.filter(img => img !== imageAttachment));
+  };
+
+  return {
+    input,
+    setInput,
+    messages,
+    setMessages,
+    threadId,
+    error,
+    status,
+    submitMessage,
+    handleInputChange,
+    append,
+    abort,
+    imageAttachments,
+    addImageAttachments,
+    setImageAttachments,
+    removeImageAttachment,
+  };
 }

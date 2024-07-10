@@ -1,4 +1,4 @@
-import { LaptopMinimal } from 'lucide-react';
+import { ScanEye } from 'lucide-react';
 
 
-export { LaptopMinimal as ScreenshotIcon };
+export { ScanEye as ScreenshotIcon };

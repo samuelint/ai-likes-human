@@ -5,7 +5,6 @@ import { useToast } from '@/components/ui/use-toast';
 import { useCallback, useState } from 'react';
 import { AddImageAttachments } from '@/lib/image-attachment.type';
 import { captureBase64Screens } from '@/lib/tauri-interrupt/screen-capture';
-import { SpinnerLoading } from '@/components/ui/loading';
 
 
 interface Props {
@@ -36,8 +35,6 @@ export function AddScreenshotToInput({ addImageAttachments }: Props) {
 
   }, [toast, addImageAttachments]);
 
-  return (<>
-    {isLoading ? <SpinnerLoading /> : <TakeScreenshotButton onClick={addScreenshotToInput} />}
-  </>);
+  return <TakeScreenshotButton onClick={addScreenshotToInput} isLoading={isLoading}/>;
 }
 

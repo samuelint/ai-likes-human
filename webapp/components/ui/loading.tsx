@@ -1,3 +1,4 @@
+import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 
@@ -21,6 +22,6 @@ function Dot({ className }: Props) {
 
 export function SpinnerLoading ({ className }: Props) {
   return (
-    <div className={cn('w-6 h-6 border-2 border-dashed rounded-full animate-spin border-slate-500', className)}></div>
+    <Loader2 className={cn('animate-spin', className)} />
   );
 };

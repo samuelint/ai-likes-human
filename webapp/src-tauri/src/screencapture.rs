@@ -67,7 +67,6 @@ fn resize_image(img: image::RgbaImage, max_size: u32) -> image::RgbaImage {
 #[tauri::command]
 pub async fn capture_screen(max_size_arg: Option<u32>) -> Vec<String> {
   let max_size = max_size_arg.unwrap_or(1024);
-  let start = Instant::now();
   let monitors = Monitor::all().unwrap();
 
   let b64_images: Vec<String> = monitors.par_iter()
@@ -78,11 +77,9 @@ pub async fn capture_screen(max_size_arg: Option<u32>) -> Vec<String> {
       let mut png_data = std::io::Cursor::new(Vec::new());
       resized_img.write_to(&mut png_data, ImageOutputFormat::Png).unwrap();
   
-      return general_purpose::STANDARD.encode(png_data.into_inner());
+      return format!("data:image/png;base64,{}", general_purpose::STANDARD.encode(png_data.into_inner()));
   })
   .collect();
-
-  println!("Capture elapsed: {:?}", start.elapsed());
 
   b64_images
 }

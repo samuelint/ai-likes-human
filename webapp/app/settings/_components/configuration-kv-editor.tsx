@@ -26,7 +26,7 @@ export function ConfigurationKvEditor({ label, kv_key }: Props) {
     const entries = Object.fromEntries(formData.entries());
     const newValue = entries[kv_key] as string;
 
-    mutate({ key: kv_key, value: newValue })
+    mutate(newValue)
       .then(() => toast({ title: `${label ?? kv_key} Saved` }))
       .catch((e) => toast({
         title: `${label ?? kv_key} Saved`,

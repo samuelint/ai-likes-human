@@ -1,7 +1,7 @@
 'use client';
 import { useErrorNotification } from '@/app/_components/use-error-notification';
 import Chat from '@/components/chat';
-import { useCurrentModel } from '@/lib/use-current-model';
+import { useLLMModel } from '@/lib/use-llm-model';
 import { useLlmTemperature } from '@/lib/use-llm-temperature';
 import { useOpenAiAssistant } from '@/lib/use-openai-assistant';
 import { useThreadRuns } from '@/lib/use-thread-runs';
@@ -13,7 +13,7 @@ interface Props {
 }
 
 export default function AssistantThread({ threadId }: Props) {
-  const { data: model } = useCurrentModel();
+  const { data: model } = useLLMModel();
   const { data: temperature } = useLlmTemperature();
   const { status, messages, error, input, submitMessage, handleInputChange, abort, addImageAttachments, imageAttachments, removeImageAttachment } = useOpenAiAssistant({ threadId, model, temperature });
   const { data: byIdRuns } = useThreadRuns({ threadId });
@@ -30,7 +30,6 @@ export default function AssistantThread({ threadId }: Props) {
     >
       <NewAssistantMessage
         isLoading={isLoading}
-        model={model}
         abort={abort}
         submitMessage={submitMessage}
         input={input}

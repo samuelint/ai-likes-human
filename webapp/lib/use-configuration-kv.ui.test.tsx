@@ -16,7 +16,7 @@ describe('stream data stream', () => {
         <button
           data-testid="mutate"
           onClick={() => {
-            mutate({ key: 'some-key', value: 'mutated-value' });
+            mutate('mutated-value');
           }}
         />
       </div>

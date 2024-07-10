@@ -36,8 +36,8 @@ export function AddScreenshotToInput({ addImageAttachments }: Props) {
 
   }, [toast, addImageAttachments]);
 
-  return (
-    isLoading ? <SpinnerLoading /> : <TakeScreenshotButton onClick={addScreenshotToInput} />
-  );
+  return (<>
+    {isLoading ? <SpinnerLoading /> : <TakeScreenshotButton onClick={addScreenshotToInput} />}
+  </>);
 }
 

@@ -18,15 +18,9 @@ export function AddScreenshotToInput({ addImageAttachments }: Props) {
     invoke<string[]>('capture_screen')
       .then((result) => {
         const imageAttachments = result
-          .map((value) => `data:image/webp;base64,${value}`)
+          .map((value) => `data:image/png;base64,${value}`)
           .map((base64, index) => ({ title: `${index}`, base64 }));
         addImageAttachments(imageAttachments);
-        toast({
-          title: 'Add screenshot added as context',
-          description: (<>
-            { imageAttachments.map((value) => <img key={value.title} src={value.base64} alt={value.title} />) }
-          </>)
-        });
       })
       .catch((error) => {
         toast({

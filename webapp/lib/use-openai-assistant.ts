@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useOpenaiClient } from './openai-client';
 import { ImageAttachment } from '@/lib/image-attachment.type';
 import { AssistantStream } from 'openai/lib/AssistantStream.mjs';
+import { MessageContentPartParam } from 'openai/resources/beta/threads/messages.mjs';
 
 
 export type AssistantStatus = 'in_progress' | 'awaiting_message';
@@ -148,13 +149,13 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai
       return;
     }
 
-    const content = [input];
+    const content: Array<MessageContentPartParam> = [{ type: 'text', text: input }];
 
     imageAttachments.forEach((imageAttachment) => {
-      content.push(`![${imageAttachment.title}](${imageAttachment.base64})`);
+      content.push({ type: 'image_url', image_url: { url: imageAttachment.base64, detail: 'low' } });
     });
 
-    append({ role: 'user', content: content.join('\n') });
+    append({ role: 'user', content });
   };
 
   const addImageAttachments = (newImageAttachments: ImageAttachment[]) => {

@@ -4,10 +4,7 @@
 
 A personalized AI assistant framework
 
-
 https://github.com/samuelint/ai-assistant/assets/5473142/50c44730-1fc7-40d8-9681-78e772fb9bc1
-
-
 
 ## Project Structure
 
@@ -15,6 +12,27 @@ Project is currently in a mono repo. This structure simplify the integration of 
 
 - `core` | Core Web Server, AI & Agent integration
 - `webapp` | Webapp / Desktop App
+
+## Build Locally
+
+#### Prerequisites:
+
+First install the following on your machine
+
+- **Core**
+  - poetry | https://python-poetry.org/docs/
+- **Webapp**
+  - pnpm | https://pnpm.io/installation
+
+#### Build
+
+At the root of the project, execute.
+
+```bash
+make build
+```
+
+Once completed, a directory `./dist` should be created at the root of the project, containing binaries of the app.
 
 ## What is this project solving?
 
@@ -51,16 +69,16 @@ Let's try to fix that by creating a personal assistant running locally on user c
 ## Roadmap
 
 - V0 - Foundation for what's next
-    - Easy to deploy - Installed as a regular app, IT JUST WORKS (no need to install third parties). Everything works out of the box (mac, windows, linux). Using the power of Tauri
-    - Access to Local LLM (LLamaCPP)
-    - Access to hosted LLM (OpenAI, Anthropic, Groq, etc...)
-    - Local Conversations history
-    - Local embedding
-    - Take computer screenshots as context
-    - Simple (do not look like a plane control board)
-    - Run LangGraph agents within the app.
+  - Easy to deploy - Installed as a regular app, IT JUST WORKS (no need to install third parties). Everything works out of the box (mac, windows, linux). Using the power of Tauri
+  - Access to Local LLM (LLamaCPP)
+  - Access to hosted LLM (OpenAI, Anthropic, Groq, etc...)
+  - Local Conversations history
+  - Local embedding
+  - Take computer screenshots as context
+  - Simple (do not look like a plane control board)
+  - Run LangGraph agents within the app.
 - V1
-    - **Curated** agents (only want usefull and working stuff)
+  - **Curated** agents (only want usefull and working stuff)
 
 ## License
 

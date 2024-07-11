@@ -14,6 +14,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Model } from './model';
 
 
 export interface ModelSettingsDto {
@@ -64,7 +65,7 @@ export function ModelSettingsForm({ choices, defaultValues, onSubmit }: Props) {
                         <RadioGroupItem value={model} />
                       </FormControl>
                       <FormLabel className="font-normal">
-                        { model }
+                        <Model model={model}/>
                       </FormLabel>
                     </FormItem>))}
                 </RadioGroup>

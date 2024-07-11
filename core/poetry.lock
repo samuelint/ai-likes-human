@@ -1274,19 +1274,21 @@ tiktoken = ">=0.7,<1"
 
 [[package]]
 name = "langchain-openai-api-bridge"
-version = "0.7.4"
+version = "0.8.2"
 description = "A bridge to use Langchain output as an OpenAI-compatible API."
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "langchain_openai_api_bridge-0.7.4-py3-none-any.whl", hash = "sha256:ba9072e298213737bfb309537154d1eb60d900c70992212986a335784585ad8e"},
-    {file = "langchain_openai_api_bridge-0.7.4.tar.gz", hash = "sha256:fb2d4d6f288715eb60f3ddc0b3b0efb70ca03d8dde175cdc5125a14482f26037"},
+    {file = "langchain_openai_api_bridge-0.8.2-py3-none-any.whl", hash = "sha256:0d97edfeadba45ac6824e77e011502247f77c087c94fd39e780c424b6eca5328"},
+    {file = "langchain_openai_api_bridge-0.8.2.tar.gz", hash = "sha256:497b7fb351ff510144d4b39675d48a09b519f758eb06ff40e3b4b7521df9260b"},
 ]
 
 [package.dependencies]
 openai = ">=1.35.1,<2.0.0"
 
 [package.extras]
+anthropic = ["langchain-anthropic (>=0.1.19,<0.2.0)"]
+groq = ["langchain-groq (>=0.1.6,<0.2.0)"]
 langchain = ["langchain (>=0.2.6,<0.3.0)", "langchain-openai (>=0.1.8,<0.2.0)", "langgraph (>=0.0.62,<0.0.63)"]
 langchain-serve = ["fastapi (>=0.111.0,<0.112.0)", "python-dotenv (>=1.0.1,<2.0.0)"]
 
@@ -3513,4 +3515,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.13"
-content-hash = "2732b214d496bc2d29e73eb66e0f996f032a037d9bf30c516422059d6c3e17e3"
+content-hash = "7e87671d55a1768138e55432e799fa29bfaeadbf245aa35de277fc78e9339a14"

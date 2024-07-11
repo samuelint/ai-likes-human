@@ -39,7 +39,7 @@ export default function NewMessage({ placeholder = 'Type your message...', input
   const hastLeftContent = React.Children.count(leftContent) > 0;
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="border rounded-xl gap-2 p-2 flex flex-col items-center">
+    <form ref={formRef} onSubmit={handleSubmit} className="border rounded-xl p-2 flex flex-col items-center">
       <div className='flex items-center w-full'>
         { hastLeftContent &&
           <div className='pr-1'>
@@ -57,7 +57,7 @@ export default function NewMessage({ placeholder = 'Type your message...', input
               if (event === 'Submit') programmaticSubmit();
             }}
           />
-          <div className='flex flex-col gap-1'>
+          <div className='flex flex-col gap-1 pl-2'>
             { isLoading ? <StopInferenceButton onClick={onAbort} disabled={disabled} /> : <SendButton disabled={disabled} type="submit" />}
             { rightContent }
           </div>

@@ -18,16 +18,18 @@ class AnthropicLLMFactory(BaseLLMFactory):
     def create(
         self,
         model: str,
-        max_tokens: Optional[int] = 1024,
-        temperature: Optional[float] = 0.7,
+        max_tokens: Optional[int] = None,
+        temperature: Optional[float] = None,
         streaming: bool = True,
     ) -> ChatAnthropic:
         api_key = self.api_key_service.get_anthropic_api_key()
 
-        return ChatAnthropic(
+        client = ChatAnthropic(
             model=model,
-            max_tokens=max_tokens,
-            temperature=temperature,
+            max_tokens=max_tokens or 2048,
+            temperature=temperature or 0.7,
             api_key=api_key,
             streaming=streaming,
         )
+
+        return client

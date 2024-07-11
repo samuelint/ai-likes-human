@@ -1,11 +1,11 @@
 import { Markdown } from './markdown';
-import { ChatMessageContentDto } from './chat.type';
+import { MessageContent as MessageContentDto } from '@/lib/use-openai-assistant';
 import { useMemo } from 'react';
 import { ExpandableImage } from './image';
 
 
 export interface ChatMessageProps {
-  content?: ChatMessageContentDto[]
+  content?: MessageContentDto[]
 }
 
 export function MessageContent({ content }: ChatMessageProps) {

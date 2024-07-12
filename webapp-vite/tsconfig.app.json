@@ -34,6 +34,8 @@
   "include": ["src"],
   "exclude": [
     "node_modules",
-    "src-tauri"
+    "src-tauri",
+    "**/*.spec.*",
+    "**/*.test.*",
   ]
 }

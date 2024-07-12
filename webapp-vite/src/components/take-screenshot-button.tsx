@@ -1,5 +1,4 @@
 import { Button } from './ui/button';
-import React from 'react';
 import { ScreenshotIcon } from './icon/screenshot';
 import { SpinnerLoading } from '@/components/ui/loading';
 import { cn } from '@/lib/utils';

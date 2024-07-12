@@ -9,7 +9,6 @@ import {
   $setSelection,
   LexicalEditor,
 } from 'lexical';
-import * as React from 'react';
 import { DocumentDuplicateIcon } from '@heroicons/react/16/solid';
 
 

@@ -13,7 +13,7 @@ export default function Settings() {
   const showLocalModelsSection = isInDesktopApp || process.env.NODE_ENV === 'development';
 
   return (
-    <div>
+    <div className="w-full h-full flex flex-col justify-between p-6 overflow-y-auto">
       <H1>Settings</H1>
       <GeneralSection />
       <ApiKeysSection />

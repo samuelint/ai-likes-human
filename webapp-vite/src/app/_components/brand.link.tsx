@@ -1,4 +1,4 @@
-
+import { Link } from "wouter";
 import { useUsername } from './use-username';
 
 
@@ -7,8 +7,8 @@ export default function BrandLink() {
   const title = userName ? `${userName}'s Assistant` : 'Assistant';
 
   return (
-    <a href="/">
+    <Link href="/">
       <span>{title}</span>
-    </a>
+    </Link>
   );
 }

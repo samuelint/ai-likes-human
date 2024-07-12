@@ -5,6 +5,7 @@ import { useListThreads } from './use-list-threads';
 import { Thread, ThreadCreateParams } from 'openai/resources/beta/threads/threads.mjs';
 import { ImageAttachment } from './image-attachment.type';
 import { createUserMessage } from './service/message-factory';
+import { useLocation } from 'wouter';
 
 
 interface Props {
@@ -14,7 +15,7 @@ interface Props {
 type CreateNewThread = (messageContent?: string, imageAttachments?: ImageAttachment[]) => Promise<Thread>;
 export function useCreateThread({ redirect }: Props = {}): CreateNewThread {
   const openai = useOpenaiClient();
-  // const router = useRouter();
+  const [_, setLocation] = useLocation();
   const { revalidate } = useListThreads();
 
   return useCallback<CreateNewThread>(async (messageContent, imageAttachments) => {
@@ -28,12 +29,11 @@ export function useCreateThread({ redirect }: Props = {}): CreateNewThread {
     });
 
     if (redirect) {
-      throw new Error("Not implemented")
-      // router.push(`/thread/${newThread.id}`);
+      setLocation(`/thread/${newThread.id}`)
     } else {
       revalidate();
     }
 
     return newThread;
-  }, [openai.beta.threads, revalidate, redirect]);
+  }, [openai.beta.threads, revalidate, redirect, setLocation]);
 }

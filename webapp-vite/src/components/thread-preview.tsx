@@ -1,3 +1,4 @@
+import { Link } from "wouter";
 import { type ThreadPreviewDto } from '@/lib/thread.type';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from './ui/button';
@@ -18,10 +19,10 @@ export function ThreadPreview<TThread extends ThreadPreviewComponentDto = Thread
 
   return (
     <ThreadPreviewContextMenu onDelete={() => onDelete && onDelete(thread)}>
-      <a href={`/thread/${id}`} className={cn(buttonVariants({ variant: isActive ? 'secondary' : 'outline' }), 'flex flex-col items-start')}>
+      <Link href={`/thread/${id}`} className={cn(buttonVariants({ variant: isActive ? 'secondary' : 'outline' }), 'flex flex-col items-start')}>
         <span className=''>{title}</span>
         <span className='text-xs text-slate-400'>{toFromNowFormattedDate(created_at)}</span>
-      </a>
+      </Link>
     </ThreadPreviewContextMenu>
   );
 }

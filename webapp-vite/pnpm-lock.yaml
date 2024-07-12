@@ -128,6 +128,9 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.4)
+      tauri-plugin-log-api:
+        specifier: github:tauri-apps/tauri-plugin-log#v1
+        version: https://codeload.github.com/tauri-apps/tauri-plugin-log/tar.gz/2bb26e22f7f7b4f164bad02f0ae4085796f77fff
       vaul:
         specifier: ^0.9.1
         version: 0.9.1(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -3343,6 +3346,10 @@ packages:
     resolution: {integrity: sha512-ZoyXOdJjISB7/BcLTR6SEsLgKtDStYyYZVLsUtWChO4Ps20CBad7lfJKVDiejocV4ME1hLmyY0WJE3hSDcmQ2A==}
     engines: {node: '>=14.0.0'}
     hasBin: true
+
+  tauri-plugin-log-api@https://codeload.github.com/tauri-apps/tauri-plugin-log/tar.gz/2bb26e22f7f7b4f164bad02f0ae4085796f77fff:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-log/tar.gz/2bb26e22f7f7b4f164bad02f0ae4085796f77fff}
+    version: 0.0.0
 
   test-exclude@6.0.0:
     resolution: {integrity: sha512-cAGWPIyOHU6zlmg88jwm7VRyXnMN7iV68OGAbYDk/Mh/xC/pzVPlQtY6ngoIH/5/tciuhGfvESU8GrHrcxD56w==}
@@ -7445,6 +7452,10 @@ snapshots:
       sucrase: 3.35.0
     transitivePeerDependencies:
       - ts-node
+
+  tauri-plugin-log-api@https://codeload.github.com/tauri-apps/tauri-plugin-log/tar.gz/2bb26e22f7f7b4f164bad02f0ae4085796f77fff:
+    dependencies:
+      '@tauri-apps/api': 1.6.0
 
   test-exclude@6.0.0:
     dependencies:

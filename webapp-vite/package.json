@@ -53,6 +53,7 @@
     "swr": "^2.2.5",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
+    "tauri-plugin-log-api": "github:tauri-apps/tauri-plugin-log#v1",
     "vaul": "^0.9.1",
     "wouter": "^3.3.1",
     "zod": "^3.23.8"

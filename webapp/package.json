@@ -16,7 +16,8 @@
     "test:watch": "vitest",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "set-version": "bash ./set-version.sh $*"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.5",

@@ -1,14 +1,10 @@
 name: Bundle
 
 on:
-  release:
-    types:
-      - created
+  push:
+    tags:
+      - "v*.*.*"
 
-# on:
-#   push:
-#     branches:
-#       - main
 
 jobs:
   bundle_core:
@@ -44,18 +40,33 @@ jobs:
   bundle_desktop:
     needs: bundle_core
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
         os: ["ubuntu-latest", "macos-latest"]
         # os: ["windows-latest", "ubuntu-latest", "macos-latest"]
     steps:
+      - name: Extract version from tag
+        id: extract_version
+        run: |
+          echo "Tag name: ${{ github.ref_name }}"
+          TAG_NAME=${{ github.ref_name }}
+          if [[ $TAG_NAME =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            VERSION=${BASH_REMATCH[1]}
+            echo "VERSION=$VERSION" >> $GITHUB_ENV
+          else
+            echo "The tag $TAG_NAME is not in the expected format 'v<MAJOR>.<MINOR>.<PATCH>'"
+            exit 1
+          fi
+          
       - uses: actions/checkout@v4
       - name: Download bundle artifacts
         uses: actions/download-artifact@v4
         with:
           name: core-${{ matrix.os }}
-          path: webapp/src-tauri/bin
+          path: core/dist
 
       - name: Linux Only - Install Extra Libs
         if: runner.os == 'Linux'
@@ -68,12 +79,30 @@ jobs:
         with:
           working-directory: webapp
 
+      - name: Set Version
+        working-directory: webapp
+        run: pnpm run set-version ${{ env.VERSION }}
+
       - name: Bundle
         working-directory: webapp
-        run: pnpm build
+        run: pnpm run build
 
-      - uses: actions/upload-artifact@v4
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
         with:
-          name: desktop-${{ matrix.os }}
-          path: webapp/src-tauri/target/release/bundle/*
-          retention-days: 1
+          files: |
+            webapp/src-tauri/target/release/bundle/**/*.dmg
+
+            webapp/src-tauri/target/release/bundle/**/*.deb
+            webapp/src-tauri/target/release/bundle/**/*.rpm
+            webapp/src-tauri/target/release/bundle/**/*.AppImage
+
+            webapp/src-tauri/target/release/bundle/**/*.exe
+
+      # # Project rules must be updated to push changes
+      # # GH013: Repository rule violations found for refs/heads/main.
+      # - uses: stefanzweifel/git-auto-commit-action@v5
+      #   with:
+      #     commit_message: Bump version to ${{ env.VERSION }}
+      #     branch: main

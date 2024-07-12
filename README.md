@@ -2,7 +2,29 @@
 
 [![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC_BY--NC--ND_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-nd/4.0/)
 
-A personalized AI assistant framework
+A personal AI assistant. 
+This is **NOT** another LLM UI wrapper. But a framework to provide a set of tools for local AI agents and improve productivity using LangGraph.
+
+Open possibilities for a wide range of private automation & productivity. 
+
+ #### Tools
+- ✅ Local inference for private data
+- ✅ Computer screenshot
+- ✅ Web Search
+- ✅ Image generation
+- 💡 Computer screen recording
+- 💡 Video calls
+- 💡 Local documents, emails, etc..
+
+### LLM Vendors
+- ✅ Local Phi3, LLama3
+- ✅ OpenAI
+- ✅ Anthropic
+
+### Compatible on
+- ✅ macOS
+- 🚧 Windows
+- 🚧 Linux
 
 https://github.com/samuelint/ai-assistant/assets/5473142/50c44730-1fc7-40d8-9681-78e772fb9bc1
 
@@ -43,6 +65,7 @@ Once completed, a directory `./dist` should be created at the root of the projec
 
 ### AI Agent Adoption Challenges:
 
+- Creating an AI agent prototype is easy, a product is hard. Deployment & reliability takes a lot of efforts.
 - Using Agent is a long & hard process. They can do incredible things, but are still hard to deploy & use rapidly.
 - Most services are cloud based, but it seem to be contradictory with business needs (they do not want to share sensitive data to the cloud).
 - There are a lot of agents/GPT/libraries that do not work well or expected. Adding reluctance to AI Agent adoption.

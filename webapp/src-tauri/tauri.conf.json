@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
-    "beforeBuildCommand": "bash ./copy-assets.sh || pnpm run build:webapp",
+    "beforeBuildCommand": "bash ./copy-assets.sh && pnpm build:webapp",
     "beforeDevCommand": "npm run dev:webapp",
     "devPath": "http://localhost:3000",
     "distDir": "../out"

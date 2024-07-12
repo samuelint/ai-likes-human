@@ -1,13 +1,13 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
-    "beforeBuildCommand": "pnpm build:webapp && bash ./copy-assets.sh",
+    "beforeBuildCommand": "npm run build:webapp && bash ./copy-assets.sh",
     "beforeDevCommand": "npm run dev:webapp",
-    "devPath": "http://localhost:3000",
-    "distDir": "../out"
+    "devPath": "http://localhost:5173",
+    "distDir": "../dist"
   },
   "package": {
-    "productName": "Assistant",
+    "productName": "assistant",
     "version": "0.1.0"
   },
   "tauri": {
@@ -76,9 +76,7 @@
         "height": 600,
         "resizable": true,
         "title": "Assistant",
-        "width": 1024,
-        "decorations": true,
-        "transparent": true
+        "width": 1024
       }
     ]
   }

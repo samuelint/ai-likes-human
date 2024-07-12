@@ -6,4 +6,8 @@ script_dir=$(dirname "$(readlink -f "$0")")
 tauri_dist_binary="$script_dir/src-tauri/bin"
 core_dist_binary="$script_dir/../core/dist"
 
-cp -r "$core_dist_binary"/* "$tauri_dist_binary"
+# Create the tauri_dist_binary directory if it does not exist
+mkdir -p "$tauri_dist_binary"
+
+# Copy all files in core_dist_binary to tauri_dist_binary
+cp -r "$core_dist_binary/"* "$tauri_dist_binary"

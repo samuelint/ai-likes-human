@@ -11,14 +11,14 @@ use tauri_plugin_window_state::{AppHandleExt, StateFlags};
 use screencapture::capture_screen;
 use system_tray::{build_menu, on_system_tray_event};
 use app_state::app_state::{AppState, start_server, stop_server, is_server_up};
-use log::info;
+use log::{info, warn};
 
-
+static CORE_SERVER_PORT_NUMBER: u16 = 8000;
 
 fn main() {
   let tray_menu = build_menu();
 
-  let state = AppState::new();
+  let state = AppState::new(CORE_SERVER_PORT_NUMBER);
 
   let log_builder = tauri_plugin_log::Builder::default().targets([
     LogTarget::LogDir,
@@ -38,6 +38,7 @@ fn main() {
 
       let is_up = app_state.is_core_server_up();
       if !is_up {
+        warn!("Core Sidecar is already running");
         app_state.start_core_server().expect("Core Sidecar start failed");
       }
 

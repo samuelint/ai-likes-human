@@ -5,13 +5,15 @@ use ureq;
 use log::info;
 
 pub struct AppState {
+    core_server_port: u16,
     code_sidecar_mutex: Mutex<SidecarLifeCycleService>,
 }
 
 impl AppState {
-  pub fn new() -> AppState {
+  pub fn new(port: u16) -> AppState {
     let core_sidecar = SidecarLifeCycleService::new("core");
     AppState {
+      core_server_port: port,
       code_sidecar_mutex: Mutex::new(core_sidecar),
     }
   }
@@ -31,7 +33,7 @@ impl AppState {
   }
 
   pub fn is_core_server_up(&self) -> bool {
-    let response = match ureq::get("http://localhost:8000").call() {
+    let response = match ureq::get(&format!("http://localhost:{}", self.core_server_port)).call() {
       Ok(res) => res,
       Err(err) => {
         info!("Failed to query the server: {}", err);

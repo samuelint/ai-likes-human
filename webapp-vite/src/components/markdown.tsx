@@ -50,7 +50,6 @@ export function Markdown({ children }: Props) {
             <Prism
               {...rest}
               PreTag="div"
-              // eslint-disable-next-line react/no-children-prop
               children={String(children).replace(/\n$/, '')}
               language={match[1]}
               showLineNumbers

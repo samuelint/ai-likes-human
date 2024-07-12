@@ -24,4 +24,4 @@ export function SpinnerLoading ({ className }: Props) {
   return (
     <Loader2 className={cn('animate-spin', className)} />
   );
-};
+}

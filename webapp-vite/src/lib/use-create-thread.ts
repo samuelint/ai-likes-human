@@ -29,7 +29,7 @@ export function useCreateThread({ redirect }: Props = {}): CreateNewThread {
     });
 
     if (redirect) {
-      setLocation(`/thread/${newThread.id}`)
+      setLocation(`/thread/${newThread.id}`);
     } else {
       revalidate();
     }

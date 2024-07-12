@@ -16,7 +16,6 @@ interface Props {
 
 export function Image({ url, alt, className }: Props) {
   return (
-    // eslint-disable-next-line @next/next/no-img-element
     <img className={cn('rounded-xl', className)} src={url} alt={alt} />
   );
 }

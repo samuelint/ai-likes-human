@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link } from 'wouter';
 import { type ThreadPreviewDto } from '@/lib/thread.type';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from './ui/button';

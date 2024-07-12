@@ -1,5 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
-
 import { TakeScreenshotButton } from '@/components/take-screenshot-button';
 import { useToast } from '@/components/ui/use-toast';
 import { useCallback, useState } from 'react';

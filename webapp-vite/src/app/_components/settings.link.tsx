@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link } from 'wouter';
 import { SettingsIcon } from 'lucide-react';
 
 

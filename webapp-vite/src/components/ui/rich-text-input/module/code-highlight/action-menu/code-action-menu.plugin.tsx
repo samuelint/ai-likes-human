@@ -12,7 +12,6 @@ export default function CodeActionMenuPlugin({
   children,
 }: Props): React.ReactPortal | null {
   return createPortal(
-    // eslint-disable-next-line react/no-children-prop
     <CodeActions anchorElem={anchorElem} children={children} />,
     anchorElem,
   );

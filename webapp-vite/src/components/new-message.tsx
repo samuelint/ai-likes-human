@@ -1,5 +1,5 @@
 import { ChangeEvent, FormEventHandler, useRef } from 'react';
-import SendButton from './ui/rich-text-input/send-button';
+import { SendButton } from './ui/rich-text-input/send-button';
 import RichTextInput from './ui/rich-text-input/rich-text-input';
 import { StopInferenceButton } from './stop-inference-button';
 import React from 'react';

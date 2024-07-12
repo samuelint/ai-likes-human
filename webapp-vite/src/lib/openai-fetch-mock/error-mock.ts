@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { AssistantResponseBuilder, NonFunctionProperties } from './assistant-response-builder';
 
 

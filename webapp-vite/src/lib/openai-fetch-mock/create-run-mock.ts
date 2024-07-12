@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { AssistantResponseBuilder, NonFunctionProperties, default_thread_id } from './assistant-response-builder';
 
 

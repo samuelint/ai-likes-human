@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link } from 'wouter';
 import { useServerStatus } from '@/lib/use-server-status';
 import { TriangleAlert } from 'lucide-react';
 

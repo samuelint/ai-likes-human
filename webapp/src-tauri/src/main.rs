@@ -1,45 +1,24 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-pub mod sidecar_lifecycle_service;
+pub mod app_state;
 pub mod screencapture;
+pub mod system_tray;
 
-use std::sync::Mutex;
 use tauri_plugin_log::LogTarget;
-use tauri::{Manager, State, WindowEvent};
+use tauri::{Manager, State, WindowEvent, SystemTray};
 use tauri_plugin_window_state::{AppHandleExt, StateFlags};
-use sidecar_lifecycle_service::SidecarLifeCycleService;
 use screencapture::capture_screen;
+use system_tray::{build_menu, on_system_tray_event};
+use app_state::app_state::{AppState, start_server, stop_server, is_server_up};
+use log::{info, warn};
 
-struct AppState {
-  code_sidecar_mutex: Mutex<SidecarLifeCycleService>,
-}
-
-#[tauri::command]
-fn start_server(api_manager_state: State<AppState>) -> Result<String, String> {
-  let am = api_manager_state
-      .code_sidecar_mutex
-      .lock()
-      .unwrap()
-      .start();
-  am
-}
-
-#[tauri::command]
-fn stop_server(api_manager_state: State<AppState>) -> Result<String, String> {
-  let app_state = api_manager_state
-      .code_sidecar_mutex
-      .lock()
-      .unwrap()
-      .stop();
-  app_state
-}
+static CORE_SERVER_PORT_NUMBER: u16 = 8000;
 
 fn main() {
-  let core_sidecar = SidecarLifeCycleService::new("core");
-  let state = AppState {
-      code_sidecar_mutex: Mutex::new(core_sidecar),
-  };
+  let tray_menu = build_menu();
+
+  let state = AppState::new(CORE_SERVER_PORT_NUMBER);
 
   let log_builder = tauri_plugin_log::Builder::default().targets([
     LogTarget::LogDir,
@@ -50,36 +29,57 @@ fn main() {
 
   tauri::Builder::default()
     .manage(state)
+    .system_tray(SystemTray::new().with_menu(tray_menu))
+    .on_system_tray_event(on_system_tray_event)
     .plugin(log_builder.build())  
     .plugin(tauri_plugin_window_state::Builder::default().build())
     .setup(move |app| {
-        let app_state: State<AppState> = app.state();
-        app_state.code_sidecar_mutex
-            .lock()
-            .unwrap()
-            .start()
-            .expect("Core Sidecar start failed");
-        Ok(())
+      let app_state: State<AppState> = app.state();
+
+      let is_up = app_state.is_core_server_up();
+      if !is_up {
+        warn!("Core Sidecar is already running");
+        app_state.start_core_server().expect("Core Sidecar start failed");
+      }
+
+      Ok(())
     })
     .on_window_event(move |event| match event.event() {
-        WindowEvent::Destroyed => {
-            let am: State<AppState> = event.window().state();
-            am.code_sidecar_mutex
-                .lock()
-                .unwrap()
-                .stop()
-                .expect("Core Sidecar stop failed");
-
-            let app_handle: tauri::AppHandle = event.window().app_handle();
-            app_handle.save_window_state(StateFlags::all()).ok();
+      WindowEvent::CloseRequested { api, .. } => {
+        info!("Window CloseRequested");
+        #[cfg(not(target_os = "macos"))] {
+          event.window().hide().unwrap();
         }
-        _ => {}
+
+        #[cfg(target_os = "macos")] {
+          tauri::AppHandle::hide(&event.window().app_handle()).unwrap();
+        }
+        api.prevent_close();
+      }
+      WindowEvent::Destroyed => {
+          info!("Window destroyed");
+
+          let app_handle: tauri::AppHandle = event.window().app_handle();
+          app_handle.save_window_state(StateFlags::all()).ok();
+      }
+      _ => {}
     })
     .invoke_handler(tauri::generate_handler![
-        start_server,
-        stop_server,
-        capture_screen,
+      start_server,
+      stop_server,
+      is_server_up,
+      capture_screen,
     ])
-    .run(tauri::generate_context!())
-    .expect("[Error] while running tauri application");
+    .build(tauri::generate_context!())
+    .expect("error while building tauri application")
+    .run(|app_handle, event| match event {
+      tauri::RunEvent::Exit => {
+        let app_state: State<AppState> = app_handle.state();
+        app_state.stop_core_server().expect("Core Sidecar stop failed");
+      }
+      tauri::RunEvent::ExitRequested { api, .. } => {
+        api.prevent_exit();
+      }
+      _ => {}
+    });
 }

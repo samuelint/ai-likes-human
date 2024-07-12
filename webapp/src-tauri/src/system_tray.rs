@@ -17,7 +17,7 @@ pub fn on_system_tray_event(app: &AppHandle, event: SystemTrayEvent) {
             "quit" => {
                 let window = app.get_window("main").unwrap();
                 let app_state: State<AppState> = window.state();
-                app_state.stop().expect("Core Sidecar stop failed");
+                app_state.stop_core_server().expect("Core Sidecar stop failed");
                 app.exit(0)
             }
             "show" => {

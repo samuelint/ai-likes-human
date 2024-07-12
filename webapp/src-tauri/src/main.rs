@@ -5,14 +5,14 @@ pub mod app_state;
 pub mod screencapture;
 pub mod system_tray;
 
-
 use tauri_plugin_log::LogTarget;
 use tauri::{Manager, State, WindowEvent, SystemTray};
 use tauri_plugin_window_state::{AppHandleExt, StateFlags};
 use screencapture::capture_screen;
 use system_tray::{build_menu, on_system_tray_event};
-use app_state::app_state::{AppState, start_server, stop_server};
+use app_state::app_state::{AppState, start_server, stop_server, is_server_up};
 use log::info;
+
 
 
 fn main() {
@@ -35,7 +35,12 @@ fn main() {
     .plugin(tauri_plugin_window_state::Builder::default().build())
     .setup(move |app| {
       let app_state: State<AppState> = app.state();
-      app_state.start().expect("Core Sidecar start failed");
+
+      let is_up = app_state.is_core_server_up();
+      if !is_up {
+        app_state.start_core_server().expect("Core Sidecar start failed");
+      }
+
       Ok(())
     })
     .on_window_event(move |event| match event.event() {
@@ -52,8 +57,6 @@ fn main() {
       }
       WindowEvent::Destroyed => {
           info!("Window destroyed");
-          let app_state: State<AppState> = event.window().state();
-          app_state.stop().expect("Core Sidecar stop failed");
 
           let app_handle: tauri::AppHandle = event.window().app_handle();
           app_handle.save_window_state(StateFlags::all()).ok();
@@ -63,6 +66,7 @@ fn main() {
     .invoke_handler(tauri::generate_handler![
       start_server,
       stop_server,
+      is_server_up,
       capture_screen,
     ])
     .build(tauri::generate_context!())
@@ -70,7 +74,7 @@ fn main() {
     .run(|app_handle, event| match event {
       tauri::RunEvent::Exit => {
         let app_state: State<AppState> = app_handle.state();
-        app_state.stop().expect("Core Sidecar stop failed");
+        app_state.stop_core_server().expect("Core Sidecar stop failed");
       }
       tauri::RunEvent::ExitRequested { api, .. } => {
         api.prevent_exit();

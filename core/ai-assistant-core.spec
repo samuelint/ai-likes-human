@@ -32,7 +32,11 @@ a = Analysis(
     ['ai_assistant_core/main.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[
+        ('ai_assistant_core/infrastructure/alembic/env.py', 'ai_assistant_core/infrastructure/alembic'),
+        ('ai_assistant_core/infrastructure/alembic/versions/*', 'ai_assistant_core/infrastructure/alembic/versions'),
+        ('ai_assistant_core/infrastructure/alembic.ini', 'ai_assistant_core/infrastructure')
+     ],
     hiddenimports=['tiktoken_ext.openai_public', 'tiktoken_ext'],
     hookspath=['./pyinstaller_hooks'],
     hooksconfig={},

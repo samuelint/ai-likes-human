@@ -55,7 +55,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: core-${{ matrix.os }}
-          path: webapp/src-tauri/bin
+          path: core/dist
 
       - name: Linux Only - Install Extra Libs
         if: runner.os == 'Linux'
@@ -70,7 +70,7 @@ jobs:
 
       - name: Bundle
         working-directory: webapp
-        run: pnpm build
+        run: pnpm run build
 
       - name: Release
         uses: softprops/action-gh-release@v2

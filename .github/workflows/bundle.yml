@@ -1,13 +1,9 @@
 name: Bundle
 
-# on:
-#   push:
-#     tags:
-#       - "v*.*.*"
-
 on:
-  pull_request:
-
+  push:
+    tags:
+      - "v*.*.*"
 
 jobs:
   bundle_core:
@@ -66,18 +62,18 @@ jobs:
             args: ''
     runs-on: ${{ matrix.platform }}
     steps:
-      # - name: Extract version from tag
-      #   id: extract_version
-      #   run: |
-      #     echo "Tag name: ${{ github.ref_name }}"
-      #     TAG_NAME=${{ github.ref_name }}
-      #     if [[ $TAG_NAME =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
-      #       v__VERSION__=${BASH_REMATCH[1]}
-      #       echo "v__VERSION__=$v__VERSION__" >> $GITHUB_ENV
-      #     else
-      #       echo "The tag $TAG_NAME is not in the expected format 'v<MAJOR>.<MINOR>.<PATCH>'"
-      #       exit 1
-      #     fi
+      - name: Extract version from tag
+        id: extract_version
+        run: |
+          echo "Tag name: ${{ github.ref_name }}"
+          TAG_NAME=${{ github.ref_name }}
+          if [[ $TAG_NAME =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            __VERSION__=${BASH_REMATCH[1]}
+            echo "__VERSION__=$__VERSION__" >> $GITHUB_ENV
+          else
+            echo "The tag $TAG_NAME is not in the expected format 'v<MAJOR>.<MINOR>.<PATCH>'"
+            exit 1
+          fi
           
       - uses: actions/checkout@v4
       - name: Download bundle artifacts
@@ -111,15 +107,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
-          releaseName: 'App v__VERSION__'
+          releaseName: 'v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'
-          releaseDraft: true
-          prerelease: false
+          # releaseDraft: true
+          # prerelease: false
           args: ${{ matrix.args }}
 
-      # - name: Bundle
-      #   working-directory: webapp
-      #   run: pnpm run build
 
       - name: Release
         uses: softprops/action-gh-release@v2
@@ -134,6 +127,7 @@ jobs:
             webapp/src-tauri/target/release/bundle/**/*.AppImage
 
             webapp/src-tauri/target/release/bundle/**/*.exe
+            webapp/src-tauri/target/release/bundle/**/*.msi
 
 
 

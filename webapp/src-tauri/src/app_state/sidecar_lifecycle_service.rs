@@ -1,12 +1,13 @@
 use std::borrow::BorrowMut;
 
 use std::process::{Child, Command, Stdio};
-use command_group::{Signal, UnixChildExt};
 use tauri::api::process::Command as TCommand;
 use log::{info, error};
 use std::io::{BufReader, BufRead};
 use std::thread;
 
+#[cfg(unix)]
+use command_group::{Signal, UnixChildExt};
 
 fn log_child_stderr(mut child: Child) -> Child {
     if let Some(stderr) = child.stderr.take() {
@@ -77,9 +78,16 @@ impl SidecarLifeCycleService {
             Some(child) => {
                 let id = child.id();
                 
-                child
+                #[cfg(unix)]
+                {
+                    child
                     .signal(Signal::SIGTERM)
                     .expect("Some error happened when killing child process");
+                }
+                #[cfg(windows)]
+                {
+                    child.kill().expect("Some error happened when killing child process");
+                }
 
                 self.child = None;
                 let info = format!("Sidecar {} stopped - {}", self.program, id);

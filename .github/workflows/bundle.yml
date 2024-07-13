@@ -1,9 +1,12 @@
 name: Bundle
 
+# on:
+#   push:
+#     tags:
+#       - "v*.*.*"
+
 on:
-  push:
-    tags:
-      - "v*.*.*"
+  pull_request:
 
 
 jobs:
@@ -15,8 +18,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-latest", "macos-latest"]
+        # os: ["ubuntu-latest", "macos-latest"]
         # os: ["windows-latest", "ubuntu-latest", "macos-latest"]
+        os: ["windows-latest"]
 
     steps:
       - uses: actions/checkout@v4
@@ -31,6 +35,7 @@ jobs:
           poetry install
 
       - run: make bundle
+
       - uses: actions/upload-artifact@v4
         with:
           name: core-${{ matrix.os }}
@@ -45,21 +50,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-latest", "macos-latest"]
+        # os: ["ubuntu-latest", "macos-latest"]
         # os: ["windows-latest", "ubuntu-latest", "macos-latest"]
+        os: ["windows-latest"]
     steps:
-      - name: Extract version from tag
-        id: extract_version
-        run: |
-          echo "Tag name: ${{ github.ref_name }}"
-          TAG_NAME=${{ github.ref_name }}
-          if [[ $TAG_NAME =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
-            VERSION=${BASH_REMATCH[1]}
-            echo "VERSION=$VERSION" >> $GITHUB_ENV
-          else
-            echo "The tag $TAG_NAME is not in the expected format 'v<MAJOR>.<MINOR>.<PATCH>'"
-            exit 1
-          fi
+      # - name: Extract version from tag
+      #   id: extract_version
+      #   run: |
+      #     echo "Tag name: ${{ github.ref_name }}"
+      #     TAG_NAME=${{ github.ref_name }}
+      #     if [[ $TAG_NAME =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+      #       VERSION=${BASH_REMATCH[1]}
+      #       echo "VERSION=$VERSION" >> $GITHUB_ENV
+      #     else
+      #       echo "The tag $TAG_NAME is not in the expected format 'v<MAJOR>.<MINOR>.<PATCH>'"
+      #       exit 1
+      #     fi
           
       - uses: actions/checkout@v4
       - name: Download bundle artifacts
@@ -87,18 +93,24 @@ jobs:
         working-directory: webapp
         run: pnpm run build
 
-      - name: Release
-        uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
+      - uses: actions/upload-artifact@v4
         with:
-          files: |
-            webapp/src-tauri/target/release/bundle/**/*.dmg
+          name: core-${{ matrix.os }}
+          retention-days: 1
+          path: webapp/src-tauri/target/release/bundle/**/*.exe
 
-            webapp/src-tauri/target/release/bundle/**/*.deb
-            webapp/src-tauri/target/release/bundle/**/*.rpm
-            webapp/src-tauri/target/release/bundle/**/*.AppImage
+      # - name: Release
+      #   uses: softprops/action-gh-release@v2
+      #   if: startsWith(github.ref, 'refs/tags/')
+      #   with:
+      #     files: |
+      #       webapp/src-tauri/target/release/bundle/**/*.dmg
 
-            webapp/src-tauri/target/release/bundle/**/*.exe
+      #       webapp/src-tauri/target/release/bundle/**/*.deb
+      #       webapp/src-tauri/target/release/bundle/**/*.rpm
+      #       webapp/src-tauri/target/release/bundle/**/*.AppImage
+
+      #       webapp/src-tauri/target/release/bundle/**/*.exe
 
       # # Project rules must be updated to push changes
       # # GH013: Repository rule violations found for refs/heads/main.

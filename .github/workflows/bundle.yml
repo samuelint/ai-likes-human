@@ -11,16 +11,22 @@ on:
 
 jobs:
   bundle_core:
-    runs-on: ${{ matrix.os }}
     defaults:
       run:
         working-directory: core
     strategy:
       fail-fast: false
       matrix:
-        # os: ["ubuntu-latest", "macos-latest"]
-        # os: ["windows-latest", "ubuntu-latest", "macos-latest"]
-        os: ["windows-latest"]
+        include:
+          - platform: 'macos-latest' # for Arm based macs (M1 and above).
+            args: '--target aarch64-apple-darwin'
+          # - platform: 'macos-latest' # for Intel based macs.
+          #   args: '--target x86_64-apple-darwin'
+          - platform: 'ubuntu-22.04' # for Tauri v1 you could replace this with ubuntu-20.04.
+            args: ''
+          - platform: 'windows-latest'
+            args: ''
+    runs-on: ${{ matrix.platform }}
 
     steps:
       - uses: actions/checkout@v4
@@ -38,21 +44,27 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: core-${{ matrix.os }}
+          name: core-${{ matrix.platform }}
           retention-days: 1
           path: core/dist/*
 
   bundle_desktop:
     needs: bundle_core
-    runs-on: ${{ matrix.os }}
     permissions:
       contents: write
     strategy:
       fail-fast: false
       matrix:
-        # os: ["ubuntu-latest", "macos-latest"]
-        # os: ["windows-latest", "ubuntu-latest", "macos-latest"]
-        os: ["windows-latest"]
+        include:
+          - platform: 'macos-latest' # for Arm based macs (M1 and above).
+            args: '--target aarch64-apple-darwin'
+          # - platform: 'macos-latest' # for Intel based macs.
+          #   args: '--target x86_64-apple-darwin'
+          - platform: 'ubuntu-22.04' # for Tauri v1 you could replace this with ubuntu-20.04.
+            args: ''
+          - platform: 'windows-latest'
+            args: ''
+    runs-on: ${{ matrix.platform }}
     steps:
       # - name: Extract version from tag
       #   id: extract_version
@@ -60,8 +72,8 @@ jobs:
       #     echo "Tag name: ${{ github.ref_name }}"
       #     TAG_NAME=${{ github.ref_name }}
       #     if [[ $TAG_NAME =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
-      #       VERSION=${BASH_REMATCH[1]}
-      #       echo "VERSION=$VERSION" >> $GITHUB_ENV
+      #       v__VERSION__=${BASH_REMATCH[1]}
+      #       echo "v__VERSION__=$v__VERSION__" >> $GITHUB_ENV
       #     else
       #       echo "The tag $TAG_NAME is not in the expected format 'v<MAJOR>.<MINOR>.<PATCH>'"
       #       exit 1
@@ -71,13 +83,22 @@ jobs:
       - name: Download bundle artifacts
         uses: actions/download-artifact@v4
         with:
-          name: core-${{ matrix.os }}
+          name: core-${{ matrix.platform }}
           path: core/dist
 
-      - name: Linux Only - Install Extra Libs
-        if: runner.os == 'Linux'
-        shell: bash
-        run: sudo apt-get update && sudo apt-get install -y build-essential libgtk-3-dev libssl-dev libsoup2.4-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev
+
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          # Those targets are only used on macos runners so it's in an `if` to slightly speed up windows and linux builds.
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+  
 
       - name: Setup Webapp
         id: prepare-webapp
@@ -85,17 +106,28 @@ jobs:
         with:
           working-directory: webapp
 
-      - name: Set Version
-        working-directory: webapp
-        run: pnpm run set-version ${{ env.VERSION }}
+      # - name: Set Version
+      #   working-directory: webapp
+      #   run: pnpm run set-version ${{ env.v__VERSION__ }}
 
-      - name: Bundle
-        working-directory: webapp
-        run: pnpm run build
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
+          releaseName: 'App v__VERSION__'
+          releaseBody: 'See the assets to download this version and install.'
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}
+
+      # - name: Bundle
+      #   working-directory: webapp
+      #   run: pnpm run build
 
       - uses: actions/upload-artifact@v4
         with:
-          name: core-${{ matrix.os }}
+          name: core-${{ matrix.platform }}
           retention-days: 1
           path: webapp/src-tauri/target/release/bundle/**/*.exe
 
@@ -111,6 +143,8 @@ jobs:
       #       webapp/src-tauri/target/release/bundle/**/*.AppImage
 
       #       webapp/src-tauri/target/release/bundle/**/*.exe
+
+
 
       # # Project rules must be updated to push changes
       # # GH013: Repository rule violations found for refs/heads/main.

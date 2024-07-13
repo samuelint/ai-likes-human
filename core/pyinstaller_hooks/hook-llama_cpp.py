@@ -18,7 +18,7 @@ datas = collect_data_files("llama_cpp")
 
 # Append the additional .dll or .so file
 if os.name == "nt":  # Windows
-    dll_path = os.path.join(package_path, "llama_cpp", "lib", "libllama.dll")
+    dll_path = os.path.join(package_path, "llama_cpp", "lib", "llama.dll")
     datas.append((dll_path, "llama_cpp"))
 elif sys.platform == "darwin":  # Mac
     so_path = os.path.join(package_path, "llama_cpp", "lib", "libllama.dylib")

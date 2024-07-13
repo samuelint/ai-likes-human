@@ -106,10 +106,6 @@ jobs:
         with:
           working-directory: webapp
 
-      # - name: Set Version
-      #   working-directory: webapp
-      #   run: pnpm run set-version ${{ env.v__VERSION__ }}
-
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -125,24 +121,19 @@ jobs:
       #   working-directory: webapp
       #   run: pnpm run build
 
-      - uses: actions/upload-artifact@v4
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
         with:
-          name: core-${{ matrix.platform }}
-          retention-days: 1
-          path: webapp/src-tauri/target/release/bundle/**/*.exe
+          files: |
+            webapp/src-tauri/target/release/bundle/**/*.dmg
+            webapp/src-tauri/target/release/bundle/**/*.app
 
-      # - name: Release
-      #   uses: softprops/action-gh-release@v2
-      #   if: startsWith(github.ref, 'refs/tags/')
-      #   with:
-      #     files: |
-      #       webapp/src-tauri/target/release/bundle/**/*.dmg
+            webapp/src-tauri/target/release/bundle/**/*.deb
+            webapp/src-tauri/target/release/bundle/**/*.rpm
+            webapp/src-tauri/target/release/bundle/**/*.AppImage
 
-      #       webapp/src-tauri/target/release/bundle/**/*.deb
-      #       webapp/src-tauri/target/release/bundle/**/*.rpm
-      #       webapp/src-tauri/target/release/bundle/**/*.AppImage
-
-      #       webapp/src-tauri/target/release/bundle/**/*.exe
+            webapp/src-tauri/target/release/bundle/**/*.exe
 
 
 

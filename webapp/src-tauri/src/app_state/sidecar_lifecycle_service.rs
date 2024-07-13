@@ -77,9 +77,16 @@ impl SidecarLifeCycleService {
             Some(child) => {
                 let id = child.id();
                 
-                child
+                #[cfg(unix)]
+                {
+                    child
                     .signal(Signal::SIGTERM)
                     .expect("Some error happened when killing child process");
+                }
+                #[cfg(windows)]
+                {
+                    child.kill().expect("Some error happened when killing child process");
+                }
 
                 self.child = None;
                 let info = format!("Sidecar {} stopped - {}", self.program, id);

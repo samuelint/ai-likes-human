@@ -45,6 +45,9 @@ First install the following on your machine
   - poetry | https://python-poetry.org/docs/
 - **Webapp**
   - pnpm | https://pnpm.io/installation
+- **Python**
+  - \>= 3.9 | https://www.python.org/downloads/
+
 
 #### Build
 
@@ -55,6 +58,16 @@ make build
 ```
 
 Once completed, a directory `./dist` should be created at the root of the project, containing binaries of the app.
+
+#### Dev
+
+In order to start the development environment, you should build the `core` first. Follow [buid](#build) steps and copy paste the binaries from `./dist` to `./webapp/src-tauri/bin`.
+
+In `core` directory, install dependencies with `peotry install`. Then `make dev` or `make run` to start the server.
+
+Once started, `core` should be served on port `8000`. You can get a health status of the server on `localhost:8000`.
+
+In the `webapp` directory, install dependencies with `pnpm install` and then run `pnpm dev`.
 
 ## What is this project solving?
 

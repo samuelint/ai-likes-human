@@ -36,8 +36,8 @@ The assistant does everything a real human assistant would do while being behind
 
 ## Setup
 
-`poetry init`
-`poetry env use ./.venv/bin/python`
+`poetry install`
+`poetry shell`
 
 ## Commands
 

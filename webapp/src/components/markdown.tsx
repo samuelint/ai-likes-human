@@ -3,7 +3,7 @@ import LibMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
-
+import { ExternalLink } from 'lucide-react';
 
 interface Props {
   children?: string
@@ -40,6 +40,9 @@ export function Markdown({ children }: Props) {
         },
         blockquote({ children }) {
           return <blockquote className="border-l-4 border-gray-300 pl-4">{children}</blockquote>;
+        },
+        a({ href, children }) {
+          return <a target='_blank' href={href} className="text-blue-600 cursor-pointer inline-block"><div className='flex gap-1'>{children} <ExternalLink className='w-4 h-4'/></div></a>;
         },
         code(props) {
           const { children, className, node, ...rest } = props;

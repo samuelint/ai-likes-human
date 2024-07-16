@@ -22,10 +22,10 @@
         "request": true
       },
       "shell": {
-        "all": true,
+        "all": false,
         "execute": true,
         "sidecar": true,
-        "open": true,
+        "open": false,
         "scope": [
           {
             "name": "bin/core",
@@ -69,7 +69,10 @@
       }
     },
     "security": {
-      "csp": null
+      "csp": {
+        "default-src": "'self' customprotocol: asset:",
+        "connect-src": "ipc: http://ipc.localhost"
+      }
     },
     "updater": {
       "active": false

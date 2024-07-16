@@ -37,7 +37,7 @@ The assistant does everything a real human assistant would do while being behind
 ## Setup
 
 `poetry install`
-`poetry env use python3` //For MacOS only, to double-check.
+`poetry shell`
 
 ## Commands
 

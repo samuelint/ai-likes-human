@@ -35,18 +35,24 @@ Project is currently in a mono repo. This structure simplify the integration of 
 - `core` | Core Web Server, AI & Agent integration
 - `webapp` | Webapp / Desktop App
 
-## Build Locally
+## Development
 
 #### Prerequisites:
 
 First install the following on your machine
 
+
 - **Core**
-  - poetry | https://python-poetry.org/docs/
+  - `python` \>= 3.9 | https://www.python.org/downloads/
+  - `poetry` | https://python-poetry.org/docs/
 - **Webapp**
-  - pnpm | https://pnpm.io/installation
-- **Python**
-  - \>= 3.9 | https://www.python.org/downloads/
+  - `pnpm` | https://pnpm.io/installation
+
+##### For Windows Development
+- Windows SDK, CMake | Install Visual Studio (https://visualstudio.microsoft.com/) and install 
+  - Desktop development with C++
+- `make` | 
+
 
 
 #### Build

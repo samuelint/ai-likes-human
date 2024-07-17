@@ -18,7 +18,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 );
 
 export default function App() {
-  const { hasAlreadyBeenUp } = useServerStatus();
+  const { hasAlreadyBeenUp, isDesktopApp } = useServerStatus();
 
-  return hasAlreadyBeenUp ? <Routes /> : <Splashscreen />;
+  return hasAlreadyBeenUp || !isDesktopApp ? <Routes /> : <Splashscreen />;
 }

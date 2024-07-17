@@ -1,3 +1,4 @@
+import { useIsInDesktopAppFn } from './is-in-desktop-app';
 import { isLocalServerRunning } from './tauri-interrupt/server-status';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export function useIsLocalServerUp ({ refreshInterval = 2000 }: Props = {}) {
+  const isDesktopAppFn = useIsInDesktopAppFn();
   const [isUp, setIsUp] = useState(false);
   const [hasAlreadyBeenUp, setHasAlreadyBeenUp] = useState(false);
 
@@ -19,17 +21,19 @@ export function useIsLocalServerUp ({ refreshInterval = 2000 }: Props = {}) {
   }, [hasAlreadyBeenUp]);
 
   useEffect(() => {
+    if (!isDesktopAppFn()) return;
     update();
   // Update at mount
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
+    if (!isDesktopAppFn()) return;
     const id = setInterval(async () => {
       update();
     }, refreshInterval);
     return () => clearInterval(id);
-  }, [update, refreshInterval]);
+  }, [update, refreshInterval, isDesktopAppFn]);
 
   return {
     isUp,

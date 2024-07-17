@@ -1,13 +1,29 @@
 # AI Assistant
 
-[![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC_BY--NC--ND_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-nd/4.0/)
+[![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC_BY--NC--ND_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-nd/4.0/) [![GitHub release](https://img.shields.io/github/v/release/samuelint/ai-assistant)](https://github.com/samuelint/ai-assistant/releases/latest)
 
-A personal AI assistant. 
+A personal AI assistant.
 This is **NOT** another LLM UI wrapper. But a framework to provide a set of tools for local AI agents and improve productivity using LangGraph.
 
-Open possibilities for a wide range of private automation & productivity. 
+Open possibilities for a wide range of private automation & productivity.
 
- #### Tools
+## Usage
+
+Download the latest version from the release page.
+[![GitHub release](https://img.shields.io/github/v/release/samuelint/ai-assistant)](https://github.com/samuelint/ai-assistant/releases/latest)
+
+
+##### :warning: Note. The app is not signed yet
+
+###### MacOS
+
+To run the app on MacOS, you need to remove the quarantine flag by running the following command in your terminal:
+`xattr -dr com.apple.quarantine ./assistant.app`
+
+## Features
+
+### Tools
+
 - ✅ Local inference for private data
 - ✅ Computer screenshot
 - ✅ Web Search
@@ -17,14 +33,16 @@ Open possibilities for a wide range of private automation & productivity.
 - 💡 Local documents, emails, etc..
 
 ### LLM Vendors
+
 - ✅ Local Phi3, LLama3
 - ✅ OpenAI
 - ✅ Anthropic
 
 ### Compatible on
+
 - ✅ macOS
-- 🚧 Windows
-- 🚧 Linux
+- ✅ Windows
+- ✅ Ubuntu/Debian
 
 https://github.com/samuelint/ai-assistant/assets/5473142/50c44730-1fc7-40d8-9681-78e772fb9bc1
 
@@ -41,7 +59,6 @@ Project is currently in a mono repo. This structure simplify the integration of 
 
 First install the following on your machine
 
-
 - **Core**
   - `python` \>= 3.9 | https://www.python.org/downloads/
   - `poetry` | https://python-poetry.org/docs/
@@ -49,11 +66,10 @@ First install the following on your machine
   - `pnpm` | https://pnpm.io/installation
 
 ##### For Windows Development
-- Windows SDK, CMake | Install Visual Studio (https://visualstudio.microsoft.com/) and install 
+
+- Windows SDK, CMake | Install Visual Studio (https://visualstudio.microsoft.com/) and install
   - Desktop development with C++
-- `make` | 
-
-
+- `make` |
 
 #### Build
 

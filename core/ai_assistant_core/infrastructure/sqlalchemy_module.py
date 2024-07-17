@@ -1,48 +1,16 @@
-import os
 from injector import Module, provider, singleton
-from sqlalchemy import Pool, QueuePool, StaticPool, create_engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session
 
 
 from ai_assistant_core.app_configuration import AppConfiguration
-from ai_assistant_core.infrastructure.migrator import run_database_migration
-
-from .sqlalchemy import Base
-from urllib.parse import urlparse
+from ai_assistant_core.infrastructure.session_factory import SqlAlchemySessionFactory
 
 
 class SqlAlchemyModule(Module):
-
     @singleton
     @provider
     def provide_sqlalchemy_session(self, configuration: AppConfiguration) -> Session:
         database_url = configuration.database_url
-        self.create_sqlite_path(database_url)
-        engine = create_engine(
-            database_url,
-            poolclass=self.get_pool_class(database_url),
-        )
+        factory = SqlAlchemySessionFactory(database_url)
 
-        Base.metadata.bind = engine
-        Base.metadata.create_all(engine)
-
-        with engine.begin() as connection:
-            run_database_migration(connection=connection)
-
-        return sessionmaker(autocommit=False, bind=engine)()
-
-    def get_pool_class(self, database_url: str) -> Pool:
-        if database_url.startswith("sqlite"):
-            return StaticPool
-        else:
-            return QueuePool
-
-    def create_sqlite_path(self, database_url: str) -> str:
-        parsed_url = urlparse(database_url)
-
-        if parsed_url.scheme in ["sqlite"]:
-            database_path = os.path.abspath(parsed_url.path)
-            directory = os.path.dirname(database_path)
-
-            if not os.path.exists(directory):
-                os.makedirs(directory)
+        return factory.create()

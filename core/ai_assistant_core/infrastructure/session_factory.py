@@ -19,10 +19,10 @@ class SqlAlchemySessionFactory:
         self,
     ) -> Session:
         database_url = self.database_url
-        self.__create_sqlite_path(database_url)
+        self._create_sqlite_path()
         engine = create_engine(
             database_url,
-            poolclass=self.__get_pool_class(database_url),
+            poolclass=self._get_pool_class(database_url),
         )
 
         Base.metadata.bind = engine
@@ -33,17 +33,18 @@ class SqlAlchemySessionFactory:
 
         return sessionmaker(autocommit=False, bind=engine)()
 
-    def __get_pool_class(self, database_url: str) -> Pool:
+    def _get_pool_class(self, database_url: str) -> Pool:
         if database_url.startswith("sqlite"):
             return StaticPool
         else:
             return QueuePool
 
-    def __create_sqlite_path(self, database_url: str) -> str:
-        parsed_url = urlparse(database_url)
+    def _create_sqlite_path(self) -> str:
+        parsed_url = urlparse(self.database_url)
 
         if parsed_url.scheme in ["sqlite"]:
-            database_path = os.path.abspath(parsed_url.path).removeprefix("/")
+            path = parsed_url.path.removeprefix("/")
+            database_path = os.path.abspath(path).removeprefix("/")
             directory = os.path.dirname(database_path)
 
             if not os.path.exists(directory):

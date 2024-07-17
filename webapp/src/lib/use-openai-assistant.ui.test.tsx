@@ -4,7 +4,7 @@
 import 'whatwg-fetch';
 import '@testing-library/jest-dom';
 import { when } from 'jest-when';
-import { cleanup, findByText, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import OpenAI from 'openai';
 import { useOpenAiAssistant } from './use-openai-assistant';
@@ -177,7 +177,10 @@ describe('new-conversation', () => {
       await userEvent.click(screen.getByTestId('do-append'));
 
       await screen.findByTestId('message-0');
-      expect(screen.getByTestId('message-0')).toHaveTextContent('Hello AI');
+
+      await waitFor(async () => {
+        expect(screen.getByTestId('message-0')).toHaveTextContent('Hello AI');
+      });
     });
 
     it('should show streamed response role assistant', async () => {
@@ -236,18 +239,16 @@ describe('new-conversation', () => {
     });
 
     it('should show loading state', async () => {
-
       await userEvent.click(screen.getByTestId('do-append'));
-
-      await screen.findByTestId('status');
-      expect(screen.getByTestId('status')).toHaveTextContent('in_progress');
+      await waitFor(async () => {
+        expect(screen.getByTestId('status')).toHaveTextContent('in_progress');
+      });
 
       finishGeneration?.();
 
-      await findByText(await screen.findByTestId('status'), 'awaiting_message');
-      expect(screen.getByTestId('status')).toHaveTextContent(
-        'awaiting_message',
-      );
+      await waitFor(async () => {
+        expect(screen.getByTestId('status')).toHaveTextContent('awaiting_message');
+      });
     });
   });
 });

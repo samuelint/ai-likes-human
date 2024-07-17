@@ -28,10 +28,10 @@ export function useCreateThread({ redirect }: Props = {}): CreateNewThread {
       messages,
     });
 
+    revalidate();
+
     if (redirect) {
       setLocation(`/thread/${newThread.id}`);
-    } else {
-      revalidate();
     }
 
     return newThread;

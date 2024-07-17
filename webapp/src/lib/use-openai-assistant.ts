@@ -59,6 +59,8 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai
   };
 
   const streamRun = useCallback(async () => {
+    if (status === 'in_progress') return;
+
     try {
       setStatus('in_progress');
 
@@ -101,20 +103,22 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai
       streamRef.current = null;
       setStatus('awaiting_message');
     }
-  }, [assistantId, messages, model, openai.beta.threads.runs, setUnknownError, temperature, threadId]);
+  }, [assistantId, messages, model, openai.beta.threads.runs, setUnknownError, status, temperature, threadId]);
+
+  const isLastMessageFromUser = useCallback(() => {
+    return messages.at(-1)?.role === 'user';
+  }, [messages]);
 
   useEffect(() => {
-    if (messages.at(-1)?.role === 'user') {
+    if (isLastMessageFromUser()) {
       streamRun();
     }
-  }, [messages, streamRun]);
+  }, [streamRun, isLastMessageFromUser]);
 
 
   const append = useCallback(async (
     message?: CreateMessage,
   ) => {
-    setInput('');
-    setImageAttachments([]);
 
     try {
       if (message) {
@@ -131,7 +135,7 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai
       setUnknownError(e);
     }
 
-  }, [setImageAttachments, openai.beta.threads.messages, threadId, setUnknownError]);
+  }, [openai.beta.threads.messages, threadId, setUnknownError]);
 
   const abort = useCallback(() => {
     if (abortControlerRef.current) {
@@ -151,6 +155,8 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai
     }
 
     append(createUserMessage({ input, imageAttachments }));
+    setInput('');
+    setImageAttachments([]);
   };
 
   return {

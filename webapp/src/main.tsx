@@ -1,22 +1,24 @@
 import './globals.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import Home from '@/app/page';
 import { MainLayout } from './app/main-layout';
-import { Route, Switch } from 'wouter';
-import Settings from '@/app/settings/page';
-import { Thread } from '@/app/thread/thread';
+import Splashscreen from './components/splashscreen';
+import Providers from './providers';
+import Routes from './routes';
+import { useServerStatus } from './lib/local-server-context';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <MainLayout>
-      <Switch>
-        <Route path="/"><Home /></Route>
-        <Route path="/thread/:threadId">
-          {(params) => <Thread threadId={params.threadId} />}
-        </Route>
-        <Route path="/settings"><Settings /></Route>
-      </Switch>
-    </MainLayout>
+    <Providers>
+      <MainLayout>
+        <App />
+      </MainLayout>
+    </Providers>
   </React.StrictMode>,
 );
+
+export default function App() {
+  const { hasAlreadyBeenUp } = useServerStatus();
+
+  return hasAlreadyBeenUp ? <Routes /> : <Splashscreen />;
+}

@@ -44,7 +44,7 @@ class SqlAlchemySessionFactory:
 
         if parsed_url.scheme in ["sqlite"]:
             path = parsed_url.path.removeprefix("/")
-            database_path = os.path.abspath(path).removeprefix("/")
+            database_path = os.path.abspath(path)
             directory = os.path.dirname(database_path)
 
             if not os.path.exists(directory):

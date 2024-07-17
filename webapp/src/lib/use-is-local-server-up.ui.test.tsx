@@ -7,8 +7,10 @@ import { cleanup, render, screen, waitFor, act } from '@testing-library/react';
 import { useIsLocalServerUp } from './use-is-local-server-up';
 import { isLocalServerRunning } from './tauri-interrupt/server-status';
 import { when } from 'jest-when';
+import { useIsInDesktopAppFn } from './is-in-desktop-app';
 
 vi.mock('./tauri-interrupt/server-status');
+vi.mock('./is-in-desktop-app');
 describe('new-conversation', () => {
   const TestComponent = () => {
     const { isUp, hasAlreadyBeenUp } = useIsLocalServerUp({ refreshInterval: 100 });
@@ -20,6 +22,10 @@ describe('new-conversation', () => {
       </div>
     );
   };
+
+  beforeEach(() => {
+    when(useIsInDesktopAppFn).mockImplementation(() => () => true);
+  });
 
   afterEach(() => {
     vi.restoreAllMocks();

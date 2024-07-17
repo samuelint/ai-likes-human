@@ -71,7 +71,7 @@
     "security": {
       "csp": {
         "default-src": "'self' customprotocol: asset:",
-        "connect-src": "ipc: http://ipc.localhost"
+        "connect-src": "ipc: http://localhost:8000"
       }
     },
     "updater": {

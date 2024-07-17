@@ -11,7 +11,7 @@ export class CreateMessageMock extends AssistantResponseBuilder {
   public text_content?: string;
   public created_at?: number = 1713226573;
 
-  public messageId?: string = (Math.random() + 1).toString(36).substring(7);
+  public messageId?: string = default_message_id;
 
   public constructor(props: CreateMessageMockProps = {}) {
     super();
@@ -23,7 +23,6 @@ export class CreateMessageMock extends AssistantResponseBuilder {
   }
 
   public getResponseJson(requestBody: any): object {
-    console.log({ this: this, requestBody });
     return {
       'id': this.messageId,
       'object': 'thread.message',

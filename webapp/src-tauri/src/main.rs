@@ -37,8 +37,10 @@ fn main() {
       let app_state: State<AppState> = app.state();
 
       let is_up = app_state.is_core_server_up();
-      if !is_up {
+      if is_up {
         warn!("Core Sidecar is already running");
+      }
+      if !is_up {
         app_state.start_core_server().expect("Core Sidecar start failed");
       }
 

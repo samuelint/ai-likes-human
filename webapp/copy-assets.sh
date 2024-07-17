@@ -11,3 +11,9 @@ mkdir -p "$tauri_dist_binary"
 
 # Copy all files in core_dist_binary to tauri_dist_binary
 cp -r "$core_dist_binary/"* "$tauri_dist_binary"
+
+# make all files in tauri_dist_binary executable
+if [[ "$OSTYPE" != "msys" ]]; then
+  find "$tauri_dist_binary" -type f -exec chmod +x {} \;
+fi
+

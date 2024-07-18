@@ -10,7 +10,6 @@ import { ChangeEvent, PropsWithChildren } from 'react';
 import { HeadingNodes, HeadingPlugin } from './module/heading';
 import { headingTheme } from './module/heading/heading.theme';
 import { MarkdownNodes, MarkdownPlugin, markdownTheme } from './module/markdown';
-import { BannerNodes, BannerPlugin, bannerTheme } from './module/banner';
 import { TextFormatNodes, TextFormatPlugin } from './module/text-format/text-format.plugin';
 import { CodeHighlightNodes, CodeHighlightPlugin, codeHighlightTheme } from './module/code-highlight';
 import { OnMarkdownChangePlugin } from './module/on-change';
@@ -18,7 +17,7 @@ import { ListNodes, ListPlugin, listTheme } from './module/list';
 import { LinkNodes, LinkPlugin, linkTheme } from './module/link';
 import { ExposeKeyboardEvent } from './module/keyboard-events';
 import { cn } from '@/lib/utils';
-
+import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 
 export type InputState = SerializedEditorState;
 export type OnError = (error: Error) => void;
@@ -35,16 +34,16 @@ interface Props extends PropsWithChildren {
   editable?: boolean
   className?: string
   onKeyboardEvent?: (event: KeyboarEvents) => void
+  debug?: boolean
 }
 
-export default function RichTextInput({ input, placeholder, onChange, onError, disabled, editable = true, className, onKeyboardEvent, children }: Props) {
+export default function RichTextInput({ input, placeholder, onChange, onError, disabled, editable = true, className, onKeyboardEvent, debug, children }: Props) {
   const initialConfig: InitialConfigType = {
-    nodes: [...HeadingNodes, ...ListNodes, ...MarkdownNodes, ...BannerNodes, ...TextFormatNodes, ...CodeHighlightNodes, ...LinkNodes],
+    nodes: [...HeadingNodes, ...ListNodes, ...MarkdownNodes, ...TextFormatNodes, ...CodeHighlightNodes, ...LinkNodes],
     editable,
     namespace: 'Conversation',
     theme: {
       ...listTheme,
-      ...bannerTheme,
       ...headingTheme,
       ...textFormatTheme,
       ...markdownTheme,
@@ -64,6 +63,7 @@ export default function RichTextInput({ input, placeholder, onChange, onError, d
         placeholder={<div className='absolute left-0 pointer-events-none text-gray-400'>{placeholder}</div>}
         ErrorBoundary={LexicalErrorBoundary}
       />
+      { debug && <OnChangePlugin onChange={(editorState) => console.log(JSON.stringify(editorState))} />}
 
       <HistoryPlugin />
       <ExposeKeyboardEvent
@@ -75,7 +75,6 @@ export default function RichTextInput({ input, placeholder, onChange, onError, d
       <ListPlugin />
       <LinkPlugin />
       <MarkdownPlugin />
-      <BannerPlugin />
       <AutoFocusPlugin defaultSelection='rootEnd' />
       <OnMarkdownChangePlugin
         input={input}

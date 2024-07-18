@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import { _TRANSFORMERS } from './transformers';
 import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
 import { HorizontalRulePlugin } from '@lexical/react/LexicalHorizontalRulePlugin';
-import { useCodeTransformOnEnter } from './use-code-transform-on-enter';
+import { useCreateCodeBlockOnEnter } from './use-create-code-block-on-enter';
 
 
 const MarkdownNodes = [
@@ -28,7 +28,7 @@ export function MarkdownPlugin() {
     );
   }, [editor]);
 
-  useCodeTransformOnEnter();
+  useCreateCodeBlockOnEnter();
 
   return <>
     <MarkdownShortcutPlugin transformers={_TRANSFORMERS} />

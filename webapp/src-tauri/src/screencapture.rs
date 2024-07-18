@@ -1,5 +1,4 @@
 use rayon::prelude::*;
-use std::time::Instant;
 use xcap::Monitor;
 use base64::{Engine as _, engine::general_purpose};
 use xcap::image::ImageOutputFormat;
@@ -33,8 +32,6 @@ fn get_image_dimension(dimensions: (u32, u32), max_size: u32) -> (u32, u32) {
 }
 
 fn resize_image(img: image::RgbaImage, max_size: u32) -> image::RgbaImage {
-  let start = Instant::now();
-
   let (src_width, src_height) = img.dimensions();
   let src_image = Image::from_vec_u8(
     src_width,
@@ -43,43 +40,54 @@ fn resize_image(img: image::RgbaImage, max_size: u32) -> image::RgbaImage {
     PixelType::U8x4,
   ).unwrap();
 
-
   let (dst_width, dst_height) = get_image_dimension((src_width, src_height), max_size);
   let mut dst_image = Image::new(dst_width, dst_height, src_image.pixel_type());
-
   let mut resizer = Resizer::new();
 
   resizer.resize(&src_image, &mut dst_image, &ResizeOptions::new().resize_alg(
     ResizeAlg::SuperSampling(FilterType::Box, 10),
-)).unwrap();
+  )).unwrap();
 
   let resized_img_buffer = ImageBuffer::<Rgba<u8>, _>::from_raw(
     dst_width,
     dst_height,
     dst_image.into_vec(),
-).unwrap();
-  
-  println!("Resize elapsed: {:?}", start.elapsed());
+  ).unwrap();
 
   return resized_img_buffer
 }
 
 #[tauri::command]
-pub async fn capture_screen(max_size: Option<i32>) -> Vec<String> {
+pub async fn capture_screen(max_size: Option<i32>) -> Result<Vec<String>, String>  {
   let max_size = max_size.unwrap_or(1024) as u32;
-  let monitors = Monitor::all().unwrap();
+  let monitors_result = Monitor::all();
+  let monitors = match monitors_result {
+    Ok(monitors) => monitors,
+    Err(err) => return Err(err.to_string()),
+  };
 
-  let b64_images: Vec<String> = monitors.par_iter()
-  .map(|monitor| {
-      let img = monitor.capture_image().unwrap();
+
+  let b64_images: Result<Vec<String>, String> = monitors.par_iter()
+    .map(|monitor| {
+      let img_result = monitor.capture_image();
+      
+      let img = match img_result {
+        Ok(img) => img,
+        Err(err) => return Err(err.to_string()),
+      };
+
       let resized_img = resize_image(img, max_size);
-     
       let mut png_data = std::io::Cursor::new(Vec::new());
-      resized_img.write_to(&mut png_data, ImageOutputFormat::Png).unwrap();
+      let resize_result = resized_img.write_to(&mut png_data, ImageOutputFormat::Png);
+
+      match resize_result {
+        Ok(_) => {},
+        Err(err) => return Err(err.to_string()),
+      };
   
-      return format!("data:image/png;base64,{}", general_purpose::STANDARD.encode(png_data.into_inner()));
-  })
-  .collect();
+      Ok(format!("data:image/png;base64,{}", general_purpose::STANDARD.encode(png_data.into_inner())))
+    })
+    .collect();
 
   b64_images
 }

@@ -8,9 +8,26 @@ interface Props {
 
 export function References({ references }: Props) {
   return (
-    <section className='flex flex-row text-xs gap-2 text-top pb-1 overflow-x-auto'>
+    <section
+      className='flex flex-row text-xs gap-2 text-top pb-1 overflow-x-auto'
+      style={{
+        whiteSpace: 'nowrap',
+        wordBreak: 'keep-all',
+        textOverflow: 'clip',
+      }}
+    >
       { references.map((reference, index) => (
-        <AppLink className='text-end' href={reference.link} key={index}>{ reference.title || reference.link }</AppLink>
+        <AppLink
+          className='text-end'
+          href={reference.link}
+          key={index}
+          style={{
+            maxHeight: '1rem',
+            lineHeight: '1rem',
+          }}
+        >
+          { reference.title || reference.link }
+        </AppLink>
       ))}
     </section>
   );

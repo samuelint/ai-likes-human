@@ -1,10 +1,6 @@
-import { AppLink } from './link';
-import { MessageReference } from './message-reference.type';
+import { MessageReference } from '@/lib/message-reference.type';
+import { AppLink } from './app-link';
 
-export interface MessageReference {
-  title?: string
-  link?: string
-}
 
 interface Props {
   references: MessageReference[]

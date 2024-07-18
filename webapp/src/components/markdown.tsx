@@ -3,7 +3,7 @@ import LibMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
-import { AppLink } from './link';
+import { AppLink } from './app-link';
 
 interface Props {
   children?: string

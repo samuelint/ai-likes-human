@@ -32,13 +32,12 @@ export default function Chat({ messages = [], byIdRuns = {}, isLoading, children
           { isLoading && <ThreeDotsLoading className="bg-blue-900 dark:bg-blue-50" /> }
         </div>
       </div>
-      <div className='mt-auto py-4 px-2 md:px-20 lg:px-32'>
+      <div className='relative mt-auto py-2 px-2 md:px-20 lg:px-32 w-full'>
         { children }
       </div>
     </div>
   );
 }
-
 
 function UserChatMessage(props: Omit<ChatMessageProps, 'type' | 'className'>) {
   return <Message type='user' className='w-max max-w-[75%] ml-auto' {...props} />;

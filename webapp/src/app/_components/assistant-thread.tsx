@@ -6,6 +6,8 @@ import { useLlmTemperature } from '@/lib/use-llm-temperature';
 import { useOpenAiAssistant } from '@/lib/use-openai-assistant';
 import { useThreadRuns } from '@/lib/use-thread-runs';
 import NewAssistantMessage from './new-assistant-message';
+import { References } from '@/components/references';
+import { useMessagesReferences } from '@/lib/use-messages-references';
 
 
 interface Props {
@@ -17,6 +19,7 @@ export default function AssistantThread({ threadId }: Props) {
   const { data: temperature } = useLlmTemperature();
   const { status, messages, error, input, submitMessage, handleInputChange, abort, addImageAttachments, imageAttachments, removeImageAttachment } = useOpenAiAssistant({ threadId, model, temperature });
   const { data: byIdRuns } = useThreadRuns({ threadId });
+  const references = useMessagesReferences({ messages });
 
   useErrorNotification(error);
 
@@ -28,6 +31,9 @@ export default function AssistantThread({ threadId }: Props) {
       byIdRuns={byIdRuns}
       isLoading={isLoading}
     >
+      <div className='flex justify-start'>
+        <References references={references}/>
+      </div>
       <NewAssistantMessage
         isLoading={isLoading}
         abort={abort}

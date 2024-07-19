@@ -6,3 +6,7 @@ export async function captureBase64Screens(): Promise<string[]> {
 
   return base64Images;
 }
+
+export async function assertScreenCapturePermissions(): Promise<boolean> {
+  return invoke<boolean>('assert_screen_capture_permissions');
+}

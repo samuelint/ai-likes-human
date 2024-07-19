@@ -82,6 +82,7 @@ dependencies = [
  "dirs",
  "fast_image_resize",
  "image 0.24.9",
+ "libc",
  "log",
  "rayon",
  "serde",

@@ -42,17 +42,6 @@ jobs:
 
       - run: make bundle
 
-      # - name: Sign binary
-      #   if: matrix.platform == 'macos-latest'
-      #   timeout-minutes: 2
-      #   uses: lando/code-sign-action@v2
-      #   with:
-      #     file: core/dist/core-aarch64-apple-darwin
-      #     certificate-data: ${{ secrets.APPLE_CERTIFICATE }}
-      #     certificate-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-      #     apple-team-id: ${{ secrets.APPLE_TEAM_ID }}
-      #     options: --entitlements entitlements.plist
-
       - name: Sign MacOS App
         if: matrix.platform == 'macos-latest'
         timeout-minutes: 2
@@ -98,20 +87,20 @@ jobs:
             args: '--target aarch64-apple-darwin'
           # - platform: 'macos-latest' # for Intel based macs.
           #   args: '--target x86_64-apple-darwin'
-          - platform: 'ubuntu-22.04' # for Tauri v1 you could replace this with ubuntu-20.04.
-            args: ''
-          - platform: 'windows-latest'
-            args: ''
+          # - platform: 'ubuntu-22.04' # for Tauri v1 you could replace this with ubuntu-20.04.
+          #   args: ''
+          # - platform: 'windows-latest'
+          #   args: ''
     runs-on: ${{ matrix.platform }}
     environment: release
     steps:
-      - name: Get Tags
-        id: tag
-        uses: ildug/get-tag-action@v1
-      - name: Display version
-        run: |
-          echo "Version ${{ steps.tag.outputs.version }}"
-          echo "Tag ${{ steps.tag.outputs.tag }}"
+      # - name: Get Tags
+      #   id: tag
+      #   uses: ildug/get-tag-action@v1
+      # - name: Display version
+      #   run: |
+      #     echo "Version ${{ steps.tag.outputs.version }}"
+      #     echo "Tag ${{ steps.tag.outputs.tag }}"
           
       - uses: actions/checkout@v4
       - name: Download bundle artifacts
@@ -155,8 +144,8 @@ jobs:
           APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
         with:
-          tagName: ${{ steps.tag.outputs.tag }}
-          releaseName: ${{ steps.tag.outputs.tag }}
+          # tagName: ${{ steps.tag.outputs.tag }}
+          # releaseName: ${{ steps.tag.outputs.tag }}
           releaseDraft: true
           args: ${{ matrix.args }}
 
@@ -167,22 +156,22 @@ jobs:
           retention-days: 1
           path: webapp/src-tauri/target/**/release/bundle/**/*.dmg
 
-      - name: Release
-        uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: |
-            webapp/src-tauri/target/**/release/bundle/**/*.dmg
-            webapp/src-tauri/target/**/release/bundle/**/*.app
-            webapp/src-tauri/target/release/bundle/**/*.dmg
-            webapp/src-tauri/target/release/bundle/**/*.app
+      # - name: Release
+      #   uses: softprops/action-gh-release@v2
+      #   if: startsWith(github.ref, 'refs/tags/')
+      #   with:
+      #     files: |
+      #       webapp/src-tauri/target/**/release/bundle/**/*.dmg
+      #       webapp/src-tauri/target/**/release/bundle/**/*.app
+      #       webapp/src-tauri/target/release/bundle/**/*.dmg
+      #       webapp/src-tauri/target/release/bundle/**/*.app
 
-            webapp/src-tauri/target/release/bundle/**/*.deb
-            webapp/src-tauri/target/release/bundle/**/*.rpm
-            webapp/src-tauri/target/release/bundle/**/*.AppImage
+      #       webapp/src-tauri/target/release/bundle/**/*.deb
+      #       webapp/src-tauri/target/release/bundle/**/*.rpm
+      #       webapp/src-tauri/target/release/bundle/**/*.AppImage
 
-            webapp/src-tauri/target/release/bundle/**/*.exe
-            webapp/src-tauri/target/release/bundle/**/*.msi
+      #       webapp/src-tauri/target/release/bundle/**/*.exe
+      #       webapp/src-tauri/target/release/bundle/**/*.msi
 
 
       # # Project rules must be updated to push changes

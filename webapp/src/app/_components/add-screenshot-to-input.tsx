@@ -3,6 +3,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { useCallback, useState } from 'react';
 import { AddImageAttachments } from '@/lib/image-attachment.type';
 import { captureBase64Screens } from '@/lib/tauri-interrupt/screen-capture';
+import { useAssertScreenCapturePermissions } from './hook/use-assert-screen-capture-permissions';
 
 
 interface Props {
@@ -12,6 +13,8 @@ interface Props {
 export function AddScreenshotToInput({ addImageAttachments }: Props) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+
+  useAssertScreenCapturePermissions();
 
   const addScreenshotToInput = useCallback(async () => {
     try {
@@ -35,4 +38,3 @@ export function AddScreenshotToInput({ addImageAttachments }: Props) {
 
   return <TakeScreenshotButton onClick={addScreenshotToInput} isLoading={isLoading}/>;
 }
-

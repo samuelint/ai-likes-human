@@ -123,12 +123,12 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
   
 
-      - name: Update Package Version
-        uses: jossef/action-set-json-field@v2.2
-        with:
-          file: webapp/src-tauri/tauri.conf.json
-          field: package.version
-          value: ${{ steps.tag.outputs.version }}
+      # - name: Update Package Version
+      #   uses: jossef/action-set-json-field@v2.2
+      #   with:
+      #     file: webapp/src-tauri/tauri.conf.json
+      #     field: package.version
+      #     value: ${{ steps.tag.outputs.version }}
 
       - name: Setup Webapp
         id: prepare-webapp

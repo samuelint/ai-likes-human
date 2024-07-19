@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { ExpandableImage } from './image';
+import { ExpandableImage } from './expandable-image';
 import { imageBase64 } from './image-asset.stories';
 
 

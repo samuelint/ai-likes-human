@@ -1,7 +1,7 @@
 import { Markdown } from './markdown';
 import { MessageContent as MessageContentDto } from '@/lib/use-openai-assistant';
 import { useMemo } from 'react';
-import { ExpandableImage } from './image';
+import { ExpandableImage } from './expandable-image';
 
 
 export interface ChatMessageProps {

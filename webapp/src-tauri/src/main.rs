@@ -8,7 +8,7 @@ pub mod system_tray;
 use tauri_plugin_log::LogTarget;
 use tauri::{Manager, State, WindowEvent, SystemTray};
 use tauri_plugin_window_state::{AppHandleExt, StateFlags};
-use screencapture::capture_screen;
+use screencapture::command::{capture_screen, assert_screen_capture_permissions};
 use system_tray::{build_menu, on_system_tray_event};
 use app_state::app_state::{AppState, start_server, stop_server, is_server_up};
 use log::{info, warn};
@@ -71,6 +71,7 @@ fn main() {
       stop_server,
       is_server_up,
       capture_screen,
+      assert_screen_capture_permissions,
     ])
     .build(tauri::generate_context!())
     .expect("error while building tauri application")

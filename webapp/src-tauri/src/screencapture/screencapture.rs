@@ -57,7 +57,7 @@ fn resize_image(img: image::RgbaImage, max_size: u32) -> image::RgbaImage {
   return resized_img_buffer
 }
 
-#[tauri::command]
+
 pub async fn capture_screen(max_size: Option<i32>) -> Result<Vec<String>, String>  {
   let max_size = max_size.unwrap_or(1024) as u32;
   let monitors_result = Monitor::all();
@@ -65,7 +65,6 @@ pub async fn capture_screen(max_size: Option<i32>) -> Result<Vec<String>, String
     Ok(monitors) => monitors,
     Err(err) => return Err(err.to_string()),
   };
-
 
   let b64_images: Result<Vec<String>, String> = monitors.par_iter()
     .map(|monitor| {

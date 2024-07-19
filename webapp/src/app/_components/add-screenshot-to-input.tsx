@@ -21,7 +21,7 @@ export function AddScreenshotToInput({ addImageAttachments }: Props) {
       setIsLoading(true);
       const base64Images = await captureBase64Screens();
       base64Images.map((base64, index) => {
-        const imageAttachments = [{ title: `${index}`, base64 }];
+        const imageAttachments = [{ title: `Monitor ${index}`, base64 }];
         addImageAttachments(imageAttachments);
       });
     } catch (error) {

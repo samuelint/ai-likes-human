@@ -12,14 +12,6 @@ Open possibilities for a wide range of private automation & productivity.
 Download the latest version from the release page.
 [![GitHub release](https://img.shields.io/github/v/release/samuelint/ai-assistant)](https://github.com/samuelint/ai-assistant/releases/latest)
 
-
-##### :warning: Note. The app is not signed yet
-
-###### MacOS
-
-To run the app on MacOS, you need to remove the quarantine flag by running the following command in your terminal:
-`xattr -dr com.apple.quarantine ./assistant.app`
-
 ## Features
 
 ### Tools

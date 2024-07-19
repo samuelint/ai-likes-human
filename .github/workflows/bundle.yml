@@ -1,9 +1,12 @@
 name: Bundle
 
+# on:
+#   push:
+#     tags:
+#       - "v*.*.*"
+
 on:
-  push:
-    tags:
-      - "v*.*.*"
+  pull_request:
 
 jobs:
   bundle_core:
@@ -16,12 +19,12 @@ jobs:
         include:
           - platform: 'macos-latest' # for Arm based macs (M1 and above).
             args: '--target aarch64-apple-darwin'
-          # - platform: 'macos-latest' # for Intel based macs.
-          #   args: '--target x86_64-apple-darwin'
-          - platform: 'ubuntu-22.04' # for Tauri v1 you could replace this with ubuntu-20.04.
-            args: ''
-          - platform: 'windows-latest'
-            args: ''
+          # # - platform: 'macos-latest' # for Intel based macs.
+          # #   args: '--target x86_64-apple-darwin'
+          # - platform: 'ubuntu-22.04' # for Tauri v1 you could replace this with ubuntu-20.04.
+          #   args: ''
+          # - platform: 'windows-latest'
+          #   args: ''
     runs-on: ${{ matrix.platform }}
     environment: release
 
@@ -134,6 +137,12 @@ jobs:
           releaseDraft: true
           args: ${{ matrix.args }}
 
+      ## TO Test release in branch
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-${{ matrix.platform }}
+          retention-days: 1
+          path: webapp/src-tauri/target/**/release/bundle/**/*.dmg
 
       - name: Release
         uses: softprops/action-gh-release@v2

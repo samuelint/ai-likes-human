@@ -42,39 +42,36 @@ jobs:
 
       - run: make bundle
 
-      - name: Sign binary
-        if: matrix.platform == 'macos-latest'
-        uses: lando/code-sign-action@v2
-        with:
-          file: core/dist/core-aarch64-apple-darwin
-          certificate-data: ${{ secrets.APPLE_CERTIFICATE }}
-          certificate-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          apple-team-id: ${{ secrets.APPLE_TEAM_ID }}
-          options: --entitlements entitlements.plist
-
-      # - name: Sign MacOS App
+      # - name: Sign binary
       #   if: matrix.platform == 'macos-latest'
-      #   env:
-      #     APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-      #     APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-      #     APPLE_ID: ${{ secrets.APPLE_ID }}
-      #     APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-      #   run: |
-      #     echo "Creating a temporary keychain"
-      #     security create-keychain -p "" tmp.keychain
-      #     security list-keychains -s tmp.keychain
-      #     security default-keychain -s tmp.keychain
-      #     security unlock-keychain -p "" tmp.keychain
-        
-      #     echo "Importing the certificate"
-      #     echo "$APPLE_CERTIFICATE" | base64 --decode > certificate.p12
-      #     security import certificate.p12 -P "$APPLE_CERTIFICATE_PASSWORD" -k ~/Library/Keychains/tmp.keychain
-        
-      #     echo "Signing the binary"
-      #     codesign --force --deep --sign "$APPLE_SIGNING_IDENTITY" --entitlements entitlements.plist dist/core-aarch64-apple-darwin
+      #   timeout-minutes: 2
+      #   uses: lando/code-sign-action@v2
+      #   with:
+      #     file: core/dist/core-aarch64-apple-darwin
+      #     certificate-data: ${{ secrets.APPLE_CERTIFICATE }}
+      #     certificate-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+      #     apple-team-id: ${{ secrets.APPLE_TEAM_ID }}
+      #     options: --entitlements entitlements.plist
 
-      #     echo "Deleting the temporary keychain"
-      #     security delete-keychain tmp.keychain
+      - name: Sign MacOS App
+        if: matrix.platform == 'macos-latest'
+        timeout-minutes: 2
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          TMP_KEYCHAIN_PASSWORD: some
+          APP_PATH: dist/core-aarch64-apple-darwin
+        run: |
+          echo $APPLE_CERTIFICATE | base64 —decode > certificate.p12
+          security create-keychain -p $TMP_KEYCHAIN_PASSWORD build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p $TMP_KEYCHAIN_PASSWORD build.keychain
+          security import certificate.p12 -k build.keychain -P $APPLE_CERTIFICATE_PASSWORD -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $TMP_KEYCHAIN_PASSWORD build.keychain
+          /usr/bin/codesign --force -s $APPLE_SIGNING_IDENTITY $APP_PATH -v
+
 
       - uses: actions/upload-artifact@v4
         with:

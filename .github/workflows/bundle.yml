@@ -42,29 +42,39 @@ jobs:
 
       - run: make bundle
 
-      - name: Sign MacOS App
+      - name: Sign binary
         if: matrix.platform == 'macos-latest'
-        env:
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-        run: |
-          echo "Creating a temporary keychain"
-          security create-keychain -p "" tmp.keychain
-          security list-keychains -s tmp.keychain
-          security default-keychain -s tmp.keychain
-          security unlock-keychain -p "" tmp.keychain
-        
-          echo "Importing the certificate"
-          echo "$APPLE_CERTIFICATE" | base64 --decode > certificate.p12
-          security import certificate.p12 -P "$APPLE_CERTIFICATE_PASSWORD" -k ~/Library/Keychains/tmp.keychain
-        
-          echo "Signing the binary"
-          codesign --force --deep --sign "$APPLE_SIGNING_IDENTITY" --entitlements entitlements.plist dist/core-aarch64-apple-darwin
+        uses: lando/code-sign-action@v2
+        with:
+          file: core/dist/core-aarch64-apple-darwin
+          certificate-data: ${{ secrets.APPLE_CERTIFICATE }}
+          certificate-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          apple-team-id: ${{ secrets.APPLE_TEAM_ID }}
+          options: --entitlements entitlements.plist
 
-          echo "Deleting the temporary keychain"
-          security delete-keychain tmp.keychain
+      # - name: Sign MacOS App
+      #   if: matrix.platform == 'macos-latest'
+      #   env:
+      #     APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+      #     APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+      #     APPLE_ID: ${{ secrets.APPLE_ID }}
+      #     APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+      #   run: |
+      #     echo "Creating a temporary keychain"
+      #     security create-keychain -p "" tmp.keychain
+      #     security list-keychains -s tmp.keychain
+      #     security default-keychain -s tmp.keychain
+      #     security unlock-keychain -p "" tmp.keychain
+        
+      #     echo "Importing the certificate"
+      #     echo "$APPLE_CERTIFICATE" | base64 --decode > certificate.p12
+      #     security import certificate.p12 -P "$APPLE_CERTIFICATE_PASSWORD" -k ~/Library/Keychains/tmp.keychain
+        
+      #     echo "Signing the binary"
+      #     codesign --force --deep --sign "$APPLE_SIGNING_IDENTITY" --entitlements entitlements.plist dist/core-aarch64-apple-darwin
+
+      #     echo "Deleting the temporary keychain"
+      #     security delete-keychain tmp.keychain
 
       - uses: actions/upload-artifact@v4
         with:

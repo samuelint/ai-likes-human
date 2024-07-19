@@ -11,21 +11,28 @@ use tauri_plugin_window_state::{AppHandleExt, StateFlags};
 use screencapture::capture_screen;
 use system_tray::{build_menu, on_system_tray_event};
 use app_state::app_state::{AppState, start_server, stop_server, is_server_up};
-use log::{info, warn};
+use log::{LevelFilter, info, warn};
 
 static CORE_SERVER_PORT_NUMBER: u16 = 8000;
+
+#[cfg(debug_assertions)]
+static LOG_LEVEL: LevelFilter = LevelFilter::Debug;
+#[cfg(not(debug_assertions))]
+static LOG_LEVEL: LevelFilter = LevelFilter::Warn;
 
 fn main() {
   let tray_menu = build_menu();
 
   let state = AppState::new(CORE_SERVER_PORT_NUMBER);
 
-  let log_builder = tauri_plugin_log::Builder::default().targets([
-    LogTarget::LogDir,
-    LogTarget::Stdout,
-    LogTarget::Stderr,
-    LogTarget::Webview,
-  ]);
+  let log_builder = tauri_plugin_log::Builder::default()
+    .level(LOG_LEVEL)
+    .targets([
+      LogTarget::LogDir,
+      LogTarget::Stdout,
+      LogTarget::Stderr,
+      LogTarget::Webview,
+    ]);
 
   tauri::Builder::default()
     .manage(state)

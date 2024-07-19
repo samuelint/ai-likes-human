@@ -5,6 +5,9 @@ on:
     tags:
       - "v*.*.*"
 
+# on:
+#   pull_request:
+
 jobs:
   bundle_core:
     defaults:
@@ -14,15 +17,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest' # for Arm based macs (M1 and above).
-            args: '--target aarch64-apple-darwin'
+          - platform: "macos-latest" # for Arm based macs (M1 and above).
+            args: "--target aarch64-apple-darwin"
           # - platform: 'macos-latest' # for Intel based macs.
           #   args: '--target x86_64-apple-darwin'
-          - platform: 'ubuntu-22.04' # for Tauri v1 you could replace this with ubuntu-20.04.
-            args: ''
-          - platform: 'windows-latest'
-            args: ''
+          - platform: "ubuntu-22.04" # for Tauri v1 you could replace this with ubuntu-20.04.
+            args: ""
+          - platform: "windows-latest"
+            args: ""
     runs-on: ${{ matrix.platform }}
+    environment: release
 
     steps:
       - uses: actions/checkout@v4
@@ -38,6 +42,33 @@ jobs:
 
       - run: make bundle
 
+      - name: Sign MacOS App
+        if: matrix.platform == 'macos-latest'
+        timeout-minutes: 2
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          TMP_KEYCHAIN_PASSWORD: some
+          APP_PATH: dist/core-aarch64-apple-darwin
+        run: |
+          echo "Creating a temporary keychain"
+          security create-keychain -p $TMP_KEYCHAIN_PASSWORD build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p $TMP_KEYCHAIN_PASSWORD build.keychain
+
+          echo "Importing the certificate"
+          echo "$APPLE_CERTIFICATE" | base64 --decode > certificate.p12
+          security import certificate.p12 -k build.keychain -P $APPLE_CERTIFICATE_PASSWORD -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $TMP_KEYCHAIN_PASSWORD build.keychain
+
+          echo "Signing the binary"
+          /usr/bin/codesign --force -s $APPLE_SIGNING_IDENTITY $APP_PATH -v
+
+          echo "Deleting the temporary keychain"
+          security delete-keychain build.keychain
+
       - uses: actions/upload-artifact@v4
         with:
           name: core-${{ matrix.platform }}
@@ -52,15 +83,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest' # for Arm based macs (M1 and above).
-            args: '--target aarch64-apple-darwin'
+          - platform: "macos-latest" # for Arm based macs (M1 and above).
+            args: "--target aarch64-apple-darwin"
           # - platform: 'macos-latest' # for Intel based macs.
           #   args: '--target x86_64-apple-darwin'
-          - platform: 'ubuntu-22.04' # for Tauri v1 you could replace this with ubuntu-20.04.
-            args: ''
-          - platform: 'windows-latest'
-            args: ''
+          - platform: "ubuntu-22.04" # for Tauri v1 you could replace this with ubuntu-20.04.
+            args: ""
+          - platform: "windows-latest"
+            args: ""
     runs-on: ${{ matrix.platform }}
+    environment: release
     steps:
       - name: Get Tags
         id: tag
@@ -69,14 +101,13 @@ jobs:
         run: |
           echo "Version ${{ steps.tag.outputs.version }}"
           echo "Tag ${{ steps.tag.outputs.tag }}"
-          
+
       - uses: actions/checkout@v4
       - name: Download bundle artifacts
         uses: actions/download-artifact@v4
         with:
           name: core-${{ matrix.platform }}
           path: core/dist
-
 
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -89,7 +120,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
-  
 
       - name: Update Package Version
         uses: jossef/action-set-json-field@v2.2
@@ -107,12 +137,16 @@ jobs:
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
-          tagName: ${{ steps.tag.outputs.tag }}
-          releaseName: ${{ steps.tag.outputs.tag }}
+          # tagName: ${{ steps.tag.outputs.tag }}
+          # releaseName: ${{ steps.tag.outputs.tag }}
           releaseDraft: true
           args: ${{ matrix.args }}
-
 
       - name: Release
         uses: softprops/action-gh-release@v2
@@ -130,7 +164,6 @@ jobs:
 
             webapp/src-tauri/target/release/bundle/**/*.exe
             webapp/src-tauri/target/release/bundle/**/*.msi
-
 
       # # Project rules must be updated to push changes
       # # GH013: Repository rule violations found for refs/heads/main.

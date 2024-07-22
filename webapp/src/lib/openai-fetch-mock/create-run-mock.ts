@@ -132,7 +132,7 @@ export class CreateRunMock extends AssistantResponseBuilder {
   }
 
 
-  public getResponse(): Response {
+  public getResponse(_requestBody: never, config: RequestInit): Response {
     const chunks = this.chunks ?? [];
     const finishGenerationPromise = this.finishGenerationPromise;
     async function* generateChunks() {
@@ -153,10 +153,24 @@ export class CreateRunMock extends AssistantResponseBuilder {
       headers: new Map([['content-type', 'text/event-stream']]),
       body: new ReadableStream({
         async start(controller) {
-          for await (const chunk of chunkGenerator) {
-            controller.enqueue(chunk);
+          if (config && config.signal) {
+            if (config.signal.aborted) {
+              controller.error(new DOMException('Aborted', 'AbortError'));
+              return;
+            }
+            config.signal.addEventListener('abort', () => {
+              controller.error(new DOMException('Aborted', 'AbortError'));
+            });
           }
-          controller.close();
+
+          try {
+            for await (const chunk of chunkGenerator) {
+              controller.enqueue(chunk);
+            }
+            controller.close();
+          } catch (error) {
+            controller.error(error);
+          }
         },
       }),
     } as unknown as Response;

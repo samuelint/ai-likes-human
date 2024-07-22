@@ -18,7 +18,7 @@ export abstract class AssistantResponseBuilder {
     return {};
   }
 
-  public getResponse(requestBody: any): Response {
+  public getResponse(requestBody: any, _config: RequestInit): Response {
     const jsonBody = this.getResponseJson(requestBody);
     return {
       ok: true,

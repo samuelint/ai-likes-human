@@ -20,11 +20,10 @@ interface Props {
     threadId: string;
     model?: string;
     temperature?: number;
-    initialInput?: string;
 }
-export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai:gpt-3.5-turbo', temperature, initialInput }: Props) {
+export function useOpenAiAssistant({ assistantId = '', threadId, model, temperature }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState(initialInput ?? '');
+  const [input, setInput] = useState('');
   const { imageAttachments, removeImageAttachment, addImageAttachments, setImageAttachments } = useImageAttachments();
   const [status, setStatus] = useState<AssistantStatus>('awaiting_message');
   const [error, setError] = useState<undefined | Error>(undefined);
@@ -32,23 +31,11 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai
   const abortControlerRef = useRef<AbortController | null>(null);
   const openai = useOpenaiClient();
 
+
   const setUnknownError = useCallback((e: unknown) => {
     if (e instanceof Error) setError(e);
     else setError(new Error(`${e}`));
   }, []);
-
-  useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const newMessages = await openai.beta.threads.messages.list(threadId);
-        setMessages(newMessages.data);
-      } catch (e) {
-        setUnknownError(e);
-      }
-    };
-    fetchMessages();
-
-  }, [openai.beta.threads.messages, threadId, setUnknownError]);
 
   const handleInputChange = (
     event:
@@ -74,18 +61,14 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai
           temperature,
         }, { signal })
           .on('messageCreated', (message: Message) => setMessages(messages => [...messages, message]))
-          .on('messageDelta', (_delta: MessageDelta, snapshot: Message) => setMessages(messages => {
-            return [
-              ...messages.slice(0, messages.length - 1),
-              snapshot
-            ];
-          }))
-          .on('messageDone', (message: Message) => {
-            return [
-              ...messages.slice(0, messages.length - 1),
-              message
-            ];
-          })
+          .on('messageDelta', (_delta: MessageDelta, snapshot: Message) => setMessages(messages => [
+            ...messages.slice(0, messages.length - 1),
+            snapshot
+          ]))
+          .on('messageDone', (message: Message) => [
+            ...messages.slice(0, messages.length - 1),
+            message
+          ])
           .on('error', (error) => rejects(error))
           .on('abort', () => resolve())
           .on('end', () => resolve());
@@ -93,11 +76,9 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai
 
     } catch (e) {
       setUnknownError(e);
-      setMessages(messages => {
-        return [
-          ...messages.slice(0, messages.length - 1),
-        ];
-      });
+      setMessages(messages => [
+        ...messages.slice(0, messages.length - 1),
+      ]);
     }
     finally {
       streamRef.current = null;
@@ -119,6 +100,7 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai
   const append = useCallback(async (
     message?: CreateMessage,
   ) => {
+    if (status === 'in_progress') throw new Error('Cannot append message while in progress');
 
     try {
       if (message) {
@@ -131,11 +113,12 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai
           created_message,
         ]);
       }
+
     } catch (e) {
       setUnknownError(e);
     }
 
-  }, [openai.beta.threads.messages, threadId, setUnknownError]);
+  }, [openai.beta.threads.messages, threadId, setUnknownError, status]);
 
   const abort = useCallback(() => {
     if (abortControlerRef.current) {
@@ -144,6 +127,24 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai
     }
   }, []);
 
+  const streamRunRef = useRef(streamRun);
+
+  useEffect(() => {
+    streamRunRef.current = streamRun;
+  }, [streamRun]);
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const newMessages = await openai.beta.threads.messages.list(threadId);
+        setMessages(newMessages.data);
+      } catch (e) {
+        setUnknownError(e);
+      }
+    };
+    fetchMessages();
+
+  }, [openai.beta.threads.messages, threadId, setUnknownError]);
 
   const submitMessage = async (
     event?: React.FormEvent<HTMLFormElement>,
@@ -154,7 +155,7 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model = 'openai
       return;
     }
 
-    append(createUserMessage({ input, imageAttachments }));
+    await append(createUserMessage({ input, imageAttachments }));
     setInput('');
     setImageAttachments([]);
   };

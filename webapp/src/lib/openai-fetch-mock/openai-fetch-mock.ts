@@ -11,7 +11,7 @@ export function buildOpenAiApiFetchMock(builders: AssistantResponseBuilder[], de
     for (const builder of builders) {
       if (builder.doesMatch(url, config)) {
         await new Promise(resolve => setTimeout(resolve, delay));
-        return builder.getResponse(requestBody);
+        return builder.getResponse(requestBody, config);
       }
     }
   };

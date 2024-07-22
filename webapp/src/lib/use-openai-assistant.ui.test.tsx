@@ -23,7 +23,7 @@ describe('new-conversation', () => {
       dangerouslyAllowBrowser: true,
     }));
 
-    const { status, messages, error, append } = useOpenAiAssistant({ threadId });
+    const { status, messages, error, append, abort } = useOpenAiAssistant({ threadId });
 
     return (
       <div>
@@ -38,9 +38,11 @@ describe('new-conversation', () => {
 
         <button
           data-testid="do-append"
-          onClick={() => {
-            append({ role: 'user', content: 'Hello AI' });
-          }}
+          onClick={() => append({ role: 'user', content: 'Hello AI' })}
+        />
+        <button
+          data-testid="abort"
+          onClick={() => abort()}
         />
       </div>
     );
@@ -200,6 +202,22 @@ describe('new-conversation', () => {
         expect(screen.getByTestId('message-1')).toHaveTextContent('Hello human');
       });
     });
+
+    it('should not submit when in progress', async () => {
+      await userEvent.click(screen.getByTestId('do-append'));
+      await waitFor(async () => {
+        expect(screen.getByTestId('status')).toHaveTextContent('in_progress');
+      });
+
+      await userEvent.click(screen.getByTestId('do-append'));
+
+
+      await waitFor(async () => {
+        expect(screen.getByTestId('message-0')).toHaveTextContent('Hello AI');
+        expect(screen.getByTestId('message-1')).toHaveTextContent('Hello human');
+        expect(screen.queryByTestId('message-2')).not.toBeInTheDocument();
+      });
+    });
   });
 
   describe('error', () => {
@@ -227,12 +245,13 @@ describe('new-conversation', () => {
     beforeEach(() => {
       fetch.mockImplementation(buildOpenAiApiFetchMock([
         new CreateMessageMock(),
+        new CreateThreadMock(),
         new CreateRunMock({
           finishGenerationPromise: new Promise(resolve => {
             finishGeneration = resolve;
           })
         }),
-        new CreateThreadMock(),
+
       ]));
 
       render(<TestComponent />);
@@ -249,6 +268,31 @@ describe('new-conversation', () => {
       await waitFor(async () => {
         expect(screen.getByTestId('status')).toHaveTextContent('awaiting_message');
       });
+    });
+  });
+
+  describe('abort', () => {
+    beforeEach(() => {
+      fetch.mockImplementation(buildOpenAiApiFetchMock([
+        new CreateMessageMock(),
+        new CreateThreadMock(),
+        new CreateRunMock({
+          finishGenerationPromise: new Promise(() => {
+            // Never resolve, will be resolved by abort controller
+          })
+        }),
+      ]));
+
+      render(<TestComponent />);
+    });
+
+    it('should stop generation', async () => {
+      await userEvent.click(screen.getByTestId('do-append'));
+      await waitFor(async () => expect(screen.getByTestId('status')).toHaveTextContent('in_progress'));
+
+      await userEvent.click(screen.getByTestId('abort'));
+
+      await waitFor(async () => expect(screen.getByTestId('status')).toHaveTextContent('awaiting_message'), { timeout: 1000 });
     });
   });
 });

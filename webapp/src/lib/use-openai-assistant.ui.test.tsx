@@ -10,6 +10,7 @@ import OpenAI from 'openai';
 import { useOpenAiAssistant } from './use-openai-assistant';
 import { buildOpenAiApiFetchMock, CreateMessageMock, CreateRunMock, CreateThreadMock, ErrorMock } from '@/lib/openai-fetch-mock';
 import { useOpenaiClient } from './openai-client';
+import { useState } from 'react';
 
 
 vi.mock('./openai-client');
@@ -24,6 +25,7 @@ describe('new-conversation', () => {
     }));
 
     const { status, messages, error, append, abort } = useOpenAiAssistant({ threadId });
+    const [appendError, setAppendError] = useState<Error>();
 
     return (
       <div>
@@ -38,12 +40,20 @@ describe('new-conversation', () => {
 
         <button
           data-testid="do-append"
-          onClick={() => append({ role: 'user', content: 'Hello AI' })}
+          onClick={async () => {
+            try {
+              await append({ role: 'user', content: 'Hello AI' });
+            } catch (e) {
+              setAppendError(e as Error);
+            }
+          }}
         />
         <button
           data-testid="abort"
           onClick={() => abort()}
         />
+
+        { appendError && <div data-testid="append-error">{appendError.toString()}</div>}
       </div>
     );
   };
@@ -216,6 +226,10 @@ describe('new-conversation', () => {
         expect(screen.getByTestId('message-0')).toHaveTextContent('Hello AI');
         expect(screen.getByTestId('message-1')).toHaveTextContent('Hello human');
         expect(screen.queryByTestId('message-2')).not.toBeInTheDocument();
+      });
+
+      await waitFor(async () => {
+        expect(screen.queryByTestId('append-error')).toBeInTheDocument();
       });
     });
   });

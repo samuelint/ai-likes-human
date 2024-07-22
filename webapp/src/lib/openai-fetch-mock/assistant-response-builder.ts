@@ -18,8 +18,7 @@ export abstract class AssistantResponseBuilder {
     return {};
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public getResponse(requestBody: any, config: RequestInit): Response {
+  public getResponse(requestBody: any, _config: RequestInit): Response {
     const jsonBody = this.getResponseJson(requestBody);
     return {
       ok: true,

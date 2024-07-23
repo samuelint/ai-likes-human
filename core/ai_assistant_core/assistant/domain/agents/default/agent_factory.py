@@ -33,5 +33,7 @@ class DefaultAgentFactory(BaseAgentFactory):
         )
 
         return create_react_agent(
-            model=llm, tools=self.tools, messages_modifier=system_prompt
+            model=llm,
+            tools=self.tools,
+            messages_modifier=system_prompt,
         )

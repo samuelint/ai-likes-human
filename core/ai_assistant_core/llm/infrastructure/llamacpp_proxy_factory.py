@@ -21,12 +21,12 @@ class LlamaCppProxyFactory:
         return ModelSettings(
             model=local_path,
             model_alias=model_alias,
-            n_ctx=10240,
-            n_batch=512,  # Should be between 1 and n_ctx, consider the amount of RAM.
+            n_ctx=8192,
+            # n_batch=512,  # Should be between 1 and n_ctx, consider the amount of RAM.
             offload_kqv=True,  # Equivalent of f16_kv=True
             n_gpu_layers=-1,  # -1 is all on GPU
             chat_format="chatml-function-calling",
-            verbose=False,
+            verbose=True,
         )
 
     def create_llama_proxy(self) -> LlamaProxy:

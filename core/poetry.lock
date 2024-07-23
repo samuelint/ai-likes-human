@@ -1239,22 +1239,23 @@ tenacity = ">=8.1.0,<8.4.0 || >8.4.0,<9.0.0"
 
 [[package]]
 name = "langchain-llamacpp-chat-model"
-version = "0.2.0"
+version = "0.2.2"
 description = ""
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "langchain_llamacpp_chat_model-0.2.0-py3-none-any.whl", hash = "sha256:fcc062a9d230635faa10394d66974bb3bb5974dd28403e995b2ece7a0eb906a1"},
-    {file = "langchain_llamacpp_chat_model-0.2.0.tar.gz", hash = "sha256:23c0fc7f028e9ab7d014d559a7d9216125b50ef972f86efcc9b8207316e09abe"},
+    {file = "langchain_llamacpp_chat_model-0.2.2-py3-none-any.whl", hash = "sha256:6f74a7ac7d0618ecace5f3323c5e9d13e6fe9503ede387f06eafdd61a3c66017"},
+    {file = "langchain_llamacpp_chat_model-0.2.2.tar.gz", hash = "sha256:b41d8c42283e648203239abd8e0f392f20aba5233d1ea4a0e6cecef8f801688c"},
 ]
 
 [package.dependencies]
 langchain-openai = ">=0.1.14,<0.2.0"
 llama-cpp-python = ">=0.2.81,<0.3.0"
+pydantic-settings = ">=2.3.4,<3.0.0"
 
 [package.extras]
 langchain = ["langchain (>=0.2.6,<0.3.0)"]
-langchain-serve = ["anyio (>=4.4.0,<5.0.0)", "fastapi (>=0.111.0,<0.112.0)", "pydantic-settings (>=2.3.4,<3.0.0)", "sse-starlette (>=2.1.2,<3.0.0)", "starlette-context (>=0.3.6,<0.4.0)"]
+llama-proxy = ["anyio (>=4.4.0,<5.0.0)", "fastapi (>=0.111.0,<0.112.0)", "sse-starlette (>=2.1.2,<3.0.0)", "starlette-context (>=0.3.6,<0.4.0)"]
 
 [[package]]
 name = "langchain-openai"
@@ -1274,13 +1275,13 @@ tiktoken = ">=0.7,<1"
 
 [[package]]
 name = "langchain-openai-api-bridge"
-version = "0.8.2"
+version = "0.9.0"
 description = "A bridge to use Langchain output as an OpenAI-compatible API."
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "langchain_openai_api_bridge-0.8.2-py3-none-any.whl", hash = "sha256:0d97edfeadba45ac6824e77e011502247f77c087c94fd39e780c424b6eca5328"},
-    {file = "langchain_openai_api_bridge-0.8.2.tar.gz", hash = "sha256:497b7fb351ff510144d4b39675d48a09b519f758eb06ff40e3b4b7521df9260b"},
+    {file = "langchain_openai_api_bridge-0.9.0-py3-none-any.whl", hash = "sha256:b26950373786c3ceab45c537d620eafb3174803409cbbdcc24f82542138ccc93"},
+    {file = "langchain_openai_api_bridge-0.9.0.tar.gz", hash = "sha256:ffa5baf34b13aab177cb5d59b45040e57a2785f8fe00085808ae2e007b254846"},
 ]
 
 [package.dependencies]
@@ -1366,12 +1367,12 @@ requests = ">=2,<3"
 
 [[package]]
 name = "llama-cpp-python"
-version = "0.2.81"
+version = "0.2.82"
 description = "Python bindings for the llama.cpp library"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "llama_cpp_python-0.2.81.tar.gz", hash = "sha256:db875f243ffd56aa4b52d6aa02890a288bcf9ec28bbebf015be697b71845d43a"},
+    {file = "llama_cpp_python-0.2.82.tar.gz", hash = "sha256:55dbc02342bd128e12be7e6b59ba9f96a1bdb35a4e32b42694134970a6d96060"},
 ]
 
 [package.dependencies]
@@ -3515,4 +3516,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.13"
-content-hash = "7e87671d55a1768138e55432e799fa29bfaeadbf245aa35de277fc78e9339a14"
+content-hash = "9c99cf708e1b387be23c509a9f7b5190b9353f81d512475b4c4324b7a13ad054"

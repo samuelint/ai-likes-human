@@ -14,7 +14,6 @@ export function useModelSettingsFormControls(): ModelSettingsFormControls {
   const { data: model, mutate } = useLLMModel();
   const { data: availableModels } = useAvailableModels();
 
-
   const handleSubmit = useCallback<OnModelSelectorSubmit>(async (newData) => {
     await mutate(newData.model);
   }, [mutate]);

@@ -1,8 +1,8 @@
 from .module import ConfigurationModule
-from .api.route import configuration_kv_router
+from .api import routes
 
 
 __all__ = [
     "ConfigurationModule",
-    "configuration_kv_router",
+    "routes",
 ]

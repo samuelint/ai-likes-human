@@ -8,7 +8,7 @@ from fastapi_injector import attach_injector
 
 from ai_assistant_core.assistant import AssistantModule, bind_assistant_routes
 from ai_assistant_core.health.route import bind_health_routes
-from ai_assistant_core.configuration import configuration_kv_router
+from ai_assistant_core.configuration import routes
 
 from ai_assistant_core.infrastructure import SqlAlchemyModule
 from ai_assistant_core.app_configuration import (
@@ -47,7 +47,7 @@ def create_app(database_url: Optional[str] = None) -> FastAPI:
 
     bind_health_routes(app=app)
     bind_assistant_routes(app=app, injector=injector)
-    app.include_router(configuration_kv_router)
+    [app.include_router(route) for route in routes]
     app.include_router(configuration_local_model_router)
 
     return app

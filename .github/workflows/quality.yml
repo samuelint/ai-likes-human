@@ -41,8 +41,6 @@ jobs:
       - name: Setup Tauri
         id: prepare-tauri
         uses: ./.github/actions/prepare_tauri
-        with:
-          platform: ${{ runner.os }}
 
       - name: Build
         run: |

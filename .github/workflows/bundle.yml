@@ -100,6 +100,13 @@ jobs:
         with:
           platform: ${{ matrix.platform }}
 
+      - uses: actions/checkout@v4
+      - name: Download bundle artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: core-${{ matrix.platform }}
+          path: core/dist
+
       - name: Get Tags
         id: tag
         uses: ildug/get-tag-action@v1
@@ -107,13 +114,6 @@ jobs:
         run: |
           echo "Version ${{ steps.tag.outputs.version }}"
           echo "Tag ${{ steps.tag.outputs.tag }}"
-
-      - uses: actions/checkout@v4
-      - name: Download bundle artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: core-${{ matrix.platform }}
-          path: core/dist
 
       - name: Update Package Version
         uses: jossef/action-set-json-field@v2.2

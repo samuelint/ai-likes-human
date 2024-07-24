@@ -29,7 +29,7 @@ runs:
         targets: ${{ contains(inputs.platform, 'macos') && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
     - name: install dependencies (ubuntu only)
-      if: contains(inputs.platform, 'ubuntu')
+      if: ${{ contains(inputs.platform, 'ubuntu') }}
       shell: bash
       run: |
         sudo apt-get update

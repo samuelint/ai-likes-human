@@ -1,12 +1,12 @@
 name: Bundle
 
-on:
-  push:
-    tags:
-      - "v*.*.*"
-
 # on:
-#   pull_request:
+#   push:
+#     tags:
+#       - "v*.*.*"
+
+on:
+  pull_request:
 
 jobs:
   bundle_core:
@@ -94,6 +94,18 @@ jobs:
     runs-on: ${{ matrix.platform }}
     environment: release
     steps:
+      - name: Setup Tauri
+        id: prepare-tauri
+        uses: ./.github/actions/prepare_pnpm
+        with:
+          working-directory: desktop
+      
+      - name: Setup Webapp
+        id: prepare-webapp
+        uses: ./.github/actions/prepare_pnpm
+        with:
+          working-directory: webapp
+
       - name: Get Tags
         id: tag
         uses: ildug/get-tag-action@v1
@@ -109,30 +121,12 @@ jobs:
           name: core-${{ matrix.platform }}
           path: core/dist
 
-      - name: install Rust stable
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          # Those targets are only used on macos runners so it's in an `if` to slightly speed up windows and linux builds.
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
-
-      - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
-
       - name: Update Package Version
         uses: jossef/action-set-json-field@v2.2
         with:
           file: webapp/src-tauri/tauri.conf.json
           field: package.version
           value: ${{ steps.tag.outputs.version }}
-
-      - name: Setup Webapp
-        id: prepare-webapp
-        uses: ./.github/actions/prepare_webapp
-        with:
-          working-directory: webapp
 
       - uses: tauri-apps/tauri-action@v0
         env:

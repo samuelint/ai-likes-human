@@ -99,12 +99,6 @@ jobs:
         uses: ./.github/actions/prepare_pnpm
         with:
           working-directory: desktop
-      
-      - name: Setup Webapp
-        id: prepare-webapp
-        uses: ./.github/actions/prepare_pnpm
-        with:
-          working-directory: webapp
 
       - name: Get Tags
         id: tag

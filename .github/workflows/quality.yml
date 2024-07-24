@@ -42,7 +42,7 @@ jobs:
         id: prepare-tauri
         uses: ./.github/actions/prepare_pnpm
         with:
-          working-directory: desktop
+          platform: ${{ runner.os }}
 
       - name: Build
         run: |

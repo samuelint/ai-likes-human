@@ -1,11 +1,10 @@
-name: Reusable steps (AKA composite action)
-description: Demonstrate how to use reusable steps in a workflow
+name: Prepare pnpm project
+description: Prepare a PNPM project for upcomming commands
 
 inputs:
   working-directory:
-    required: false
+    required: true
     type: string
-    default: webapp
 
 runs:
   using: "composite"

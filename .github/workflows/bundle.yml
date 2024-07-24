@@ -87,13 +87,26 @@ jobs:
             args: "--target aarch64-apple-darwin"
           # - platform: 'macos-latest' # for Intel based macs.
           #   args: '--target x86_64-apple-darwin'
-          - platform: "ubuntu-22.04" # for Tauri v1 you could replace this with ubuntu-20.04.
+          - platform: "ubuntu-22.04"
             args: ""
           - platform: "windows-latest"
             args: ""
     runs-on: ${{ matrix.platform }}
     environment: release
     steps:
+      - uses: actions/checkout@v4
+      - name: Download bundle artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: core-${{ matrix.platform }}
+          path: core/dist
+          
+      - name: Setup Tauri
+        id: prepare-tauri
+        uses: ./.github/actions/prepare_tauri
+        with:
+          platform: ${{ matrix.platform }}
+
       - name: Get Tags
         id: tag
         uses: ildug/get-tag-action@v1
@@ -102,37 +115,12 @@ jobs:
           echo "Version ${{ steps.tag.outputs.version }}"
           echo "Tag ${{ steps.tag.outputs.tag }}"
 
-      - uses: actions/checkout@v4
-      - name: Download bundle artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: core-${{ matrix.platform }}
-          path: core/dist
-
-      - name: install Rust stable
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          # Those targets are only used on macos runners so it's in an `if` to slightly speed up windows and linux builds.
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
-
-      - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
-
       - name: Update Package Version
         uses: jossef/action-set-json-field@v2.2
         with:
           file: webapp/src-tauri/tauri.conf.json
           field: package.version
           value: ${{ steps.tag.outputs.version }}
-
-      - name: Setup Webapp
-        id: prepare-webapp
-        uses: ./.github/actions/prepare_webapp
-        with:
-          working-directory: webapp
 
       - uses: tauri-apps/tauri-action@v0
         env:

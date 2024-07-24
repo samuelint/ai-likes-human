@@ -1,23 +1,18 @@
 {
-  "name": "webapp-vite",
+  "name": "alh-webapp",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev:webapp": "vite",
-    "dev:desktop": "tauri dev",
-    "dev": "pnpm run dev:desktop",
-    "build:webapp": "tsc -b && vite build",
-    "build:desktop": "tauri build",
-    "build": "pnpm run build:desktop",
+    "dev": "vite",
+    "build": "tsc -b && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "test": "vitest run",
     "test:ui": "vitest --ui",
     "test:watch": "vitest",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
-    "set-version": "bash ./set-version.sh $*"
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.5",
@@ -77,7 +72,6 @@
     "@storybook/react": "^8.2.2",
     "@storybook/react-vite": "^8.2.2",
     "@storybook/test": "^8.2.2",
-    "@tauri-apps/cli": "^1.6.0",
     "@testing-library/react": "^16.0.0",
     "@types/jest": "^29.5.12",
     "@types/jest-when": "^3.5.5",

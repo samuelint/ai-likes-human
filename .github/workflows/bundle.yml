@@ -1,12 +1,12 @@
 name: Bundle
 
-# on:
-#   push:
-#     tags:
-#       - "v*.*.*"
-
 on:
-  pull_request:
+  push:
+    tags:
+      - "v*.*.*"
+
+# on:
+#   pull_request:
 
 jobs:
   bundle_core:

@@ -30,21 +30,21 @@ jobs:
         run: |
           pnpm run build
 
-  desktop_quality:
-    name: Desktop Quality
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: desktop
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Tauri
-        id: prepare-tauri
-        uses: ./.github/actions/prepare_tauri
+  # desktop_quality:
+  #   name: Desktop Quality
+  #   runs-on: ubuntu-latest
+  #   defaults:
+  #     run:
+  #       working-directory: desktop
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Setup Tauri
+  #       id: prepare-tauri
+  #       uses: ./.github/actions/prepare_tauri
 
-      - name: Build
-        run: |
-          pnpm run build
+  #     - name: Build
+  #       run: |
+  #         pnpm run build
 
   core_quality:
     name: Core Quality

@@ -94,18 +94,18 @@ jobs:
     runs-on: ${{ matrix.platform }}
     environment: release
     steps:
-      - name: Setup Tauri
-        id: prepare-tauri
-        uses: ./.github/actions/prepare_tauri
-        with:
-          platform: ${{ matrix.platform }}
-
       - uses: actions/checkout@v4
       - name: Download bundle artifacts
         uses: actions/download-artifact@v4
         with:
           name: core-${{ matrix.platform }}
           path: core/dist
+          
+      - name: Setup Tauri
+        id: prepare-tauri
+        uses: ./.github/actions/prepare_tauri
+        with:
+          platform: ${{ matrix.platform }}
 
       - name: Get Tags
         id: tag

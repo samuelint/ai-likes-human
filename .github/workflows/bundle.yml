@@ -96,7 +96,7 @@ jobs:
     steps:
       - name: Setup Tauri
         id: prepare-tauri
-        uses: ./.github/actions/prepare_pnpm
+        uses: ./.github/actions/prepare_tauri
         with:
           platform: ${{ matrix.platform }}
 

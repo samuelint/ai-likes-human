@@ -85,6 +85,7 @@ class WhlExtensionRepository(BaseExtensionRepository):
         )
 
     def _list_whl_files_in_extension_directory(self) -> list[str]:
+        self._assert_extension_directory_exist()
         whl_files: list[str] = []
         for entry in os.scandir(self.extensions_directory):
             if entry.is_file() and entry.path.endswith(".whl"):

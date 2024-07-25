@@ -10,6 +10,9 @@ from ai_assistant_core.extension.domain.base_extension_repository import (
 from ai_assistant_core.extension.domain.base_extension_service import (
     BaseExtensionService,
 )
+from ai_assistant_core.extension.domain.extension_as_tool_factory import (
+    ExtensionAsToolFactory,
+)
 from tests.extension.domain.__dto_factories__ import ExtensionInfoDtoPolyfactory
 
 
@@ -28,13 +31,22 @@ def extension_service(decoy: Decoy) -> BaseExtensionService:
 
 
 @pytest.fixture
+def extension_as_tool_factory(decoy: Decoy) -> ExtensionAsToolFactory:
+    repo = decoy.mock(cls=ExtensionAsToolFactory)
+
+    return repo
+
+
+@pytest.fixture
 def instance(
     extension_repository: BaseExtensionRepository,
     extension_service: BaseExtensionService,
+    extension_as_tool_factory: ExtensionAsToolFactory,
 ) -> ExtensionAgentFactory:
     return ExtensionAgentFactory(
         extension_repository=extension_repository,
         extension_service=extension_service,
+        extension_as_tool_factory=extension_as_tool_factory,
     )
 
 

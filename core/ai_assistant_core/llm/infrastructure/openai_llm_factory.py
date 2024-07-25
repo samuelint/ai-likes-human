@@ -22,7 +22,7 @@ class OpenAILLMFactory(BaseLLMFactory):
         self,
         model: str,
         max_tokens: Optional[int] = None,
-        temperature: Optional[float] = 0.7,
+        temperature: Optional[float] = None,
         streaming: bool = True,
     ) -> ChatOpenAI:
         api_key = self.api_key_service.get_openai_api_key()
@@ -30,7 +30,7 @@ class OpenAILLMFactory(BaseLLMFactory):
         return ChatOpenAI(
             model=model,
             max_tokens=max_tokens,
-            temperature=temperature,
+            temperature=temperature or 0.7,
             api_key=api_key,
             streaming=streaming,
         )

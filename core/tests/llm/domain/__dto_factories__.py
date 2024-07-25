@@ -4,5 +4,5 @@ from ai_assistant_core.llm.domain.local_model_dto import (
 )
 
 
-class LLMModelIndexFactory(DataclassFactory[FileLLMModelIndex]):
+class LLMModelIndexPolyfactory(DataclassFactory[FileLLMModelIndex]):
     __model__ = FileLLMModelIndex

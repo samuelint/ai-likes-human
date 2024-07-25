@@ -1,4 +1,4 @@
-from ai_assistant_core.assistant.domain.agents.default.prompt import (
+from ai_assistant_core.assistant.domain.prompt.prompt import (
     build_system_prompt,
 )
 

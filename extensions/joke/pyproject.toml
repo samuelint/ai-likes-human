@@ -8,7 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
 langchain = { version = "^0.2.6", optional = true }
-base-assistant-extension = "0.3.0"
+base-assistant-extension = "0.4.0"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^7.0.0"

@@ -5,6 +5,7 @@ from tests.test_functional.functional_test_utils import (
     assistant_stream_events_to_str_response,
     create_test_client,
 )
+
 from openai import OpenAI
 from openai.types.beta import AssistantStreamEvent, Thread
 
@@ -60,7 +61,7 @@ class TestExtensionsInference:
 
         stream = openai_client.beta.threads.runs.create(
             thread_id=thread.id,
-            model="openai:gpt-3.5-turbo",
+            model="openai:gpt-4o-mini",
             assistant_id=extension_name,
             stream=True,
             temperature=0,
@@ -71,4 +72,15 @@ class TestExtensionsInference:
             events.append(event)
         str_response = assistant_stream_events_to_str_response(events)
 
-        assert "turtle" in str_response
+        grader_response = OpenAI().chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"Is this a joke about turtle? Answer by yes or no. \nMesssage: {str_response}",
+                }
+            ],
+            stream=False,
+        )
+
+        assert "yes" in grader_response.choices[0].message.content.lower()

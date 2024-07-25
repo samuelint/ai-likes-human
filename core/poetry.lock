@@ -230,13 +230,13 @@ tests-no-zope = ["attrs[tests-mypy]", "cloudpickle", "hypothesis", "pympler", "p
 
 [[package]]
 name = "base-assistant-extension"
-version = "0.3.0"
+version = "0.4.0"
 description = ""
 optional = false
 python-versions = "<3.13,>=3.9"
 files = [
-    {file = "base_assistant_extension-0.3.0-py3-none-any.whl", hash = "sha256:de9f2cf67b7db3b9dc52510fe161d6fa29363137d87466f153547a150af818e6"},
-    {file = "base_assistant_extension-0.3.0.tar.gz", hash = "sha256:e8de80250d214d5a7c17b51de54857ee7e392b10e37040a20ea7bebd05852a6e"},
+    {file = "base_assistant_extension-0.4.0-py3-none-any.whl", hash = "sha256:06bfd7d1ab59149a325875af545467c51ac2d659511a0573e06bbad516a2f1ae"},
+    {file = "base_assistant_extension-0.4.0.tar.gz", hash = "sha256:c1892a834d92bff231fc1785a862c2cfd8fc49a48ab5466a469a6038f94e649e"},
 ]
 
 [package.extras]
@@ -3530,4 +3530,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.13"
-content-hash = "4424dd76e9281b5c93e051a4777ecca9d2b0a90a28d9e4e1495448cf7f6cd84e"
+content-hash = "5a31a82dd554e6ca59e9fac9cb52f9f985e71036ecca42388d2976ae8c6c2a70"

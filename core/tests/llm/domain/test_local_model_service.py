@@ -7,7 +7,7 @@ from ai_assistant_core.llm.domain.local_model_index_repository import (
 )
 from ai_assistant_core.llm.domain.local_model_service import LocalLLMModelService
 from tests.llm.domain.__dto_factories__ import (
-    LLMModelIndexFactory,
+    LLMModelIndexPolyfactory,
 )
 
 
@@ -30,7 +30,7 @@ class TestDelete:
         instance: LocalLLMModelService,
         index_repository: LocalLLMModelIndexRepository,
     ):
-        some_deleted_index_item = LLMModelIndexFactory.build()
+        some_deleted_index_item = LLMModelIndexPolyfactory.build()
         decoy.when(index_repository.delete(model_name="a")).then_return(
             some_deleted_index_item
         )
@@ -46,7 +46,7 @@ class TestDelete:
         index_repository: LocalLLMModelIndexRepository,
     ):
 
-        some_deleted_index_item = LLMModelIndexFactory.build(local_path="./q4.gguf")
+        some_deleted_index_item = LLMModelIndexPolyfactory.build(local_path="./q4.gguf")
         decoy.when(index_repository.delete(model_name="a")).then_return(
             some_deleted_index_item
         )

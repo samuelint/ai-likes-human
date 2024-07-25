@@ -1,7 +1,8 @@
-from pydantic import BaseModel
+from dataclasses import dataclass
 
 
-class ExtensionInfoDto(BaseModel):
+@dataclass
+class ExtensionInfoDto:
     name: str
     version: str
     author: str

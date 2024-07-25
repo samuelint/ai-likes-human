@@ -10,6 +10,7 @@ class BaseAgentFactory(ABC):
     @abstractmethod
     def create(
         self,
+        assistant_id: str,
         llm: BaseChatModel,
     ) -> Runnable:
         pass

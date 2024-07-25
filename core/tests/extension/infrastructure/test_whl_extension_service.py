@@ -28,7 +28,7 @@ mock_entries = [
 class TestListAvailable:
     def test_list_available(self):
         with mock.patch("os.scandir") as mock_scandir, mock.patch(
-            "ai_assistant_core.extension.infrastructure.whl_extension_service.WhlMetadataLoader"
+            "ai_assistant_core.extension.infrastructure.whl_extension_repository.WhlMetadataLoader"
         ) as mock_metadata_loader:
             mock_scandir.side_effect = lambda path: path == extensions_directory and [
                 mock_entry_1

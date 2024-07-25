@@ -229,6 +229,20 @@ tests-mypy = ["mypy (>=1.6)", "pytest-mypy-plugins"]
 tests-no-zope = ["attrs[tests-mypy]", "cloudpickle", "hypothesis", "pympler", "pytest (>=4.3.0)", "pytest-xdist[psutil]"]
 
 [[package]]
+name = "base-assistant-extension"
+version = "0.2.0"
+description = ""
+optional = false
+python-versions = "<3.13,>=3.9"
+files = [
+    {file = "base_assistant_extension-0.2.0-py3-none-any.whl", hash = "sha256:4e8a8a9fca01494314f405924c68763b8e3a4daa4da33c51a9761b782745674e"},
+    {file = "base_assistant_extension-0.2.0.tar.gz", hash = "sha256:1a966cf2b01b2a1d26e90b583873ebf21aa35775ff3cd8be316e607ed4084836"},
+]
+
+[package.extras]
+langchain = ["langchain (>=0.2.6,<0.3.0)"]
+
+[[package]]
 name = "beautifulsoup4"
 version = "4.12.3"
 description = "Screen-scraping library"
@@ -3516,4 +3530,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.13"
-content-hash = "9c99cf708e1b387be23c509a9f7b5190b9353f81d512475b4c4324b7a13ad054"
+content-hash = "45d87c963bdb83ddacb844705251b6cc59059d17038fb46730ac113728caa731"

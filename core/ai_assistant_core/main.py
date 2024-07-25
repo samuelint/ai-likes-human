@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 import uvicorn
 import argparse
@@ -16,7 +17,10 @@ from ai_assistant_core.app_configuration import (
 )
 from ai_assistant_core.configuration import ConfigurationModule
 from ai_assistant_core.llm import LLMModule, configuration_local_model_router
+from ai_assistant_core.extension import extension_router, ExtensionModule
 from ai_assistant_core.tools import ToolsModule
+
+os.environ["LANGCHAIN_TRACING_V2"] = "false"
 
 
 def create_app(database_url: Optional[str] = None) -> FastAPI:
@@ -28,6 +32,7 @@ def create_app(database_url: Optional[str] = None) -> FastAPI:
             AssistantModule(),
             ToolsModule(),
             SqlAlchemyModule(),
+            ExtensionModule(),
         ]
     )
 
@@ -49,6 +54,7 @@ def create_app(database_url: Optional[str] = None) -> FastAPI:
     bind_assistant_routes(app=app, injector=injector)
     [app.include_router(route) for route in routes]
     app.include_router(configuration_local_model_router)
+    app.include_router(extension_router)
 
     return app
 

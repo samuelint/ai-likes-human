@@ -12,10 +12,14 @@ app_name = "com.samuelint.assistant"
 class AppConfiguration:
     app_directory: str
     database_url: str
+    extensions_directory: str
 
     def __init__(self, database_url: Optional[str] = None):
         os.environ["APP_DIRECTORY"] = self.app_directory = user_data_dir(
             appname=app_name,
+        )
+        os.environ["EXTENSIONS_DIRECTORY"] = self.extensions_directory = os.path.join(
+            self.app_directory, "extensions"
         )
         os.environ["DATABASE_URL"] = self.database_url = (
             database_url or f"sqlite:///{self.app_directory}/data.db"

@@ -36,7 +36,6 @@ class WhlExtensionLoader:
             return False
 
     def load(self) -> BaseExtension:
-        self.install()
         module = importlib.import_module(self.module_name)
 
         return module.Extension()

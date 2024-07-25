@@ -1,4 +1,4 @@
-import { ImageAttachment as ImageDto } from '@/lib/image-attachment.type';
+import { ImageAttachment as ImageDto } from '@/lib/assistant/image-attachment.type';
 import { ExpandableImage } from './expandable-image';
 import { Button } from './ui/button';
 import { CircleXIcon } from 'lucide-react';

@@ -1,5 +1,5 @@
 import { MessageContentPartParam, MessageCreateParams } from 'openai/resources/beta/threads/messages.mjs';
-import { ImageAttachment } from '../image-attachment.type';
+import { ImageAttachment } from './image-attachment.type';
 
 
 interface Props {

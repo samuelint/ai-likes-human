@@ -4,7 +4,7 @@ import { useOpenaiClient } from './openai-client';
 import { useListThreads } from './use-list-threads';
 import { Thread, ThreadCreateParams } from 'openai/resources/beta/threads/threads.mjs';
 import { ImageAttachment } from './image-attachment.type';
-import { createUserMessage } from './service/message-factory';
+import { createUserMessage } from './message-factory';
 import { useLocation } from 'wouter';
 
 

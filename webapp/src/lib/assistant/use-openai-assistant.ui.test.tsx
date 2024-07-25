@@ -8,7 +8,7 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import OpenAI from 'openai';
 import { useOpenAiAssistant } from './use-openai-assistant';
-import { buildOpenAiApiFetchMock, CreateMessageMock, CreateRunMock, CreateThreadMock, ErrorMock } from '@/lib/openai-fetch-mock';
+import { buildOpenAiApiFetchMock, CreateMessageMock, CreateRunMock, CreateThreadMock, ErrorMock } from '@/lib/assistant/openai-fetch-mock';
 import { useOpenaiClient } from './openai-client';
 import { useState } from 'react';
 

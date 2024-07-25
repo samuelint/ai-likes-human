@@ -1,5 +1,5 @@
 import { Markdown } from './markdown';
-import { MessageContent as MessageContentDto } from '@/lib/use-openai-assistant';
+import { MessageContent as MessageContentDto } from '@/lib/assistant/use-openai-assistant';
 import { useMemo } from 'react';
 import { ExpandableImage } from './expandable-image';
 

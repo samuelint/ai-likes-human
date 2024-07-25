@@ -1,6 +1,6 @@
 
 import { NewThread } from '@/components/new-thread';
-import { useCreateThread } from '@/lib/use-create-thread';
+import { useCreateThread } from '@/lib/assistant/use-create-thread';
 
 
 

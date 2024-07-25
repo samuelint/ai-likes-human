@@ -1,10 +1,14 @@
-from ai_assistant_core.extension.domain.base_extension_service import (
-    BaseExtensionService,
+from typing import BinaryIO, Optional
+import shutil
+from ai_assistant_core.extension.domain.base_extension_repository import (
+    BaseExtensionRepository,
 )
 from ai_assistant_core.extension.domain.extension_dto import ExtensionInfoDto
 import os
 
-
+from ai_assistant_core.extension.domain.invalid_file_format_error import (
+    InvalidFileFormat,
+)
 from ai_assistant_core.extension.infrastructure.whl_extension_loader import (
     WhlExtensionLoader,
 )
@@ -13,7 +17,40 @@ from ai_assistant_core.extension.infrastructure.whl_metadata_loader import (
 )
 
 
-class WhlExtensionService(BaseExtensionService):
+class WhlExtensionRepository(BaseExtensionRepository):
+    def __init__(self, extensions_directory: str) -> None:
+        self.extensions_directory = extensions_directory
+
+    def list_available(self) -> list[ExtensionInfoDto]:
+        whl_file_paths = self._list_whl_files_in_extension_directory()
+
+        return [
+            self._whl_file_to_extension_dto(whl_file) for whl_file in whl_file_paths
+        ]
+
+    def upload(self, filename: str, file: BinaryIO) -> ExtensionInfoDto:
+        if not filename.endswith(".whl"):
+            raise InvalidFileFormat()
+
+        self._assert_extension_directory_exist()
+
+        file_path = os.path.join(self.extensions_directory, filename)
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file, buffer)
+
+        return self._whl_file_to_extension_dto(file_path)
+
+    def delete(self, name: str) -> ExtensionInfoDto:
+        extension = self.get_by_name(name=name)
+        os.remove(extension.uri)
+
+        return extension
+
+    def find_by_name(self, name: str) -> Optional[ExtensionInfoDto]:
+        available_extensions = self.list_available()
+        for extension in available_extensions:
+            if extension.name == name:
+                return extension
 
     def list_installed(self) -> list[ExtensionInfoDto]:
         available_extensions = self.list_available()
@@ -29,10 +66,6 @@ class WhlExtensionService(BaseExtensionService):
     def install(self, extension: ExtensionInfoDto):
         loader = WhlExtensionLoader(wheel_path=extension.uri)
         loader.install()
-
-    def uninstall(self, extension: ExtensionInfoDto):
-        loader = WhlExtensionLoader(wheel_path=extension.uri)
-        loader.uninstall()
 
     def is_installed(self, extension: ExtensionInfoDto) -> bool:
         loader = WhlExtensionLoader(wheel_path=extension.uri)

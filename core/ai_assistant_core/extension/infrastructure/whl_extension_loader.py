@@ -24,6 +24,10 @@ class WhlExtensionLoader:
             ]
         )
 
+    def uninstall(self):
+        if self.module_name in sys.modules:
+            del sys.modules[self.module_name]
+
     def is_installed(self):
         try:
             importlib.import_module(self.module_name)

@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Optional
 from langchain_core.language_models import BaseChatModel
-from langchain_core.tools import BaseTool
-from langgraph.graph.graph import CompiledGraph
+from langchain_core.runnables import Runnable
 
 
 class BaseAgentFactory(ABC):
@@ -11,6 +9,7 @@ class BaseAgentFactory(ABC):
 
     @abstractmethod
     def create(
-        self, llm: BaseChatModel, tools: Optional[list[BaseTool]] = [], **kwargs
-    ) -> CompiledGraph:
+        self,
+        llm: BaseChatModel,
+    ) -> Runnable:
         pass

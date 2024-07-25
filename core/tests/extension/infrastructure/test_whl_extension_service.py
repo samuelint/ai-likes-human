@@ -1,5 +1,5 @@
-from ai_assistant_core.extension.infrastructure.whl_extension_service import (
-    WhlExtensionService,
+from ai_assistant_core.extension.infrastructure.whl_extension_repository import (
+    WhlExtensionRepository,
 )
 from unittest import mock
 
@@ -40,7 +40,7 @@ class TestListAvailable:
                 "author": "Author Name",
             }
 
-            service = WhlExtensionService(extensions_directory=extensions_directory)
+            service = WhlExtensionRepository(extensions_directory=extensions_directory)
             result = service.list_available()
 
             assert result[0].author == "Author Name"
@@ -53,7 +53,7 @@ class TestListAvailable:
             mock_scandir.side_effect = (
                 lambda path: path == extensions_directory and mock_entries
             )
-            instance = WhlExtensionService(extensions_directory=extensions_directory)
+            instance = WhlExtensionRepository(extensions_directory=extensions_directory)
             files = instance._list_whl_files_in_extension_directory()
 
             assert len(files) == 2

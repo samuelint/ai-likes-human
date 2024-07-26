@@ -1,6 +1,6 @@
 import { Tools } from './tools';
 import NewMessage from '@/components/new-message';
-import { ImageAttachment as ImageDto } from '@/lib/image-attachment.type';
+import { ImageAttachment as ImageDto } from '@/lib/assistant/image-attachment.type';
 import { ImageAttachment } from '@/components/image-attachment';
 import AssistantModelSettingsModal from './assistant-model-settings-modal';
 

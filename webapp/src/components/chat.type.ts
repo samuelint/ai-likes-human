@@ -1,4 +1,4 @@
-import { Message, MessageContent } from '@/lib/use-openai-assistant';
+import { Message, MessageContent } from '@/lib/assistant/use-openai-assistant';
 
 
 export type ChatMessageDto = Message;

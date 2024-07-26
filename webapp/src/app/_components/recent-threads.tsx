@@ -4,8 +4,8 @@ import { CreateNewThread } from './create-new-thread';
 import { ThreadsPreviewCollection } from '@/components/threads-preview-collection';
 
 import { useCallback } from 'react';
-import { useDeleteThread } from '@/lib/use-delete-thread';
-import { useListThreads } from '@/lib/use-list-threads';
+import { useDeleteThread } from '@/lib/assistant/use-delete-thread';
+import { useListThreads } from '@/lib/assistant/use-list-threads';
 
 
 export default function RecentThreads() {

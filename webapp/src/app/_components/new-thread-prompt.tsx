@@ -1,9 +1,9 @@
 
 import Chat from '@/components/chat';
-import { useCreateThread } from '@/lib/use-create-thread';
+import { useCreateThread } from '@/lib/assistant/use-create-thread';
 import { useState } from 'react';
 import NewAssistantMessage from './new-assistant-message';
-import { useImageAttachments } from '@/lib/use-image-attachments';
+import { useImageAttachments } from '@/lib/assistant/use-image-attachments';
 
 
 export default function NewThreadPrompt() {

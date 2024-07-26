@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { createApiJsonFetcher } from './api-fetcher';
+import { createApiJsonFetcher } from '../api-fetcher';
 import { toThreadPreview } from './thread.type';
 
 

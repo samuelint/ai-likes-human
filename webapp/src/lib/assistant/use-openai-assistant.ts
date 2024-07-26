@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useOpenaiClient } from './openai-client';
 import { AssistantStream } from 'openai/lib/AssistantStream.mjs';
 import { useImageAttachments } from './use-image-attachments';
-import { createUserMessage } from './service/message-factory';
+import { createUserMessage } from './message-factory';
 
 
 export type AssistantStatus = 'in_progress' | 'awaiting_message';

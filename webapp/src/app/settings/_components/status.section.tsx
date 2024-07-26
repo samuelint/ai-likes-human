@@ -9,7 +9,7 @@ export default function StatusSection() {
   const isInDesktopApp = useIsInDesktopApp();
 
   return (
-    <Section title="Status">
+    <Section id='status' title="Status">
       <ServerStatus />
       { isInDesktopApp && <LocalServerSettings /> }
     </Section>

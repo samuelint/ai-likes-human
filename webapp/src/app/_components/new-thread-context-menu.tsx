@@ -19,7 +19,6 @@ interface Props extends PropsWithChildren { }
 export function NewThreadContextMenu({ children }: Props) {
   const createThread = useCreateThread({ redirect: true });
 
-
   return (
     <ContextMenu>
       <ContextMenuTrigger>
@@ -30,7 +29,6 @@ export function NewThreadContextMenu({ children }: Props) {
           New
         </ContextMenuItem>
         <ExtensionSection />
-
       </ContextMenuContent>
     </ContextMenu>
   );
@@ -47,7 +45,7 @@ function ExtensionSection() {
       <ContextMenuItem
         className='font-bold'
         inset
-        onSelect={() => setLocation('/extensions')}
+        onSelect={() => setLocation('/settings#extensions')}
         title='Manage Extensions'
       >
         Extensions

@@ -8,7 +8,7 @@ import {
 import { ErrorDetails } from '@/components/ui/error';
 import { ThreeDotsLoading } from '@/components/ui/loading';
 import { useCreateThread } from '@/lib/assistant/use-create-thread';
-import { useAvailableExtensions } from '@/lib/extension/use-available-extensions';
+import { useExtensions } from '@/lib/extension/use-extensions';
 
 import { PropsWithChildren } from 'react';
 import { useLocation } from 'wouter';
@@ -35,7 +35,7 @@ export function NewThreadContextMenu({ children }: Props) {
 }
 
 function ExtensionSection() {
-  const { data, isLoading, error } = useAvailableExtensions();
+  const { data, isLoading, error } = useExtensions();
   const [_, setLocation] = useLocation();
   const createThread = useCreateThread({ redirect: true });
 

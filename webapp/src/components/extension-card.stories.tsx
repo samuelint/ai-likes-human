@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { ExtensionCard } from './extension-card';
+import { Button } from './ui/button';
 
 
 const meta = {
@@ -27,5 +28,20 @@ export const Default: Story = {
       author: 'Me',
       version: '0.1.0',
     }
+  }
+};
+
+export const Actions: Story = {
+  args: {
+    extension: {
+      name: 'My Extension',
+      description: 'My extension description',
+      author: 'Me',
+      version: '0.1.0',
+    },
+    children: () => <>
+      <Button variant="destructive">Delete</Button>
+      <Button variant="outline">Reset</Button>
+    </>
   }
 };

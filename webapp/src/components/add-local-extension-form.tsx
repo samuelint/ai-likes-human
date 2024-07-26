@@ -11,6 +11,7 @@ import {
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { UploadExtensionDto, UploadExtensionSchema } from '@/lib/extension/extension.dto';
+import { useRef } from 'react';
 
 
 export type OnExtensionSubmit = SubmitHandler<UploadExtensionDto>;
@@ -25,21 +26,38 @@ export function AddLocalExtensionForm({ onSubmit }: Props) {
     resolver: zodResolver(UploadExtensionSchema),
   });
 
+  const inputFileRef = useRef<HTMLInputElement | null>(null);
+
+  const reset = () => {
+    form.reset();
+
+    // Workaround since the input file name is not reset
+    if (inputFileRef.current) inputFileRef.current.value = '';
+  };
+
+  const handleSubmit: OnExtensionSubmit = async (data, event) => {
+    if (onSubmit) {
+      await onSubmit(data, event);
+    }
+    reset();
+  };
+
+
   return (
-    <Form {...form} >
-      <form onSubmit={onSubmit && form.handleSubmit(onSubmit)} className="space-y-6">
+    <Form {...form}>
+      <form onSubmit={onSubmit && form.handleSubmit(handleSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="file"
           render={({ field: { value, onChange, ...fieldProps } }) => (
             <FormItem className="space-y-3">
-              <FormLabel>Upload Extension</FormLabel>
+              <FormLabel>Extension File</FormLabel>
               <FormControl>
                 <Input
                   {...fieldProps}
+                  ref={inputFileRef}
                   type="file"
                   accept=".whl"
-                  placeholder='Select a .whl file'
                   onChange={(event) =>
                     onChange(event.target.files && event.target.files[0])
                   }
@@ -48,7 +66,10 @@ export function AddLocalExtensionForm({ onSubmit }: Props) {
               <FormMessage />
             </FormItem>
           )} />
-        <Button type="submit">Add</Button>
+        <div className='flex gap-4'>
+          <Button type="submit">Add</Button>
+          <Button type="button" variant='outline' onClick={() => reset()}>Reset</Button>
+        </div>
       </form>
     </Form>
   );

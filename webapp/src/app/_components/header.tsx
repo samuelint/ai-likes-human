@@ -2,7 +2,6 @@ import BrandLink from './brand.link';
 import SettingLink from './settings.link';
 import StatusIndicator from './status-indicator';
 
-
 export default function Header() {
   return (
     <header className="w-full bg-gray-200 text-slate-600 py-2 px-6 flex items-center">

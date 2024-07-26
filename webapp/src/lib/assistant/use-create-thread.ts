@@ -12,13 +12,19 @@ interface Props {
   redirect?: boolean
 }
 
-type CreateNewThread = (messageContent?: string, imageAttachments?: ImageAttachment[]) => Promise<Thread>;
+interface CreateNewThreadArgs {
+  assistantId?: string
+  messageContent?: string
+  imageAttachments?: ImageAttachment[]
+}
+
+type CreateNewThread = (args?: CreateNewThreadArgs) => Promise<Thread>;
 export function useCreateThread({ redirect }: Props = {}): CreateNewThread {
   const openai = useOpenaiClient();
   const [_, setLocation] = useLocation();
   const { revalidate } = useListThreads();
 
-  return useCallback<CreateNewThread>(async (messageContent, imageAttachments) => {
+  return useCallback<CreateNewThread>(async ({ messageContent, imageAttachments } = {}) => {
     const messages: ThreadCreateParams.Message[] = [];
 
     if (messageContent) {

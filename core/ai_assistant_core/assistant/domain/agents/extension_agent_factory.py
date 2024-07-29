@@ -10,14 +10,14 @@ from ai_assistant_core.extension.domain.extension_as_tool_factory import (
     ExtensionAsToolFactory,
 )
 
-from ..agent_factory import BaseAgentFactory
+
 from langchain_core.language_models import BaseChatModel
 from langchain_core.runnables import Runnable
 from langgraph.prebuilt import create_react_agent
 
 
 @inject
-class ExtensionAgentFactory(BaseAgentFactory):
+class ExtensionAgentFactory:
     def __init__(
         self,
         extension_repository: BaseExtensionRepository,

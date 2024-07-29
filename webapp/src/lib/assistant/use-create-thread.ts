@@ -24,7 +24,7 @@ export function useCreateThread({ redirect }: Props = {}): CreateNewThread {
   const [_, setLocation] = useLocation();
   const { revalidate } = useListThreads();
 
-  return useCallback<CreateNewThread>(async ({ messageContent, imageAttachments } = {}) => {
+  return useCallback<CreateNewThread>(async ({ assistantId, messageContent, imageAttachments } = {}) => {
     const messages: ThreadCreateParams.Message[] = [];
 
     if (messageContent) {
@@ -32,6 +32,9 @@ export function useCreateThread({ redirect }: Props = {}): CreateNewThread {
     }
     const newThread = await openai.beta.threads.create({
       messages,
+      metadata: {
+        assistantId,
+      }
     });
 
     revalidate();

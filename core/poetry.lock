@@ -1289,13 +1289,13 @@ tiktoken = ">=0.7,<1"
 
 [[package]]
 name = "langchain-openai-api-bridge"
-version = "0.10.0"
+version = "0.10.1"
 description = "A bridge to use Langchain output as an OpenAI-compatible API."
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "langchain_openai_api_bridge-0.10.0-py3-none-any.whl", hash = "sha256:551be025fb2a561845314067f45d7057413fbc4e9f8eb783d649ce6e87b786db"},
-    {file = "langchain_openai_api_bridge-0.10.0.tar.gz", hash = "sha256:ac598d793b4be9a72ccaf77f8e2d44e6fcea09be5cd1796fc3d8bc49ff120ff3"},
+    {file = "langchain_openai_api_bridge-0.10.1-py3-none-any.whl", hash = "sha256:d841f645ba214bdcc3c538b509ae79f6f860665f2acfc8f3484402c2a5fe631a"},
+    {file = "langchain_openai_api_bridge-0.10.1.tar.gz", hash = "sha256:ab50fc2d6e8b564e3d4f44443d1cd64a8c4cf58c0ea477eae4e4a36661abd045"},
 ]
 
 [package.dependencies]
@@ -3530,4 +3530,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.13"
-content-hash = "20ae8770ef327e5b567d3224ebeebcf26ac0ad477b2b0e0931d29b340a6f3d71"
+content-hash = "f49b2454fe36dcb62b5f8aeb7db1e5fc90dd027e5af05443fdd5f6f27fc7bd28"

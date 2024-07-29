@@ -13,7 +13,9 @@ from langgraph.prebuilt import create_react_agent
 @inject
 class DefaultAgentFactory:
     def __init__(
-        self, tools: Optional[list[BaseTool]], prompt_factory: UserSystemPromptFactory
+        self,
+        tools: Optional[list[BaseTool]],
+        prompt_factory: UserSystemPromptFactory,
     ) -> None:
         self.tools = tools
         self.prompt_factory = prompt_factory

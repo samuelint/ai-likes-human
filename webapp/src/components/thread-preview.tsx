@@ -22,7 +22,7 @@ export function ThreadPreview<TThread extends ThreadPreviewComponentDto = Thread
       <Link href={`/thread/${id}`} className={cn(buttonVariants({ variant: isActive ? 'secondary' : 'outline' }), 'flex flex-col items-start')}>
         <span className=''>{title}</span>
         <span className='text-xs text-slate-400'>{toFromNowFormattedDate(created_at)}</span>
-        <span className='text-xs font-bold text-slate-400'>{ thread.assistantId}</span>
+        <span className='text-xs font-bold text-slate-400'>{ thread.assistantId }</span>
       </Link>
     </ThreadPreviewContextMenu>
   );

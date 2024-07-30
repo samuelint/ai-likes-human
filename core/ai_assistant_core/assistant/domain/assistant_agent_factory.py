@@ -55,7 +55,7 @@ class AssistantAgentFactory(BaseAgentFactory):
     def _get_assistant_id(self, dto: CreateAgentDto) -> str:
         thread = self.thread_repository.retreive(thread_id=dto.thread_id)
         thread_assistant_id = None
-        if thread is not None:
+        if thread is not None and thread.metadata is not None:
             thread_assistant_id = thread.metadata.get("assistantId", None)
 
         return thread_assistant_id or dto.assistant_id

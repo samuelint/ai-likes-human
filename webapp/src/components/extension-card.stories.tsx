@@ -39,9 +39,9 @@ export const Actions: Story = {
       author: 'Me',
       version: '0.1.0',
     },
-    children: () => <>
+    children: (<>
       <Button variant="destructive">Delete</Button>
       <Button variant="outline">Reset</Button>
-    </>
+    </>)
   }
 };

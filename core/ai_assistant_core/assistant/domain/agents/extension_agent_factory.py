@@ -10,14 +10,14 @@ from ai_assistant_core.extension.domain.extension_as_tool_factory import (
     ExtensionAsToolFactory,
 )
 
-from ..agent_factory import BaseAgentFactory
+
 from langchain_core.language_models import BaseChatModel
 from langchain_core.runnables import Runnable
 from langgraph.prebuilt import create_react_agent
 
 
 @inject
-class ExtensionAgentFactory(BaseAgentFactory):
+class ExtensionAgentFactory:
     def __init__(
         self,
         extension_repository: BaseExtensionRepository,
@@ -37,10 +37,13 @@ class ExtensionAgentFactory(BaseAgentFactory):
     def create(self, assistant_id: str, llm: BaseChatModel) -> Runnable:
         extension_info = self.extension_repository.get_by_name(name=assistant_id)
         extension = self.extension_service.load(extension=extension_info)
-        tool = self.extension_as_tool_factory.create(extension=extension, llm=llm)
+        extension_as_tool = self.extension_as_tool_factory.create(
+            extension=extension, llm=llm
+        )
 
         return create_react_agent(
             model=llm,
-            tools=[tool],
-            messages_modifier=f'No matter the input, call the tool "{tool.description}"',
+            tools=[extension_as_tool],
+            messages_modifier=f"""No matter the input, always use the following tool. If the input is not relevant, use the tool anyway with the input.
+Name: "{extension_as_tool.name}". Description: "{extension_as_tool.description}".""",
         )

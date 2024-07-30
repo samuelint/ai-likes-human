@@ -4,7 +4,6 @@ from injector import inject
 from ai_assistant_core.assistant.domain.prompt.user_system_prompt_factory import (
     UserSystemPromptFactory,
 )
-from ..agent_factory import BaseAgentFactory
 from langchain_core.language_models import BaseChatModel
 from langchain_core.tools import BaseTool
 from langgraph.graph.graph import CompiledGraph
@@ -12,9 +11,11 @@ from langgraph.prebuilt import create_react_agent
 
 
 @inject
-class DefaultAgentFactory(BaseAgentFactory):
+class DefaultAgentFactory:
     def __init__(
-        self, tools: Optional[list[BaseTool]], prompt_factory: UserSystemPromptFactory
+        self,
+        tools: Optional[list[BaseTool]],
+        prompt_factory: UserSystemPromptFactory,
     ) -> None:
         self.tools = tools
         self.prompt_factory = prompt_factory

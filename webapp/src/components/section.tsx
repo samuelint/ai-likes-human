@@ -4,14 +4,15 @@ import { cn } from '@/lib/utils';
 
 
 interface Props {
+  id?: string
   title: ReactNode
   children?: ReactNode
   className?: string
 }
 
-export function Section({ title, className, children }: Props) {
+export function Section({ id, title, className, children }: Props) {
   return (
-    <section className='py-4'>
+    <section id={id} className='py-4'>
       <H2 className='text-xl'>{title}</H2>
       <div className={cn('w-full flex flex-col gap-4 px-4', className)}>
         { children }

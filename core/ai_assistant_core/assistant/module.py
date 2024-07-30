@@ -4,7 +4,7 @@ from langchain_openai_api_bridge.assistant import (
     MessageRepository,
     RunRepository,
 )
-from langchain_openai_api_bridge.core import AgentFactory
+from langchain_openai_api_bridge.core import BaseAgentFactory
 
 from ai_assistant_core.assistant.domain.user_info_service import (
     UserInfo,
@@ -27,7 +27,7 @@ class AssistantModule(Module):
         binder.bind(ThreadRepository, to=SqlalchemyThreadRepository, scope=singleton)
         binder.bind(MessageRepository, to=SqlalchemyMessageRepository, scope=singleton)
         binder.bind(RunRepository, to=SqlalchemyRunRepository, scope=singleton)
-        binder.bind(AgentFactory, to=AssistantAgentFactory)
+        binder.bind(BaseAgentFactory, to=AssistantAgentFactory)
 
     @provider
     def provide_user_info(self, service: UserInfoService) -> UserInfo:

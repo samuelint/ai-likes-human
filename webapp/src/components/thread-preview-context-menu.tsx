@@ -19,7 +19,7 @@ export function ThreadPreviewContextMenu({ onDelete, children }: Props) {
         { children }
       </ContextMenuTrigger>
       <ContextMenuContent>
-        <ContextMenuItem inset onClick={() => onDelete && onDelete()}>
+        <ContextMenuItem inset onSelect={() => onDelete && onDelete()}>
         Delete
         </ContextMenuItem>
       </ContextMenuContent>

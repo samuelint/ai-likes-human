@@ -54,25 +54,28 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model, temperat
       abortControlerRef.current = new AbortController();
       const signal = abortControlerRef.current.signal;
 
-      await new Promise<void>((resolve, rejects) => {
-        streamRef.current = openai.beta.threads.runs.stream(threadId, {
-          model,
-          assistant_id: assistantId,
-          temperature,
-        }, { signal })
-          .on('messageCreated', (message: Message) => setMessages(messages => [...messages, message]))
-          .on('messageDelta', (_delta: MessageDelta, snapshot: Message) => setMessages(messages => [
-            ...messages.slice(0, messages.length - 1),
-            snapshot
-          ]))
-          .on('messageDone', (message: Message) => [
-            ...messages.slice(0, messages.length - 1),
-            message
-          ])
-          .on('error', (error) => rejects(error))
-          .on('abort', () => resolve())
-          .on('end', () => resolve());
-      });
+      await new Promise<void>(
+        (resolve, rejects) => {
+          streamRef.current = openai.beta.threads.runs.stream(threadId, {
+            model,
+            assistant_id: assistantId,
+            temperature,
+          },
+          { signal }
+          )
+            .on('messageCreated', (message: Message) => setMessages(messages => [...messages, message]))
+            .on('messageDelta', (_delta: MessageDelta, snapshot: Message) => setMessages(messages => [
+              ...messages.slice(0, messages.length - 1),
+              snapshot
+            ]))
+            .on('messageDone', (message: Message) => [
+              ...messages.slice(0, messages.length - 1),
+              message
+            ])
+            .on('error', (error) => rejects(error))
+            .on('abort', () => resolve())
+            .on('end', () => resolve());
+        });
 
     } catch (e) {
       setUnknownError(e);

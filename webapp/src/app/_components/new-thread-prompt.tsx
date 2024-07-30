@@ -17,7 +17,7 @@ export default function NewThreadPrompt() {
         submitMessage={(event) => {
           event?.preventDefault();
           event?.stopPropagation();
-          createThread(input, imageAttachments);
+          createThread({ messageContent: input, imageAttachments });
         }}
         input={input}
         handleInputChange={(event) => setInput(event.target.value)}

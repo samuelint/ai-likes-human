@@ -8,7 +8,7 @@ interface Props {
   onClick?: () => void
 }
 
-export function NewThread({ className, onClick }: Props) {
+export function NewThreadButton({ className, onClick }: Props) {
   return (
     <Button
       variant='outline'

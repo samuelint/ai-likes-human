@@ -118,7 +118,7 @@ jobs:
       - name: Update Package Version
         uses: jossef/action-set-json-field@v2.2
         with:
-          file: webapp/src-tauri/tauri.conf.json
+          file: desktop/tauri.conf.json
           field: package.version
           value: ${{ steps.tag.outputs.version }}
 
@@ -141,17 +141,17 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            webapp/src-tauri/target/**/release/bundle/**/*.dmg
-            webapp/src-tauri/target/**/release/bundle/**/*.app
-            webapp/src-tauri/target/release/bundle/**/*.dmg
-            webapp/src-tauri/target/release/bundle/**/*.app
+            desktop/target/**/release/bundle/**/*.dmg
+            desktop/target/**/release/bundle/**/*.app
+            desktop/target/release/bundle/**/*.dmg
+            desktop/target/release/bundle/**/*.app
 
-            webapp/src-tauri/target/release/bundle/**/*.deb
-            webapp/src-tauri/target/release/bundle/**/*.rpm
-            webapp/src-tauri/target/release/bundle/**/*.AppImage
+            desktop/target/release/bundle/**/*.deb
+            desktop/target/release/bundle/**/*.rpm
+            desktop/target/release/bundle/**/*.AppImage
 
-            webapp/src-tauri/target/release/bundle/**/*.exe
-            webapp/src-tauri/target/release/bundle/**/*.msi
+            desktop/target/release/bundle/**/*.exe
+            desktop/target/release/bundle/**/*.msi
 
       # # Project rules must be updated to push changes
       # # GH013: Repository rule violations found for refs/heads/main.

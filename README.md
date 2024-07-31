@@ -83,6 +83,14 @@ Once started, `core` should be served on port `8000`. You can get a health statu
 
 In the `webapp` directory, install dependencies with `pnpm install` and then run `pnpm dev`.
 
+## Extensions
+
+Extensions need to implement the following project:
+https://github.com/samuelint/ai-assistant-extension
+
+A full example is available here: https://github.com/samuelint/ai-assistant/tree/main/extensions/joke
+
+
 ## What is this project solving?
 
 ### Rapidly Evolving LLM Models:
@@ -115,20 +123,6 @@ In the `webapp` directory, install dependencies with `pnpm install` and then run
 - Some of these services can be replicated locally at a fraction of the cost.
 
 Let's try to fix that by creating a personal assistant running locally on user computer.
-
-## Roadmap
-
-- V0 - Foundation for what's next
-  - Easy to deploy - Installed as a regular app, IT JUST WORKS (no need to install third parties). Everything works out of the box (mac, windows, linux). Using the power of Tauri
-  - Access to Local LLM (LLamaCPP)
-  - Access to hosted LLM (OpenAI, Anthropic, Groq, etc...)
-  - Local Conversations history
-  - Local embedding
-  - Take computer screenshots as context
-  - Simple (do not look like a plane control board)
-  - Run LangGraph agents within the app.
-- V1
-  - **Curated** agents (only want usefull and working stuff)
 
 ## License
 

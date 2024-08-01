@@ -8,7 +8,6 @@ import { OnExtensionSubmit } from '@/components/add-local-extension-form';
 
 export function useExtensions() {
   const { data, error: fetchAvailableError, isLoading, mutate } = useSWR<ExtensionInfoDto[]>('/extension', fetchApiJson);
-
   const [error, setError] = useState<Error | undefined>(undefined);
 
   useEffect(() => {
@@ -35,10 +34,15 @@ export function useExtensions() {
   }, [mutate]);
 
   const remove = useCallback(async (extension: Pick<ExtensionInfoDto, 'name'>) => {
-    await fetchApi(`/extension/${extension.name}`, {
-      method: 'DELETE',
-    });
-    mutate((prevData) => (prevData || []).filter((ex) => ex.name !== extension.name));
+    try {
+      await fetchApi(`/extension/${extension.name}`, {
+        method: 'DELETE',
+      });
+      mutate((prevData) => (prevData || []).filter((ex) => ex.name !== extension.name));
+    } catch (error) {
+      setError(error as Error);
+    }
+
   }, [mutate]);
 
   return {

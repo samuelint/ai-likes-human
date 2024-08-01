@@ -20,7 +20,7 @@ class BaseExtensionRepository(ABC):
     def find_by_name(self, name: str) -> Optional[ExtensionInfoDto]:
         raise NotImplementedError()
 
-    def get_by_name(self, name: str) -> Optional[ExtensionInfoDto]:
+    def get_by_name(self, name: str) -> ExtensionInfoDto:
         extension = self.find_by_name(name)
         if extension is None:
             raise Exception(f"Extension {name} not found")

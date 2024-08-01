@@ -20,17 +20,28 @@ class WhlExtensionLoader:
                 "pip",
                 "install",
                 "--force-reinstall",
+                "--no-deps",
                 self.wheel_path,
             ]
         )
 
     def uninstall(self):
+        subprocess.check_call(
+            [
+                sys.executable,
+                "-m",
+                "pip",
+                "uninstall",
+                "-y",
+                self.wheel_path,
+            ]
+        )
         if self.module_name in sys.modules:
             del sys.modules[self.module_name]
 
     def is_installed(self):
         try:
-            importlib.import_module(self.module_name)
+            self.load()
             return True
         except ImportError:
             return False

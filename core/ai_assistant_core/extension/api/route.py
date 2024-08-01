@@ -6,8 +6,8 @@ from ai_assistant_core.extension.domain.extension_dto import ExtensionInfoDto
 from ai_assistant_core.extension.domain.invalid_file_format_error import (
     InvalidFileFormat,
 )
-from ai_assistant_core.extension.infrastructure.whl_extension_repository import (
-    WhlExtensionRepository,
+from ai_assistant_core.extension.infrastructure.whl_extension_install_service import (
+    WhlExtensionInstallService,
 )
 
 extension_router = APIRouter(prefix="/extension")
@@ -15,15 +15,19 @@ extension_router = APIRouter(prefix="/extension")
 
 @extension_router.get("/")
 async def list_extensions(
-    extension_service: WhlExtensionRepository = Injected(WhlExtensionRepository),
+    extension_service: WhlExtensionInstallService = Injected(
+        WhlExtensionInstallService
+    ),
 ) -> list[ExtensionInfoDto]:
-    return extension_service.list_available()
+    return extension_service.list_installed()
 
 
 @extension_router.post("/upload")
 async def upload_extension(
     file: UploadFile = File(...),
-    extension_service: WhlExtensionRepository = Injected(WhlExtensionRepository),
+    extension_service: WhlExtensionInstallService = Injected(
+        WhlExtensionInstallService
+    ),
 ) -> ExtensionInfoDto:
 
     try:
@@ -35,7 +39,9 @@ async def upload_extension(
 @extension_router.get("/{name}")
 async def find_extension_by_name(
     name: str,
-    extension_service: WhlExtensionRepository = Injected(WhlExtensionRepository),
+    extension_service: WhlExtensionInstallService = Injected(
+        WhlExtensionInstallService
+    ),
 ) -> Optional[ExtensionInfoDto]:
     return extension_service.find_by_name(name=name)
 
@@ -43,6 +49,11 @@ async def find_extension_by_name(
 @extension_router.delete("/{name}")
 async def delete_extension(
     name: str,
-    extension_service: WhlExtensionRepository = Injected(WhlExtensionRepository),
+    extension_service: WhlExtensionInstallService = Injected(
+        WhlExtensionInstallService
+    ),
 ) -> ExtensionInfoDto:
-    return extension_service.delete(name=name)
+    try:
+        return extension_service.uninstall_by_name(name=name)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Cannot delete extension")

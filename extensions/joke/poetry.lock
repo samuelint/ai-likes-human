@@ -186,13 +186,13 @@ tests-no-zope = ["attrs[tests-mypy]", "cloudpickle", "hypothesis", "pympler", "p
 
 [[package]]
 name = "base-assistant-extension"
-version = "0.4.0"
+version = "0.5.0"
 description = ""
 optional = false
 python-versions = "<3.13,>=3.9"
 files = [
-    {file = "base_assistant_extension-0.4.0-py3-none-any.whl", hash = "sha256:06bfd7d1ab59149a325875af545467c51ac2d659511a0573e06bbad516a2f1ae"},
-    {file = "base_assistant_extension-0.4.0.tar.gz", hash = "sha256:c1892a834d92bff231fc1785a862c2cfd8fc49a48ab5466a469a6038f94e649e"},
+    {file = "base_assistant_extension-0.5.0-py3-none-any.whl", hash = "sha256:ab19a226d08601b83f86804603ce0b0a40edfacd7e758c9d9ba4ebf46d791071"},
+    {file = "base_assistant_extension-0.5.0.tar.gz", hash = "sha256:6ca58c18525a683d14af485bfb5e59bb557c6ae55f08713b1f1eea6eaa3ad8a6"},
 ]
 
 [package.extras]
@@ -1884,4 +1884,4 @@ langchain = ["langchain"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.13"
-content-hash = "f753708d7bdfaea4114d8b55326bb03eaea99699a8325f44bf59d2ce824b30a7"
+content-hash = "6d60140905c8b2f46db5f7b21a99ce016c1380786456e74712c62feb8782ea3b"

@@ -5,8 +5,8 @@ from langchain_core.language_models import BaseChatModel
 from ai_assistant_core.extension.domain.base_extension_repository import (
     BaseExtensionRepository,
 )
-from ai_assistant_core.extension.domain.base_extension_service import (
-    BaseExtensionService,
+from ai_assistant_core.extension.domain.base_extension_install_service import (
+    BaseExtensionInstallService,
 )
 
 
@@ -15,7 +15,7 @@ class ExtensionAsToolFactory:
     def __init__(
         self,
         extension_repository: BaseExtensionRepository,
-        extension_service: BaseExtensionService,
+        extension_service: BaseExtensionInstallService,
     ) -> None:
         self.extension_repository = extension_repository
         self.extension_service = extension_service
@@ -28,7 +28,7 @@ class ExtensionAsToolFactory:
 
             return result.content
 
-        tool_name = extension.name()
+        tool_name = extension.name().replace(" ", "_")
         tool_description = extension.description()
 
         return StructuredTool.from_function(

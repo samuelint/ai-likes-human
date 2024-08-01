@@ -1,10 +1,10 @@
-from base_assistant_extension import BaseExtension
+from typing import BinaryIO, Optional
 from injector import inject
 from ai_assistant_core.extension.domain.base_extension_repository import (
     BaseExtensionRepository,
 )
-from ai_assistant_core.extension.domain.base_extension_service import (
-    BaseExtensionService,
+from ai_assistant_core.extension.domain.base_extension_install_service import (
+    BaseExtensionInstallService,
 )
 from ai_assistant_core.extension.domain.extension_dto import ExtensionInfoDto
 
@@ -14,36 +14,32 @@ from ai_assistant_core.extension.infrastructure.whl_extension_loader import (
 
 
 @inject
-class WhlExtensionService(BaseExtensionService):
+class WhlExtensionInstallService(BaseExtensionInstallService):
     def __init__(self, repository: BaseExtensionRepository) -> None:
         self.repository = repository
 
-    def load(self, extension: ExtensionInfoDto) -> BaseExtension:
-        if not self.is_installed(extension=extension):
-            self.install(extension=extension)
+    def find_by_name(self, name: str) -> Optional[ExtensionInfoDto]:
+        return self.repository.find_by_name(name=name)
 
-        loader = WhlExtensionLoader(wheel_path=extension.uri)
-
-        return loader.load()
+    def upload(self, filename: str, file: BinaryIO) -> list[ExtensionInfoDto]:
+        return self.repository.upload(filename=filename, file=file)
 
     def list_installed(self) -> list[ExtensionInfoDto]:
-        available_extensions = self.repository.list_available()
-
-        installed_extensions: list[ExtensionInfoDto] = []
-
-        for extension in available_extensions:
-            if self.is_installed(extension):
-                installed_extensions.append(extension)
-
-        return installed_extensions
+        return self.repository.list_available()
 
     def install(self, extension: ExtensionInfoDto):
         loader = WhlExtensionLoader(wheel_path=extension.uri)
         loader.install()
 
-    def uninstall(self, extension: ExtensionInfoDto):
+    def uninstall_by_name(self, name: str) -> ExtensionInfoDto:
+        extension = self.repository.get_by_name(name=name)
+        return self.uninstall(extension=extension)
+
+    def uninstall(self, extension: ExtensionInfoDto) -> ExtensionInfoDto:
         loader = WhlExtensionLoader(wheel_path=extension.uri)
         loader.uninstall()
+
+        return self.repository.delete(name=extension.name)
 
     def is_installed(self, extension: ExtensionInfoDto) -> bool:
         loader = WhlExtensionLoader(wheel_path=extension.uri)

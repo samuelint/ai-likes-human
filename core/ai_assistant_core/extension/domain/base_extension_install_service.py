@@ -1,13 +1,11 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 from ai_assistant_core.extension.domain.extension_dto import ExtensionInfoDto
-from base_assistant_extension.base_extension import (
-    BaseExtension,
-)
 
 
-class BaseExtensionService(ABC):
+class BaseExtensionInstallService(ABC):
     @abstractmethod
-    def load(self, extension: ExtensionInfoDto) -> BaseExtension:
+    def find_by_name(self, name: str) -> Optional[ExtensionInfoDto]:
         raise NotImplementedError()
 
     @abstractmethod
@@ -19,7 +17,11 @@ class BaseExtensionService(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def uninstall(self, extension: ExtensionInfoDto):
+    def uninstall_by_name(self, name: str) -> ExtensionInfoDto:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def uninstall(self, extension: ExtensionInfoDto) -> ExtensionInfoDto:
         raise NotImplementedError()
 
     @abstractmethod

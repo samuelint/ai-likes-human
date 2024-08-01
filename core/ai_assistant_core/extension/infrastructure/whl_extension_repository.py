@@ -9,9 +9,6 @@ import os
 from ai_assistant_core.extension.domain.invalid_file_format_error import (
     InvalidFileFormat,
 )
-from ai_assistant_core.extension.infrastructure.whl_extension_loader import (
-    WhlExtensionLoader,
-)
 from ai_assistant_core.extension.infrastructure.whl_metadata_loader import (
     WhlMetadataLoader,
 )
@@ -51,25 +48,6 @@ class WhlExtensionRepository(BaseExtensionRepository):
         for extension in available_extensions:
             if extension.name == name:
                 return extension
-
-    def list_installed(self) -> list[ExtensionInfoDto]:
-        available_extensions = self.list_available()
-
-        installed_extensions: list[ExtensionInfoDto] = []
-
-        for extension in available_extensions:
-            if self.is_installed(extension):
-                installed_extensions.append(extension)
-
-        return installed_extensions
-
-    def install(self, extension: ExtensionInfoDto):
-        loader = WhlExtensionLoader(wheel_path=extension.uri)
-        loader.install()
-
-    def is_installed(self, extension: ExtensionInfoDto) -> bool:
-        loader = WhlExtensionLoader(wheel_path=extension.uri)
-        return loader.is_installed()
 
     def _assert_extension_directory_exist(self):
         if not os.path.exists(self.extensions_directory):

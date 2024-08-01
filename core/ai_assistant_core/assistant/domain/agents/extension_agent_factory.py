@@ -3,9 +3,6 @@ from injector import inject
 from ai_assistant_core.extension.domain.base_extension_repository import (
     BaseExtensionRepository,
 )
-from ai_assistant_core.extension.domain.base_extension_service import (
-    BaseExtensionService,
-)
 from ai_assistant_core.extension.domain.extension_as_tool_factory import (
     ExtensionAsToolFactory,
 )
@@ -15,13 +12,17 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.runnables import Runnable
 from langgraph.prebuilt import create_react_agent
 
+from ai_assistant_core.extension.domain.extension_load_service import (
+    ExtensionLoadService,
+)
+
 
 @inject
 class ExtensionAgentFactory:
     def __init__(
         self,
         extension_repository: BaseExtensionRepository,
-        extension_service: BaseExtensionService,
+        extension_service: ExtensionLoadService,
         extension_as_tool_factory: ExtensionAsToolFactory,
     ) -> None:
         self.extension_repository = extension_repository

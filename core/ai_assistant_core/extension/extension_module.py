@@ -4,20 +4,20 @@ from ai_assistant_core.app_configuration import AppConfiguration
 from ai_assistant_core.extension.domain.base_extension_repository import (
     BaseExtensionRepository,
 )
-from ai_assistant_core.extension.domain.base_extension_service import (
-    BaseExtensionService,
+from ai_assistant_core.extension.domain.base_extension_install_service import (
+    BaseExtensionInstallService,
 )
 from ai_assistant_core.extension.infrastructure.whl_extension_repository import (
     WhlExtensionRepository,
 )
-from ai_assistant_core.extension.infrastructure.whl_extension_service import (
-    WhlExtensionService,
+from ai_assistant_core.extension.infrastructure.whl_extension_install_service import (
+    WhlExtensionInstallService,
 )
 
 
 class ExtensionModule(Module):
     def configure(self, binder: Binder):
-        binder.bind(BaseExtensionService, to=WhlExtensionService)
+        binder.bind(BaseExtensionInstallService, to=WhlExtensionInstallService)
 
     @singleton
     @provider

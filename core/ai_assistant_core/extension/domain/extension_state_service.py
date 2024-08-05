@@ -14,10 +14,10 @@ from ai_assistant_core.extension.infrastructure.pex_extension_load_service impor
 class ExtensionStateService:
     def __init__(
         self,
-        extension_service: PexExtensionInstallService,
+        installed_extension_service: PexExtensionInstallService,
         load_service: PexExtensionLoadService,
     ) -> None:
-        self.extension_service = extension_service
+        self.extension_service = installed_extension_service
         self.load_service = load_service
 
     def find_by_name(self, name: str) -> Optional[ExtensionStateDto]:
@@ -25,12 +25,13 @@ class ExtensionStateService:
         if extension_info is None:
             return None
 
-        extension_process = self.load_service.find_extension_process(
+        loaded_extension = self.load_service.find_loaded_extensions(
             extension_name=extension_info.name
         )
 
         return ExtensionStateDto(
-            is_loaded=extension_process is not None,
-            pid=extension_process.pid,
+            is_loaded=loaded_extension is not None,
+            ipc_port=loaded_extension.ipc_port,
+            pid=loaded_extension.pid,
             **extension_info.to_dict(),
         )

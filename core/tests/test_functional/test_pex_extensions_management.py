@@ -145,3 +145,10 @@ class TestPexExtensionLoad:
         assert extension_state["pid"] > 0
         process = psutil.Process(extension_state["pid"])
         assert process.is_running()
+
+    def test_loaded_extension_has_ipc_port(self):
+        extension_name = self.upload_extension()
+
+        extension_state = test_api.get(f"{base_route}/{extension_name}").json()
+
+        assert extension_state["ipc_port"] > 0

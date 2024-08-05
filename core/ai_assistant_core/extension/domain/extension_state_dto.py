@@ -7,4 +7,5 @@ from ai_assistant_core.extension.domain.extension_dto import ExtensionInfoDto
 @dataclass
 class ExtensionStateDto(ExtensionInfoDto):
     is_loaded: bool
-    pid: Optional[str]
+    ipc_port: Optional[int]
+    pid: Optional[int]

@@ -230,17 +230,20 @@ tests-no-zope = ["attrs[tests-mypy]", "cloudpickle", "hypothesis", "pympler", "p
 
 [[package]]
 name = "base-assistant-extension"
-version = "0.5.0"
+version = "0.6.5"
 description = ""
 optional = false
 python-versions = "<3.13,>=3.9"
 files = [
-    {file = "base_assistant_extension-0.5.0-py3-none-any.whl", hash = "sha256:ab19a226d08601b83f86804603ce0b0a40edfacd7e758c9d9ba4ebf46d791071"},
-    {file = "base_assistant_extension-0.5.0.tar.gz", hash = "sha256:6ca58c18525a683d14af485bfb5e59bb557c6ae55f08713b1f1eea6eaa3ad8a6"},
+    {file = "base_assistant_extension-0.6.5-py3-none-any.whl", hash = "sha256:3ec10296877ddedb1991788fe3100592271c32f0a9e174b2bfbe19c33d2ff4ca"},
+    {file = "base_assistant_extension-0.6.5.tar.gz", hash = "sha256:09e4a4b1932c5e2421467ae3ac6d806ea024382183c627f835762c86307f506c"},
 ]
 
+[package.dependencies]
+langchain-openai-api-bridge = ">=0.11.1"
+
 [package.extras]
-langchain = ["langchain (>=0.2.6,<0.3.0)"]
+host-dependencies = ["fastapi (>=0.112.0)", "langchain (>=0.2.6)", "langchain-openai (>=0.1.20)", "langgraph (>=0.1.19)", "uvicorn (>=0.30.5)"]
 
 [[package]]
 name = "beautifulsoup4"
@@ -1289,13 +1292,13 @@ tiktoken = ">=0.7,<1"
 
 [[package]]
 name = "langchain-openai-api-bridge"
-version = "0.10.1"
+version = "0.11.1"
 description = "A bridge to use Langchain output as an OpenAI-compatible API."
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "langchain_openai_api_bridge-0.10.1-py3-none-any.whl", hash = "sha256:d841f645ba214bdcc3c538b509ae79f6f860665f2acfc8f3484402c2a5fe631a"},
-    {file = "langchain_openai_api_bridge-0.10.1.tar.gz", hash = "sha256:ab50fc2d6e8b564e3d4f44443d1cd64a8c4cf58c0ea477eae4e4a36661abd045"},
+    {file = "langchain_openai_api_bridge-0.11.1-py3-none-any.whl", hash = "sha256:d2c892c71bfd05b4dbcf4303b614115de672a7f0094053a506b744609ec1109a"},
+    {file = "langchain_openai_api_bridge-0.11.1.tar.gz", hash = "sha256:822e4d3c05c939351f69ef57bfb456e10b234ed673d7265a5a9a27a0ba9b6f1e"},
 ]
 
 [package.dependencies]
@@ -3530,4 +3533,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.13"
-content-hash = "3e7e376df5376eade8d51172b33ea5021a2da133f344392c75c3c8ec1ccc8f86"
+content-hash = "c4ff8cc893cf3638aa6bf1d5c8fd1f2e6f0e52ca91f8b9f6e9c31822e613506f"

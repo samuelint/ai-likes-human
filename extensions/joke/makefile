@@ -8,3 +8,8 @@ test:
 .PHONY: build
 build:
 	poetry build
+
+.PHONY: bundle
+bundle:
+	@mkdir -p dist
+	poetry run pex . -m joke_extension.main -o dist/extension.pex

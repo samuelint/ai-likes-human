@@ -1,6 +1,6 @@
 from langchain_core.language_models import BaseChatModel
 from langchain_core.runnables import Runnable
-from base_assistant_extension.base_extension import (
+from base_assistant_extension import (
     BaseExtension,
 )
 from langchain_core.prompts import PromptTemplate

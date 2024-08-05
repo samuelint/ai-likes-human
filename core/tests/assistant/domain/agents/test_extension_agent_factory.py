@@ -7,11 +7,11 @@ from ai_assistant_core.assistant.domain.agents.extension_agent_factory import (
 from ai_assistant_core.extension.domain.base_extension_repository import (
     BaseExtensionRepository,
 )
-from ai_assistant_core.extension.domain.base_extension_install_service import (
-    BaseExtensionInstallService,
-)
 from ai_assistant_core.extension.domain.extension_as_tool_factory import (
     ExtensionAsToolFactory,
+)
+from ai_assistant_core.extension.infrastructure.pex_extension_install_service import (
+    PexExtensionInstallService,
 )
 from tests.extension.domain.__dto_factories__ import ExtensionInfoDtoPolyfactory
 
@@ -24,8 +24,8 @@ def extension_repository(decoy: Decoy) -> BaseExtensionRepository:
 
 
 @pytest.fixture
-def extension_service(decoy: Decoy) -> BaseExtensionInstallService:
-    repo = decoy.mock(cls=BaseExtensionInstallService)
+def extension_service(decoy: Decoy) -> PexExtensionInstallService:
+    repo = decoy.mock(cls=PexExtensionInstallService)
 
     return repo
 
@@ -40,7 +40,7 @@ def extension_as_tool_factory(decoy: Decoy) -> ExtensionAsToolFactory:
 @pytest.fixture
 def instance(
     extension_repository: BaseExtensionRepository,
-    extension_service: BaseExtensionInstallService,
+    extension_service: PexExtensionInstallService,
     extension_as_tool_factory: ExtensionAsToolFactory,
 ) -> ExtensionAgentFactory:
     return ExtensionAgentFactory(

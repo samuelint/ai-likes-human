@@ -4,13 +4,15 @@ import pytest
 from ai_assistant_core.extension.domain.base_extension_repository import (
     BaseExtensionRepository,
 )
-from ai_assistant_core.extension.domain.base_extension_install_service import (
-    BaseExtensionInstallService,
-)
+
 from ai_assistant_core.extension.domain.extension_as_tool_factory import (
     ExtensionAsToolFactory,
 )
 from langchain_core.language_models import BaseChatModel
+
+from ai_assistant_core.extension.infrastructure.pex_extension_install_service import (
+    PexExtensionInstallService,
+)
 
 
 class TestExtensionAsToolFactory:
@@ -20,8 +22,8 @@ class TestExtensionAsToolFactory:
         return decoy.mock(cls=BaseExtensionRepository)
 
     @pytest.fixture
-    def extension_service(self, decoy: Decoy) -> BaseExtensionInstallService:
-        return decoy.mock(cls=BaseExtensionInstallService)
+    def extension_service(self, decoy: Decoy) -> PexExtensionInstallService:
+        return decoy.mock(cls=PexExtensionInstallService)
 
     @pytest.fixture
     def llm(self, decoy: Decoy) -> BaseChatModel:
@@ -31,7 +33,7 @@ class TestExtensionAsToolFactory:
     def instance(
         self,
         extension_repository: BaseExtensionRepository,
-        extension_service: BaseExtensionInstallService,
+        extension_service: PexExtensionInstallService,
     ) -> ExtensionAsToolFactory:
         return ExtensionAsToolFactory(
             extension_repository=extension_repository,

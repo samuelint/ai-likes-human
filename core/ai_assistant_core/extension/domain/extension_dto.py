@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 
 
 @dataclass
@@ -7,3 +7,6 @@ class ExtensionInfoDto:
     version: str
     author: str
     uri: str
+
+    def to_dict(self) -> dict:
+        return asdict(self)

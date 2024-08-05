@@ -5,7 +5,7 @@ from ai_assistant_core.extension.domain.extension_dto import ExtensionInfoDto
 
 class BaseExtensionRepository(ABC):
     @abstractmethod
-    def list_available(self) -> list[ExtensionInfoDto]:
+    def list(self) -> list[ExtensionInfoDto]:
         raise NotImplementedError()
 
     @abstractmethod

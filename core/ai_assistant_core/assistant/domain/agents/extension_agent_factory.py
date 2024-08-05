@@ -12,8 +12,8 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.runnables import Runnable
 from langgraph.prebuilt import create_react_agent
 
-from ai_assistant_core.extension.domain.extension_load_service import (
-    ExtensionLoadService,
+from ai_assistant_core.extension.infrastructure.pex_extension_load_service import (
+    PexExtensionLoadService,
 )
 
 
@@ -22,7 +22,7 @@ class ExtensionAgentFactory:
     def __init__(
         self,
         extension_repository: BaseExtensionRepository,
-        extension_service: ExtensionLoadService,
+        extension_service: PexExtensionLoadService,
         extension_as_tool_factory: ExtensionAsToolFactory,
     ) -> None:
         self.extension_repository = extension_repository

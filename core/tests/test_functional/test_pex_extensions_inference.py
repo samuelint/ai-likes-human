@@ -41,7 +41,7 @@ class TestPexExtensionsInference:
         extension_name = ""
         with open(joke_extension_pex_file_path, "rb") as file:
             response = test_api.post(
-                "/extension/upload",
+                "/extension/pex/upload",
                 files={
                     "file": (
                         joke_extension_pex_file_name,

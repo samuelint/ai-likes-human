@@ -19,17 +19,18 @@ class ExtensionAsToolFactory:
         self.extension_inference_service = extension_inference_service
 
     def create(self, extension_name: str) -> BaseTool:
-        runnable = self.extension_inference_service.create_as_runnable(
-            name=extension_name
+        inferable = self.extension_inference_service.create(
+            extension_name=extension_name
         )
+        runnable = inferable.runnable
 
         def call_extension(query: str) -> str:
             result = runnable.invoke(query)
 
             return result.content
 
-        tool_name = extension.name().replace(" ", "_")
-        tool_description = extension.description()
+        tool_name = inferable.name.replace(" ", "_")
+        tool_description = inferable.description
 
         return StructuredTool.from_function(
             func=call_extension,

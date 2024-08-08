@@ -1,8 +1,4 @@
-import os
-import subprocess
-import sys
 from typing import Optional
-import zipfile
 from injector import inject
 import psutil
 
@@ -18,6 +14,7 @@ from ai_assistant_core.extension.infrastructure.in_memory_loaded_extension_repos
 from ai_assistant_core.extension.infrastructure.pex_extension_repository import (
     PexExtensionRepository,
 )
+from ai_assistant_core.extension.infrastructure.pex_process import PexProcess
 
 
 @inject
@@ -35,20 +32,28 @@ class PexExtensionLoadService:
     ) -> Optional[ExtensionLoadStateDto]:
         return self.loaded_extensions_repository.find_by_name(name=extension_name)
 
+    def assert_loaded_extension(
+        self, extension_name: str
+    ) -> Optional[ExtensionLoadStateDto]:
+        loaded_extension = self.find_loaded_extensions(extension_name=extension_name)
+        if loaded_extension is None:
+            self.load(extension_name=extension_name)
+
+        return self.find_loaded_extensions(extension_name=extension_name)
+
     def load(
         self,
         extension_name: str,
         ipc_port: Optional[int] = ExtensionIpcPortService.find_next_available_port(),
-    ) -> None:
+    ) -> PexProcess:
         extension_info = self.extensions_repository.find_by_name(name=extension_name)
 
         if extension_info is None:
             raise ValueError(f"Extension {extension_name} not installed")
 
-        pex_process = self._run_pex_file(
-            pex_path=extension_info.uri,
-            ipc_port=ipc_port,
-        )
+        pex_process = PexProcess(pex_path=extension_info.uri, ipc_port=ipc_port)
+        pex_process.start()
+
         self._register_pex(
             pid=pex_process.pid,
             ipc_port=ipc_port,
@@ -83,24 +88,3 @@ class PexExtensionLoadService:
         self.loaded_extensions_repository.register(state)
 
         return state
-
-    def _run_pex_file(
-        self, pex_path, ipc_port: int, inference_url: Optional[str] = None
-    ) -> subprocess.Popen:
-        extract_path = os.path.join(os.path.dirname(sys.executable), "pex_extract")
-
-        os.makedirs(extract_path, exist_ok=True)
-
-        with zipfile.ZipFile(pex_path, "r") as zip_ref:
-            zip_ref.extractall(extract_path)
-
-        pex_executable = os.path.join(extract_path, ".bootstrap", "pex")
-        command = [sys.executable, pex_executable, "--port", str(ipc_port)]
-        if inference_url is not None:
-            command += ["--inference-url", inference_url]
-
-        pex_process = subprocess.Popen(
-            command,
-        )
-
-        return pex_process

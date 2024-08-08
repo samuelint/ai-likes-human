@@ -1,5 +1,6 @@
 from injector import inject
 from langchain_core.runnables import Runnable
+from langchain_openai import ChatOpenAI
 
 from ai_assistant_core.extension.domain.extension_load_state import (
     ExtensionLoadStateDto,
@@ -22,23 +23,22 @@ class PexExtensionInferenceFactory:
         self.extension_load_service = extension_load_service
 
     def create(self, extension_name: str) -> InferableExtension:
-        loaded_extension = self.extension_load_service.find_loaded_extensions(
+        loaded_extension = self.extension_load_service.assert_loaded_extension(
             extension_name=extension_name
         )
         api_service = self.create_api(loaded_extension=loaded_extension)
 
         metadata = api_service.get_metadata()
+        name = metadata["name"]
+        description = metadata["description"]
 
-        runnable = self.create_runnable(name=extension_name)
+        runnable = api_service.get_proxy_openai_chat_client(model="gpt-4o-mini")
 
         return InferableExtension(
-            name=loaded_extension.name,
-            description="Joker",
+            name=name,
+            description=description,
             runnable=runnable,
         )
-
-    def create_runnable(self, name: str) -> Runnable:
-        pass
 
     def create_api(self, loaded_extension: ExtensionLoadStateDto) -> PexExtensionApi:
         return PexExtensionApi(uri=f"http://localhost:{loaded_extension.ipc_port}")

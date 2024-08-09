@@ -1,6 +1,4 @@
 from injector import inject
-from langchain_core.runnables import Runnable
-from langchain_openai import ChatOpenAI
 
 from ai_assistant_core.extension.domain.extension_load_state import (
     ExtensionLoadStateDto,

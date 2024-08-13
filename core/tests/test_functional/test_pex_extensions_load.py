@@ -17,7 +17,7 @@ class TestPexExtensionLoadOnInstall:
     def upload_extension(self) -> str:
         with open(joke_extension_pex_file_path, "rb") as file:
             response = test_api.post(
-                f"{base_route}/pex/upload",
+                f"{base_route}/upload",
                 files={
                     "file": (
                         joke_extension_pex_file_name,
@@ -59,7 +59,7 @@ class TestPexExtensionLoad:
     def upload_extension(self) -> str:
         with open(joke_extension_pex_file_path, "rb") as file:
             response = test_api.post(
-                f"{base_route}/pex/upload",
+                f"{base_route}/upload",
                 files={
                     "file": (
                         joke_extension_pex_file_name,

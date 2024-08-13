@@ -43,7 +43,7 @@ class PexExtensionRepository(BaseExtensionRepository):
 
         return ExtensionInfoDto(
             name=file_name,
-            version="unknown",
-            author="unknown",
+            version=None,
+            author=None,
             uri=whl_file,
         )

@@ -32,7 +32,7 @@ async def list_extensions(
     return extension_state_service.list()
 
 
-@extension_router.post("/pex/upload")
+@extension_router.post("/upload")
 async def upload_extension(
     file: UploadFile = File(...),
     install_service: PexExtensionInstallService = Injected(PexExtensionInstallService),

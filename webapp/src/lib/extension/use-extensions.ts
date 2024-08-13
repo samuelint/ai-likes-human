@@ -1,13 +1,13 @@
 import useSWR from 'swr';
 import { fetchApiJson, fetchApi } from '@/lib/api-fetcher';
-import { ExtensionInfoDto } from './extension.dto';
+import { ExtensionStateDto } from './extension.dto';
 import { useCallback, useEffect, useState } from 'react';
 import { OnExtensionSubmit } from '@/components/add-local-extension-form';
 
 
 
 export function useExtensions() {
-  const { data, error: fetchAvailableError, isLoading, mutate } = useSWR<ExtensionInfoDto[]>('/extension', fetchApiJson);
+  const { data, error: fetchAvailableError, isLoading, mutate } = useSWR<ExtensionStateDto[]>('/extension', fetchApiJson);
   const [error, setError] = useState<Error | undefined>(undefined);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export function useExtensions() {
         body: formData,
       });
 
-      const newExtensionInfo = await result.json() as ExtensionInfoDto;
+      const newExtensionInfo = await result.json() as ExtensionStateDto;
       mutate((prevData) => (prevData || []).concat(newExtensionInfo), true);
     } catch (error) {
       setError(error as Error);
@@ -33,7 +33,7 @@ export function useExtensions() {
 
   }, [mutate]);
 
-  const remove = useCallback(async (extension: Pick<ExtensionInfoDto, 'name'>) => {
+  const remove = useCallback(async (extension: Pick<ExtensionStateDto, 'name'>) => {
     try {
       await fetchApi(`/extension/${extension.name}`, {
         method: 'DELETE',
@@ -45,11 +45,41 @@ export function useExtensions() {
 
   }, [mutate]);
 
+  const load = useCallback(async (extension: Pick<ExtensionStateDto, 'name'>) => {
+    try {
+      const result = await fetchApiJson<ExtensionStateDto>(`/extension/${extension.name}/load`, {
+        method: 'POST',
+      });
+
+      mutate((prevData) => (prevData || []).map((ex) =>
+        ex.name === result.name ? result : ex
+      ));
+    } catch (error) {
+      setError(error as Error);
+    }
+  }, [mutate]);
+
+  const unload = useCallback(async (extension: Pick<ExtensionStateDto, 'name'>) => {
+    try {
+      const result = await fetchApiJson<ExtensionStateDto>(`/extension/${extension.name}/unload`, {
+        method: 'POST',
+      });
+
+      mutate((prevData) => (prevData || []).map((ex) =>
+        ex.name === result.name ? result : ex
+      ));
+    } catch (error) {
+      setError(error as Error);
+    }
+  }, [mutate]);
+
   return {
     data,
     isLoading,
     error,
     upload,
+    load,
+    unload,
     remove,
   };
 }

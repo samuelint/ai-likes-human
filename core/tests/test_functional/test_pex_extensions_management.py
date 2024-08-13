@@ -17,7 +17,7 @@ class TestPexExtensionCRUD:
     def test_upload_file_must_have_pex_extension(self):
         with open(joke_extension_pex_file_path, "rb") as file:
             response = test_api.post(
-                f"{base_route}/pex/upload",
+                f"{base_route}/upload",
                 files={"file": ("joke_extension", file, "application/zip")},
             )
             body = response.json()
@@ -29,7 +29,7 @@ class TestPexExtensionCRUD:
         # Upload
         with open(joke_extension_pex_file_path, "rb") as file:
             response = test_api.post(
-                f"{base_route}/pex/upload",
+                f"{base_route}/upload",
                 files={
                     "file": (
                         joke_extension_pex_file_name,
@@ -70,7 +70,7 @@ class TestPexExtensionCRUD:
     def test_on_upload_file_is_uploaded(self):
         with open(joke_extension_pex_file_path, "rb") as file:
             test_api.post(
-                f"{base_route}/pex/upload",
+                f"{base_route}/upload",
                 files={
                     "file": (
                         joke_extension_pex_file_name,
@@ -90,7 +90,7 @@ class TestPexExtensionCRUD:
     def test_file_is_deleted_from_disk_delete(self):
         with open(joke_extension_pex_file_path, "rb") as file:
             test_api.post(
-                f"{base_route}/pex/upload",
+                f"{base_route}/upload",
                 files={
                     "file": (
                         joke_extension_pex_file_name,

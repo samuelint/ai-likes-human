@@ -23,5 +23,5 @@ def bind_assistant_routes(app: FastAPI, injector: Injector):
         prefix="/assistant",
     )
     bridge.bind_openai_chat_completion(
-        prefix="/completion",
+        prefix="",
     )

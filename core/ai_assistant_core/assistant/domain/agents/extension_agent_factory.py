@@ -29,9 +29,15 @@ class ExtensionAgentFactory:
             return False
         return True
 
-    def create(self, assistant_id: str, llm: BaseChatModel) -> Runnable:
+    def create(
+        self,
+        assistant_id: str,
+        llm: BaseChatModel,
+        extension_llm_model: str,
+    ) -> Runnable:
         extension_as_tool = self.extension_as_tool_factory.create(
-            extension_name=assistant_id
+            extension_name=assistant_id,
+            extension_llm_model=extension_llm_model,
         )
 
         return create_react_agent(

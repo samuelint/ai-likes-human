@@ -1,4 +1,3 @@
-from base_assistant_extension import BaseExtension
 from decoy import Decoy
 import pytest
 from ai_assistant_core.extension.domain.base_extension_repository import (
@@ -8,10 +7,9 @@ from ai_assistant_core.extension.domain.base_extension_repository import (
 from ai_assistant_core.extension.domain.extension_as_tool_factory import (
     ExtensionAsToolFactory,
 )
-from langchain_core.language_models import BaseChatModel
-
-from ai_assistant_core.extension.infrastructure.pex_extension_install_service import (
-    PexExtensionInstallService,
+from ai_assistant_core.extension.domain.inferable_extension import InferableExtension
+from ai_assistant_core.extension.infrastructure.pex_extension_inference_factory import (
+    PexExtensionInferenceFactory,
 )
 
 
@@ -22,56 +20,58 @@ class TestExtensionAsToolFactory:
         return decoy.mock(cls=BaseExtensionRepository)
 
     @pytest.fixture
-    def extension_service(self, decoy: Decoy) -> PexExtensionInstallService:
-        return decoy.mock(cls=PexExtensionInstallService)
-
-    @pytest.fixture
-    def llm(self, decoy: Decoy) -> BaseChatModel:
-        return decoy.mock(cls=BaseChatModel)
+    def extension_inference_service(self, decoy: Decoy) -> PexExtensionInferenceFactory:
+        return decoy.mock(cls=PexExtensionInferenceFactory)
 
     @pytest.fixture
     def instance(
         self,
         extension_repository: BaseExtensionRepository,
-        extension_service: PexExtensionInstallService,
+        extension_inference_service: PexExtensionInferenceFactory,
     ) -> ExtensionAsToolFactory:
         return ExtensionAsToolFactory(
             extension_repository=extension_repository,
-            extension_service=extension_service,
+            extension_inference_service=extension_inference_service,
         )
 
     def test_created_tool_name_has_no_spaces(
-        self, instance: ExtensionAsToolFactory, llm: BaseChatModel
+        self,
+        decoy: Decoy,
+        instance: ExtensionAsToolFactory,
+        extension_inference_service: PexExtensionInferenceFactory,
     ):
+        inferable_extension = InferableExtension(
+            name="my super extension", description="some description", runnable=None
+        )
+        decoy.when(
+            extension_inference_service.create(
+                extension_name="some-extension", extension_llm_model="gpt4"
+            )
+        ).then_return(inferable_extension)
 
-        class ExtensionFixture(BaseExtension):
-            def name(self) -> str:
-                return "my super extension"
-
-            def description(self) -> str:
-                return ""
-
-            def create_runnable(self, **kwargs) -> None:
-                return None
-
-        tool = instance.create(extension=ExtensionFixture(), llm=llm)
+        tool = instance.create(
+            extension_name="some-extension", extension_llm_model="gpt4"
+        )
 
         assert tool.name == "my_super_extension"
 
     def test_created_tool_description_is_the_same(
-        self, instance: ExtensionAsToolFactory, llm: BaseChatModel
+        self,
+        decoy: Decoy,
+        instance: ExtensionAsToolFactory,
+        extension_inference_service: PexExtensionInferenceFactory,
     ):
+        inferable_extension = InferableExtension(
+            name="my super extension", description="some description", runnable=None
+        )
+        decoy.when(
+            extension_inference_service.create(
+                extension_name="some-extension", extension_llm_model="gpt4"
+            )
+        ).then_return(inferable_extension)
 
-        class ExtensionFixture(BaseExtension):
-            def name(self) -> str:
-                return "my super extension"
-
-            def description(self) -> str:
-                return "some description"
-
-            def create_runnable(self, **kwargs) -> None:
-                return None
-
-        tool = instance.create(extension=ExtensionFixture(), llm=llm)
+        tool = instance.create(
+            extension_name="some-extension", extension_llm_model="gpt4"
+        )
 
         assert tool.description == "some description"

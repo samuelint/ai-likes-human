@@ -32,14 +32,17 @@ class PexExtensionLoadService:
     ) -> Optional[ExtensionLoadStateDto]:
         return self.loaded_extensions_repository.find_by_name(name=extension_name)
 
-    def assert_loaded_extension(
-        self, extension_name: str
-    ) -> Optional[ExtensionLoadStateDto]:
+    def assert_loaded_extension(self, extension_name: str) -> ExtensionLoadStateDto:
         loaded_extension = self.find_loaded_extensions(extension_name=extension_name)
         if loaded_extension is None:
             self.load(extension_name=extension_name)
 
-        return self.find_loaded_extensions(extension_name=extension_name)
+        extension = self.find_loaded_extensions(extension_name=extension_name)
+
+        if extension is None:
+            raise ValueError(f"Cannot load extension {extension_name} not loaded")
+
+        return extension
 
     def load(
         self,

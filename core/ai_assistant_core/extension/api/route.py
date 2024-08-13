@@ -70,14 +70,20 @@ async def delete_extension(
 @extension_router.post("/{name}/load")
 async def load_extension(
     name: str,
-    extension_service: PexExtensionLoadService = Injected(PexExtensionLoadService),
-) -> None:
-    return extension_service.load(extension_name=name)
+    extension_load_service: PexExtensionLoadService = Injected(PexExtensionLoadService),
+    extension_state_service: ExtensionStateService = Injected(ExtensionStateService),
+) -> ExtensionInfoDto:
+    extension_load_service.load(extension_name=name)
+
+    return extension_state_service.find_by_name(name=name)
 
 
 @extension_router.post("/{name}/unload")
 async def unload_extension(
     name: str,
-    extension_service: PexExtensionLoadService = Injected(PexExtensionLoadService),
-) -> None:
-    return extension_service.unload(extension_name=name)
+    extension_load_service: PexExtensionLoadService = Injected(PexExtensionLoadService),
+    extension_state_service: ExtensionStateService = Injected(ExtensionStateService),
+) -> ExtensionInfoDto:
+    extension_load_service.unload(extension_name=name)
+
+    return extension_state_service.find_by_name(name=name)

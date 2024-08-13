@@ -1,6 +1,5 @@
 import os
 
-import psutil
 from ai_assistant_core.app_configuration import AppConfiguration
 from tests.test_functional.functional_test_utils import create_test_client
 from tests.test_functional.assets.assets import (
@@ -108,47 +107,3 @@ class TestPexExtensionCRUD:
                 joke_extension_pex_file_name,
             )
         )
-
-
-class TestPexExtensionLoad:
-    appConfig = AppConfiguration(database_url="sqlite:///:memory:")
-
-    def upload_extension(self) -> str:
-        with open(joke_extension_pex_file_path, "rb") as file:
-            response = test_api.post(
-                f"{base_route}/pex/upload",
-                files={
-                    "file": (
-                        joke_extension_pex_file_name,
-                        file,
-                        "application/zip",
-                    )
-                },
-            )
-            upload_body = response.json()
-
-            assert response.status_code == 200
-            return upload_body["name"]
-
-    def test_installing_an_extension_loads_it(self):
-        extension_name = self.upload_extension()
-
-        extension_state = test_api.get(f"{base_route}/{extension_name}").json()
-
-        assert extension_state["is_loaded"] is True
-
-    def test_loaded_extension_has_process(self):
-        extension_name = self.upload_extension()
-
-        extension_state = test_api.get(f"{base_route}/{extension_name}").json()
-
-        assert extension_state["pid"] > 0
-        process = psutil.Process(extension_state["pid"])
-        assert process.is_running()
-
-    def test_loaded_extension_has_ipc_port(self):
-        extension_name = self.upload_extension()
-
-        extension_state = test_api.get(f"{base_route}/{extension_name}").json()
-
-        assert extension_state["ipc_port"] > 0

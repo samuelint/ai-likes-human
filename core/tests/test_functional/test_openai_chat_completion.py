@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.DEBUG)
 @pytest.fixture(scope="session")
 def openai_client():
     return OpenAI(
-        base_url="http://testserver/completion/openai/v1",
+        base_url="http://testserver/openai/v1",
         http_client=test_api,
     )
 

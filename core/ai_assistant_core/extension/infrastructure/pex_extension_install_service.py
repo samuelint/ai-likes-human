@@ -27,8 +27,6 @@ class PexExtensionInstallService:
     def install(self, filename: str, file: BinaryIO) -> ExtensionInfoDto:
         extension_info = self.repository.upload(filename=filename, file=file)
 
-        self.load_service.load(extension_name=extension_info.name)
-
         return extension_info
 
     def list(self) -> list[ExtensionInfoDto]:

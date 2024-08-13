@@ -40,12 +40,10 @@ def extension_as_tool_factory(decoy: Decoy) -> ExtensionAsToolFactory:
 @pytest.fixture
 def instance(
     extension_repository: BaseExtensionRepository,
-    extension_service: PexExtensionInstallService,
     extension_as_tool_factory: ExtensionAsToolFactory,
 ) -> ExtensionAgentFactory:
     return ExtensionAgentFactory(
         extension_repository=extension_repository,
-        extension_service=extension_service,
         extension_as_tool_factory=extension_as_tool_factory,
     )
 

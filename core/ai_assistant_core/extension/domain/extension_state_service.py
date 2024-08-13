@@ -29,9 +29,13 @@ class ExtensionStateService:
             extension_name=extension_info.name
         )
 
+        is_loaded = loaded_extension is not None
+        ipc_port = loaded_extension.ipc_port if is_loaded else None
+        pid = loaded_extension.pid if is_loaded else None
+
         return ExtensionStateDto(
-            is_loaded=loaded_extension is not None,
-            ipc_port=loaded_extension.ipc_port,
-            pid=loaded_extension.pid,
+            is_loaded=is_loaded,
+            ipc_port=ipc_port,
+            pid=pid,
             **extension_info.to_dict(),
         )

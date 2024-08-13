@@ -18,16 +18,20 @@ class ExtensionAsToolFactory:
         self.extension_repository = extension_repository
         self.extension_inference_service = extension_inference_service
 
-    def create(self, extension_name: str) -> BaseTool:
+    def create(self, extension_name: str, extension_llm_model: str) -> BaseTool:
         inferable = self.extension_inference_service.create(
-            extension_name=extension_name
+            extension_name=extension_name,
+            extension_llm_model=extension_llm_model,
         )
         runnable = inferable.runnable
 
         def call_extension(query: str) -> str:
-            result = runnable.invoke(query)
+            try:
+                result = runnable.invoke(query)
 
-            return result.content
+                return result.content
+            except Exception as e:
+                return f"Error: {e}"
 
         tool_name = inferable.name.replace(" ", "_")
         tool_description = inferable.description

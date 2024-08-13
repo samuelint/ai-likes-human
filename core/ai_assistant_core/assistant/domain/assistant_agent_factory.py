@@ -32,18 +32,18 @@ class AssistantAgentFactory(BaseAgentFactory):
 
     def create_agent(self, dto: CreateAgentDto) -> Runnable:
         llm = self.create_llm(dto)
-        factory = self.default_agent_factory.create
         assistant_id = self._get_assistant_id(dto)
 
         if self.extension_agent_factory.is_assistant_an_extension(
             assistant_id=assistant_id
         ):
-            factory = self.extension_agent_factory.create
-
-        return factory(
-            assistant_id=assistant_id,
-            llm=llm,
-        )
+            return self.extension_agent_factory.create(
+                assistant_id=assistant_id,
+                llm=llm,
+                extension_llm_model=dto.model,
+            )
+        else:
+            return self.default_agent_factory.create(llm=llm)
 
     def create_llm(self, dto: CreateAgentDto) -> BaseChatModel:
         return self.llm_factory.create_chat_model(

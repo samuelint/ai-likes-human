@@ -26,12 +26,9 @@ class ExtensionAsToolFactory:
         runnable = inferable.runnable
 
         def call_extension(query: str) -> str:
-            try:
-                result = runnable.invoke(query)
+            result = runnable.invoke(query)
 
-                return result.content
-            except Exception as e:
-                return f"Error: {e}"
+            return result.content
 
         tool_name = inferable.name.replace(" ", "_")
         tool_description = inferable.description

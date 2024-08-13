@@ -4,8 +4,8 @@ from fastapi import APIRouter, HTTPException, UploadFile, File
 from fastapi_injector import Injected
 from ai_assistant_core.extension.domain.extension_dto import ExtensionInfoDto
 from ai_assistant_core.extension.domain.extension_state_dto import ExtensionStateDto
-from ai_assistant_core.extension.domain.extension_state_service import (
-    ExtensionStateService,
+from ai_assistant_core.extension.infrastructure.pex_extension_state_service import (
+    PexExtensionStateService,
 )
 from ai_assistant_core.extension.domain.invalid_file_format_error import (
     InvalidFileFormat,
@@ -25,18 +25,18 @@ extension_router = APIRouter(prefix="/extension")
 
 @extension_router.get("/")
 async def list_extensions(
-    extension_service: PexExtensionInstallService = Injected(
-        PexExtensionInstallService
+    extension_state_service: PexExtensionStateService = Injected(
+        PexExtensionStateService
     ),
 ) -> list[ExtensionInfoDto]:
-    return extension_service.list()
+    return extension_state_service.list()
 
 
 @extension_router.post("/pex/upload")
 async def upload_extension(
     file: UploadFile = File(...),
     install_service: PexExtensionInstallService = Injected(PexExtensionInstallService),
-    extension_service: ExtensionStateService = Injected(ExtensionStateService),
+    extension_service: PexExtensionStateService = Injected(PexExtensionStateService),
 ) -> ExtensionStateDto:
 
     try:
@@ -49,7 +49,7 @@ async def upload_extension(
 @extension_router.get("/{name}")
 async def find_extension_by_name(
     name: str,
-    extension_service: ExtensionStateService = Injected(ExtensionStateService),
+    extension_service: PexExtensionStateService = Injected(PexExtensionStateService),
 ) -> Optional[ExtensionStateDto]:
     return extension_service.find_by_name(name=name)
 
@@ -71,7 +71,9 @@ async def delete_extension(
 async def load_extension(
     name: str,
     extension_load_service: PexExtensionLoadService = Injected(PexExtensionLoadService),
-    extension_state_service: ExtensionStateService = Injected(ExtensionStateService),
+    extension_state_service: PexExtensionStateService = Injected(
+        PexExtensionStateService
+    ),
 ) -> ExtensionInfoDto:
     extension_load_service.load(extension_name=name)
 
@@ -82,7 +84,9 @@ async def load_extension(
 async def unload_extension(
     name: str,
     extension_load_service: PexExtensionLoadService = Injected(PexExtensionLoadService),
-    extension_state_service: ExtensionStateService = Injected(ExtensionStateService),
+    extension_state_service: PexExtensionStateService = Injected(
+        PexExtensionStateService
+    ),
 ) -> ExtensionInfoDto:
     extension_load_service.unload(extension_name=name)
 

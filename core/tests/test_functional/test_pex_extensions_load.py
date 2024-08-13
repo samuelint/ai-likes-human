@@ -102,3 +102,9 @@ class TestPexExtensionLoad:
         extension_state = test_api.get(f"{base_route}/{extension_name}").json()
 
         assert extension_state["ipc_port"] > 0
+
+    def test_loaded_extensions_are_listed(self, setup_and_teardown):
+        extension_name = setup_and_teardown
+        extensions = test_api.get(f"{base_route}").json()
+
+        assert any(item["name"] == extension_name for item in extensions)

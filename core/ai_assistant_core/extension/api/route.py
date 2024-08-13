@@ -28,7 +28,7 @@ async def list_extensions(
     extension_state_service: PexExtensionStateService = Injected(
         PexExtensionStateService
     ),
-) -> list[ExtensionInfoDto]:
+) -> list[ExtensionStateDto]:
     return extension_state_service.list()
 
 
@@ -74,7 +74,7 @@ async def load_extension(
     extension_state_service: PexExtensionStateService = Injected(
         PexExtensionStateService
     ),
-) -> ExtensionInfoDto:
+) -> ExtensionStateDto:
     extension_load_service.load(extension_name=name)
 
     return extension_state_service.find_by_name(name=name)
@@ -87,7 +87,7 @@ async def unload_extension(
     extension_state_service: PexExtensionStateService = Injected(
         PexExtensionStateService
     ),
-) -> ExtensionInfoDto:
+) -> ExtensionStateDto:
     extension_load_service.unload(extension_name=name)
 
     return extension_state_service.find_by_name(name=name)

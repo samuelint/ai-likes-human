@@ -52,6 +52,13 @@ class TestPexExtensionLoadOnInstall:
 
         assert extension_state["ipc_port"] is None
 
+    def test_not_loaded_extension_has_installed_status(self):
+        extension_name = self.upload_extension()
+
+        extension_state = test_api.get(f"{base_route}/{extension_name}").json()
+
+        assert extension_state["status"] == "installed"
+
 
 class TestPexExtensionLoad:
     appConfig = AppConfiguration(database_url="sqlite:///:memory:")
@@ -103,8 +110,21 @@ class TestPexExtensionLoad:
 
         assert extension_state["ipc_port"] > 0
 
+    def test_loaded_extension_has_loaded_status(self, setup_and_teardown):
+        extension_name = setup_and_teardown
+        extension_state = test_api.get(f"{base_route}/{extension_name}").json()
+
+        assert extension_state["status"] == "loaded"
+
     def test_loaded_extensions_are_listed(self, setup_and_teardown):
         extension_name = setup_and_teardown
         extensions = test_api.get(f"{base_route}").json()
 
         assert any(item["name"] == extension_name for item in extensions)
+
+    def test_loaded_extensions_are_listed_with_status(self, setup_and_teardown):
+        extension_name = setup_and_teardown
+        extensions = test_api.get(f"{base_route}").json()
+
+        extension = next(item for item in extensions if item["name"] == extension_name)
+        assert extension["status"] == "loaded"

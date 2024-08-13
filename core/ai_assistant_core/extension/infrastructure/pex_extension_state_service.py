@@ -47,6 +47,7 @@ class PexExtensionStateService:
         pid = loaded_extension.pid if is_loaded else None
 
         return ExtensionStateDto(
+            status="loaded" if is_loaded else "installed",
             is_loaded=is_loaded,
             ipc_port=ipc_port,
             pid=pid,

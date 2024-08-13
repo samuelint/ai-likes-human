@@ -20,15 +20,14 @@ export default function ExtensionsSection() {
   );
 }
 
-
 export function AvailableExtensions({ children }: PropsWithChildren) {
-  const { data, isLoading, error, remove } = useExtensions();
+  const { data, isLoading, error, remove, load, unload } = useExtensions();
 
   return (
     <ExtensionTable
       extensions={data}
       Actions={(extension) => <>
-        <Button onClick={() => remove(extension)}>Load / Unload</Button>
+        <Button onClick={() => extension.status === 'installed' ? load(extension) : unload(extension)}>{extension.status === 'installed' ? 'Load' : 'Unload'}</Button>
         <Button variant="destructive" onClick={() => remove(extension)}>Delete</Button>
       </>}
     >

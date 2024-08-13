@@ -6,6 +6,8 @@ export interface ExtensionStateDto {
   version: string
   author: string
 
+  status: 'installed' | 'loaded'
+
   pid?: number
   ipc_port?: number
 }

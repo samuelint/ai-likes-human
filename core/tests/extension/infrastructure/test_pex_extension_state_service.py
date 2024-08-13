@@ -157,6 +157,41 @@ class TestPexExtensionStateService__find_by_name:
 
         assert state.ipc_port == 65
 
+    def test_not_loaded_have_status_installed(
+        self,
+        decoy: Decoy,
+        instance: PexExtensionStateService,
+        install_extension_service: PexExtensionInstallService,
+    ):
+        some_info = ExtensionInfoDto(name="some", version="1.0.1", author="", uri="")
+        decoy.when(install_extension_service.find_by_name(name="some")).then_return(
+            some_info
+        )
+
+        state = instance.find_by_name(name="some")
+
+        assert state.status == "installed"
+
+    def test_loaded_have_status_loaded(
+        self,
+        decoy: Decoy,
+        instance: PexExtensionStateService,
+        install_extension_service: PexExtensionInstallService,
+        load_service: PexExtensionLoadService,
+    ):
+        some_info = ExtensionInfoDto(name="some", version="", author="", uri="")
+        some_loaded_extension = ExtensionLoadStateDto(pid=111, ipc_port=65, name="some")
+        decoy.when(install_extension_service.find_by_name(name="some")).then_return(
+            some_info
+        )
+        decoy.when(
+            load_service.find_loaded_extensions(extension_name="some")
+        ).then_return(some_loaded_extension)
+
+        state = instance.find_by_name(name="some")
+
+        assert state.status == "loaded"
+
 
 class TestPexExtensionStateService__list:
 

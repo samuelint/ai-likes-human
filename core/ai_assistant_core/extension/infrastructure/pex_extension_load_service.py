@@ -11,6 +11,9 @@ from ai_assistant_core.extension.infrastructure.extension_ipc_port_service impor
 from ai_assistant_core.extension.infrastructure.in_memory_loaded_extension_repository import (
     InMemoryLoadedExtensionRepository,
 )
+from ai_assistant_core.extension.infrastructure.pex_extension_inference_url_factory import (
+    PexExtensionInferenceUrlFactory,
+)
 from ai_assistant_core.extension.infrastructure.pex_extension_repository import (
     PexExtensionRepository,
 )
@@ -23,9 +26,11 @@ class PexExtensionLoadService:
         self,
         loaded_extensions_repository: InMemoryLoadedExtensionRepository,
         extensions_repository: PexExtensionRepository,
+        inference_url_factory: PexExtensionInferenceUrlFactory,
     ) -> None:
         self.loaded_extensions_repository = loaded_extensions_repository
         self.extensions_repository = extensions_repository
+        self.inference_url_factory = inference_url_factory
 
     def find_loaded_extensions(
         self, extension_name: str
@@ -47,14 +52,23 @@ class PexExtensionLoadService:
     def load(
         self,
         extension_name: str,
-        ipc_port: Optional[int] = ExtensionIpcPortService.find_next_available_port(),
+        ipc_port: Optional[int] = None,
+        inference_url: Optional[str] = None,
     ) -> PexProcess:
+        ipc_port = ipc_port or ExtensionIpcPortService.find_next_available_port()
+        inference_url = (
+            inference_url or self.inference_url_factory.get_self_inference_url()
+        )
         extension_info = self.extensions_repository.find_by_name(name=extension_name)
 
         if extension_info is None:
             raise ValueError(f"Extension {extension_name} not installed")
 
-        pex_process = PexProcess(pex_path=extension_info.uri, ipc_port=ipc_port)
+        pex_process = PexProcess(
+            pex_path=extension_info.uri,
+            ipc_port=ipc_port,
+            inference_url=inference_url,
+        )
         pex_process.start()
 
         self._register_pex(

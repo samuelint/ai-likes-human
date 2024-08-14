@@ -119,4 +119,4 @@ class TestPexProcess:
             sys.stdout = original_stdout
 
         stdout_contents = stdout_capture.getvalue()
-        assert "['--inference-url', 'http://127.0.0.1']" in stdout_contents
+        assert "['--inference_url', 'http://127.0.0.1']" in stdout_contents

@@ -3,7 +3,7 @@ export PYTHONPATH=$(shell pwd)
 .PHONY: dev run
 dev run:
 	poetry env use ./.venv/bin/python
-	DEBUG=true poetry run uvicorn ai_assistant_core.main:create_app --reload
+	DEBUG=true poetry run python ai_assistant_core/main.py
 
 .PHONY: test
 test:

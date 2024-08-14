@@ -57,7 +57,7 @@ class PexProcess:
             command += ["--port", f"{self.ipc_port}"]
 
         if self.inference_url is not None:
-            command += ["--inference-url", self.inference_url]
+            command += ["--inference_url", self.inference_url]
 
         return command
 

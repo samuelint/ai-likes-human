@@ -7,7 +7,7 @@ database_url = "sqlite:///:memory:?check_same_thread=False"
 
 
 def create_test_client() -> TestClient:
-    app = create_app(database_url=database_url)
+    app = create_app(server_port=8000, database_url=database_url)
 
     return TestClient(app)
 

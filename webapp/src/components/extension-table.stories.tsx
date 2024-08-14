@@ -23,13 +23,13 @@ export const Default: Story = {
     extensions: [
       {
         name: 'A',
-        version: '1.0.0',
-        ipc_port: 123
+        ipc_port: 123,
+        status: 'installed',
       },
       {
         name: 'B',
-        version: '2.1.0',
-        ipc_port: 543
+        ipc_port: 543,
+        status: 'loaded',
       }
     ],
     Actions: (extension) => <>

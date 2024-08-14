@@ -15,7 +15,11 @@ class AppConfiguration:
     extensions_directory: str
     self_url: str
 
-    def __init__(self, server_port: int, database_url: Optional[str] = None):
+    def __init__(
+        self,
+        server_port: Optional[int] = 8000,
+        database_url: Optional[str] = None,
+    ):
         os.environ["APP_DIRECTORY"] = self.app_directory = user_data_dir(
             appname=app_name,
         )

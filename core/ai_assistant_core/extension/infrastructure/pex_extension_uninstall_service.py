@@ -1,13 +1,13 @@
 from injector import inject
 from ai_assistant_core.extension.domain.extension_dto import ExtensionInfoDto
-from ai_assistant_core.extension.infrastructure.pex_extension_repository import (
-    PexExtensionRepository,
+from ai_assistant_core.extension.infrastructure.pex_installed_extension_repository import (
+    PexInstalledExtensionRepository,
 )
 
 
 @inject
 class PexExtensionUninstallService:
-    def __init__(self, repository: PexExtensionRepository) -> None:
+    def __init__(self, repository: PexInstalledExtensionRepository) -> None:
         self.repository = repository
 
     def uninstall_by_name(self, name: str) -> ExtensionInfoDto:

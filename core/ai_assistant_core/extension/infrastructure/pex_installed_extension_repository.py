@@ -9,7 +9,7 @@ from ai_assistant_core.extension.infrastructure.localfile_extension_repository i
 )
 
 
-class PexExtensionRepository(BaseExtensionRepository):
+class PexInstalledExtensionRepository(BaseExtensionRepository):
     def __init__(self, extensions_directory: str) -> None:
         self.local_file_repository = LocalFileExtensionRepository(
             extensions_directory=extensions_directory,
@@ -31,6 +31,14 @@ class PexExtensionRepository(BaseExtensionRepository):
         self.local_file_repository.delete(extension.uri)
 
         return extension
+
+    def get_by_name(self, name: str) -> ExtensionInfoDto:
+        extension_info = self.find_by_name(name=name)
+
+        if extension_info is None:
+            raise ValueError(f"Extension {name} not installed")
+
+        return extension_info
 
     def find_by_name(self, name: str) -> Optional[ExtensionInfoDto]:
         available_extensions = self.list()

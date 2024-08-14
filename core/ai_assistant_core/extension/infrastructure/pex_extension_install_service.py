@@ -6,8 +6,8 @@ from ai_assistant_core.extension.domain.extension_dto import ExtensionInfoDto
 from ai_assistant_core.extension.infrastructure.pex_extension_load_service import (
     PexExtensionLoadService,
 )
-from ai_assistant_core.extension.infrastructure.pex_extension_repository import (
-    PexExtensionRepository,
+from ai_assistant_core.extension.infrastructure.pex_installed_extension_repository import (
+    PexInstalledExtensionRepository,
 )
 
 
@@ -15,7 +15,7 @@ from ai_assistant_core.extension.infrastructure.pex_extension_repository import 
 class PexExtensionInstallService:
     def __init__(
         self,
-        repository: PexExtensionRepository,
+        repository: PexInstalledExtensionRepository,
         load_service: PexExtensionLoadService,
     ) -> None:
         self.repository = repository

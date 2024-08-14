@@ -21,11 +21,13 @@ class PexProcess:
         pex_path: str,
         ipc_port: Optional[int] = None,
         inference_url: Optional[str] = None,
+        process: Optional[subprocess.Popen] = None,
     ):
         self.pex_path = pex_path
 
         self.ipc_port = ipc_port
         self.inference_url = inference_url
+        self.process = process
 
     def start(self):
         command = self._build_command()

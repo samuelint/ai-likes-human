@@ -1,5 +1,5 @@
-from ai_assistant_core.extension.infrastructure.pex_extension_repository import (
-    PexExtensionRepository,
+from ai_assistant_core.extension.infrastructure.pex_installed_extension_repository import (
+    PexInstalledExtensionRepository,
 )
 from unittest import mock
 
@@ -32,7 +32,9 @@ class TestListAvailable:
                 mock_entry_1
             ]
 
-            service = PexExtensionRepository(extensions_directory=extensions_directory)
+            service = PexInstalledExtensionRepository(
+                extensions_directory=extensions_directory
+            )
             result = service.list()
 
             assert result[0].name == "extension_1"
@@ -43,7 +45,9 @@ class TestListAvailable:
             mock_scandir.side_effect = (
                 lambda path: path == extensions_directory and mock_entries
             )
-            instance = PexExtensionRepository(extensions_directory=extensions_directory)
+            instance = PexInstalledExtensionRepository(
+                extensions_directory=extensions_directory
+            )
             files = instance.list()
 
             assert len(files) == 2

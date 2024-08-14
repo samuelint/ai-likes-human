@@ -5,19 +5,13 @@ import psutil
 from ai_assistant_core.extension.domain.extension_load_state import (
     ExtensionLoadStateDto,
 )
-from ai_assistant_core.extension.infrastructure.extension_ipc_port_service import (
-    ExtensionIpcPortService,
-)
 from ai_assistant_core.extension.infrastructure.in_memory_loaded_extension_repository import (
     InMemoryLoadedExtensionRepository,
 )
-from ai_assistant_core.extension.infrastructure.pex_extension_inference_url_factory import (
-    PexExtensionInferenceUrlFactory,
-)
-from ai_assistant_core.extension.infrastructure.pex_extension_repository import (
-    PexExtensionRepository,
-)
 from ai_assistant_core.extension.infrastructure.pex_process import PexProcess
+from ai_assistant_core.extension.infrastructure.pex_process_factory import (
+    PexProcessFactory,
+)
 
 
 @inject
@@ -25,12 +19,10 @@ class PexExtensionLoadService:
     def __init__(
         self,
         loaded_extensions_repository: InMemoryLoadedExtensionRepository,
-        extensions_repository: PexExtensionRepository,
-        inference_url_factory: PexExtensionInferenceUrlFactory,
+        pex_process_factory: PexProcessFactory,
     ) -> None:
         self.loaded_extensions_repository = loaded_extensions_repository
-        self.extensions_repository = extensions_repository
-        self.inference_url_factory = inference_url_factory
+        self.pex_process_factory = pex_process_factory
 
     def find_loaded_extensions(
         self, extension_name: str
@@ -52,37 +44,22 @@ class PexExtensionLoadService:
     def load(
         self,
         extension_name: str,
-        ipc_port: Optional[int] = None,
-        inference_url: Optional[str] = None,
     ) -> PexProcess:
-        ipc_port = ipc_port or ExtensionIpcPortService.find_next_available_port()
-        inference_url = (
-            inference_url or self.inference_url_factory.get_self_inference_url()
-        )
-        extension_info = self.extensions_repository.find_by_name(name=extension_name)
-
-        if extension_info is None:
-            raise ValueError(f"Extension {extension_name} not installed")
-
-        pex_process = PexProcess(
-            pex_path=extension_info.uri,
-            ipc_port=ipc_port,
-            inference_url=inference_url,
+        pex_process = self.pex_process_factory.create(
+            extension_name=extension_name,
         )
         pex_process.start()
 
         self._register_pex(
             pid=pex_process.pid,
-            ipc_port=ipc_port,
+            ipc_port=pex_process.ipc_port,
             extension_name=extension_name,
         )
 
         return pex_process
 
     def unload(self, extension_name: str) -> None:
-        extension_state = self.loaded_extensions_repository.find_by_name(
-            name=extension_name
-        )
+        extension_state = self._find_registered_extension(extension_name=extension_name)
         if extension_state is None:
             return
 
@@ -97,6 +74,9 @@ class PexExtensionLoadService:
         )
 
         return psutil.Process(extension_state.pid)
+
+    def _find_registered_extension(self, extension_name: str) -> ExtensionLoadStateDto:
+        return self.loaded_extensions_repository.find_by_name(name=extension_name)
 
     def _register_pex(
         self, pid: int, ipc_port: int, extension_name: str

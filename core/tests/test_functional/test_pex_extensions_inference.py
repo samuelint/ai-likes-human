@@ -1,3 +1,4 @@
+import time
 from typing import List
 import pytest
 from tests.test_functional.assets.assets import (
@@ -37,7 +38,7 @@ class TestPexExtensionsInference:
 
         return thread
 
-    def upload_joke_extension(self):
+    def install_joke_extension(self):
         extension_name = ""
         with open(joke_extension_pex_file_path, "rb") as file:
             response = test_api.post(
@@ -55,12 +56,18 @@ class TestPexExtensionsInference:
 
         return extension_name
 
+    def load_extension(self, extension_name: str) -> None:
+        test_api.post(f"/extension/{extension_name}/load")
+
     def test_extension_are_inferable_through_assistant_api(
         self,
         openai_client: OpenAI,
         thread: Thread,
     ):
-        extension_name = self.upload_joke_extension()
+        extension_name = self.install_joke_extension()
+        self.load_extension(extension_name)
+
+        time.sleep(60)
 
         stream = openai_client.beta.threads.runs.create(
             thread_id=thread.id,

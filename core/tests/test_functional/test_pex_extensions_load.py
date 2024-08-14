@@ -14,7 +14,7 @@ base_route = "/extension"
 class TestPexExtensionLoadOnInstall:
     appConfig = AppConfiguration(database_url="sqlite:///:memory:")
 
-    def upload_extension(self) -> str:
+    def install_extension(self) -> str:
         with open(joke_extension_pex_file_path, "rb") as file:
             response = test_api.post(
                 f"{base_route}/upload",
@@ -32,28 +32,28 @@ class TestPexExtensionLoadOnInstall:
             return upload_body["name"]
 
     def test_installing_an_extension_does_not_loads_it(self):
-        extension_name = self.upload_extension()
+        extension_name = self.install_extension()
 
         extension_state = test_api.get(f"{base_route}/{extension_name}").json()
 
         assert extension_state["is_loaded"] is False
 
     def test_not_loaded_extension_has_no_pid(self):
-        extension_name = self.upload_extension()
+        extension_name = self.install_extension()
 
         extension_state = test_api.get(f"{base_route}/{extension_name}").json()
 
         assert extension_state["pid"] is None
 
     def test_not_loaded_extension_has_no_ipc_port(self):
-        extension_name = self.upload_extension()
+        extension_name = self.install_extension()
 
         extension_state = test_api.get(f"{base_route}/{extension_name}").json()
 
         assert extension_state["ipc_port"] is None
 
     def test_not_loaded_extension_has_installed_status(self):
-        extension_name = self.upload_extension()
+        extension_name = self.install_extension()
 
         extension_state = test_api.get(f"{base_route}/{extension_name}").json()
 

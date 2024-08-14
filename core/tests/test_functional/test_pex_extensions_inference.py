@@ -1,4 +1,4 @@
-import time
+import requests
 from typing import List
 import pytest
 from tests.test_functional.assets.assets import (
@@ -7,22 +7,30 @@ from tests.test_functional.assets.assets import (
 )
 from tests.test_functional.functional_test_utils import (
     assistant_stream_events_to_str_response,
-    create_test_client,
+    start_server,
+    stop_server,
 )
 
 from openai import OpenAI
 from openai.types.beta import AssistantStreamEvent, Thread
 
-test_api = create_test_client()
-
 
 class TestPexExtensionsInference:
 
+    base_url = "http://localhost:9001"
+
     @pytest.fixture(scope="session")
-    def openai_client(self):
+    def start_server(self):
+        handle = start_server(9001)
+
+        yield
+
+        stop_server(handle)
+
+    @pytest.fixture(scope="session")
+    def openai_client(self, start_server):
         return OpenAI(
-            base_url="http://testserver/assistant/openai/v1",
-            http_client=test_api,
+            base_url=f"{self.base_url}/assistant/openai/v1",
         )
 
     @pytest.fixture(scope="session")
@@ -41,8 +49,8 @@ class TestPexExtensionsInference:
     def install_joke_extension(self):
         extension_name = ""
         with open(joke_extension_pex_file_path, "rb") as file:
-            response = test_api.post(
-                "/extension/upload",
+            response = requests.post(
+                f"{self.base_url}/extension/upload",
                 files={
                     "file": (
                         joke_extension_pex_file_name,
@@ -57,7 +65,7 @@ class TestPexExtensionsInference:
         return extension_name
 
     def load_extension(self, extension_name: str) -> None:
-        test_api.post(f"/extension/{extension_name}/load")
+        requests.post(f"{self.base_url}/extension/{extension_name}/load")
 
     def test_extension_are_inferable_through_assistant_api(
         self,
@@ -66,8 +74,6 @@ class TestPexExtensionsInference:
     ):
         extension_name = self.install_joke_extension()
         self.load_extension(extension_name)
-
-        time.sleep(60)
 
         stream = openai_client.beta.threads.runs.create(
             thread_id=thread.id,

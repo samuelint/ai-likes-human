@@ -32,14 +32,6 @@ class PexInstalledExtensionRepository(BaseExtensionRepository):
 
         return extension
 
-    def get_by_name(self, name: str) -> ExtensionInfoDto:
-        extension_info = self.find_by_name(name=name)
-
-        if extension_info is None:
-            raise ValueError(f"Extension {name} not installed")
-
-        return extension_info
-
     def find_by_name(self, name: str) -> Optional[ExtensionInfoDto]:
         available_extensions = self.list()
         for extension in available_extensions:

@@ -9,6 +9,9 @@ from ai_assistant_core.extension.domain.extension_load_state import (
 from ai_assistant_core.extension.infrastructure.in_memory_loaded_extension_repository import (
     InMemoryLoadedExtensionRepository,
 )
+from ai_assistant_core.extension.infrastructure.pex_extension_is_running_service import (
+    PexExtensionIsRunningService,
+)
 from ai_assistant_core.extension.infrastructure.pex_extension_load_service import (
     PexExtensionLoadService,
 )
@@ -29,13 +32,20 @@ def pex_process_factory(decoy: Decoy) -> PexProcessFactory:
 
 
 @pytest.fixture
+def is_running_service(decoy: Decoy) -> PexExtensionIsRunningService:
+    return decoy.mock(cls=PexExtensionIsRunningService)
+
+
+@pytest.fixture
 def instance(
     loaded_extensions_repository: InMemoryLoadedExtensionRepository,
     pex_process_factory: PexProcessFactory,
+    is_running_service: PexExtensionIsRunningService,
 ) -> PexExtensionLoadService:
     return PexExtensionLoadService(
         loaded_extensions_repository=loaded_extensions_repository,
         pex_process_factory=pex_process_factory,
+        is_running_service=is_running_service,
     )
 
 
@@ -70,6 +80,22 @@ class TestPexExtensionLoadService__load:
         instance.load(extension_name="test")
 
         decoy.verify(mock_pex_process.start())
+
+    def test_wait_for_extension_to_run_before_returning(
+        self,
+        decoy: Decoy,
+        instance: PexExtensionLoadService,
+        pex_process_factory: PexProcessFactory,
+        is_running_service: PexExtensionIsRunningService,
+    ):
+        mock_pex_process = decoy.mock(cls=PexProcess)
+        decoy.when(pex_process_factory.create(extension_name="test")).then_return(
+            mock_pex_process
+        )
+
+        instance.load(extension_name="test")
+
+        decoy.verify(is_running_service.wait_for_running(extension_name="test"))
 
     def test_pex_process_is_registred(
         self,

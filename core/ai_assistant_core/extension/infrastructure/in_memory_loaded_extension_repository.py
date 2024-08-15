@@ -18,6 +18,14 @@ class InMemoryLoadedExtensionRepository:
     def find_by_name(self, name: str) -> Optional[ExtensionLoadStateDto]:
         return self._loaded_extensions.get(name, None)
 
+    def get_by_name(self, name: str) -> ExtensionLoadStateDto:
+        result = self._loaded_extensions.get(name, None)
+
+        if result is None:
+            raise ValueError(f"Extension {name} not found")
+
+        return result
+
     def register(self, extension_load_state: ExtensionLoadStateDto) -> None:
         if self.find_by_name(extension_load_state.name) is not None:
             raise ValueError(

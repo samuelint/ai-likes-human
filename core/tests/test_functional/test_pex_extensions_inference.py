@@ -1,4 +1,3 @@
-import time
 import requests
 from typing import List
 import pytest
@@ -75,8 +74,6 @@ class TestPexExtensionsInference:
     ):
         extension_name = self.install_joke_extension()
         self.load_extension(extension_name)
-
-        time.sleep(15)
 
         stream = openai_client.beta.threads.runs.create(
             thread_id=thread.id,

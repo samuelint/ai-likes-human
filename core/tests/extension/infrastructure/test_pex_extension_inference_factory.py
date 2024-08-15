@@ -7,6 +7,9 @@ from ai_assistant_core.extension.infrastructure.pex_extension_api_factory import
 from ai_assistant_core.extension.infrastructure.pex_extension_inference_factory import (
     PexExtensionInferenceFactory,
 )
+from ai_assistant_core.extension.infrastructure.pex_extension_load_service import (
+    PexExtensionLoadService,
+)
 from ai_assistant_core.extension.infrastructure.pex_extension_metadata_api import (
     PexExtensionApi,
 )
@@ -17,6 +20,10 @@ class TestPexExtensionInferenceFactory:
     @pytest.fixture
     def extension_api(self, decoy: Decoy) -> PexExtensionApi:
         return decoy.mock(cls=PexExtensionApi)
+
+    @pytest.fixture
+    def load_service(self, decoy: Decoy) -> PexExtensionLoadService:
+        return decoy.mock(cls=PexExtensionLoadService)
 
     @pytest.fixture
     def extension_api_factory(
@@ -37,9 +44,13 @@ class TestPexExtensionInferenceFactory:
 
     @pytest.fixture
     def instance(
-        self, extension_api_factory: PexExtensionApiFactory
+        self,
+        extension_api_factory: PexExtensionApiFactory,
+        load_service: PexExtensionLoadService,
     ) -> PexExtensionInferenceFactory:
-        return PexExtensionInferenceFactory(extension_api_factory=extension_api_factory)
+        return PexExtensionInferenceFactory(
+            extension_api_factory=extension_api_factory, load_service=load_service
+        )
 
     def test_extension_name_is_from_metadata(
         self,
@@ -80,3 +91,16 @@ class TestPexExtensionInferenceFactory:
         )
 
         assert result.runnable is runnable_mock
+
+    def test_extension_is_loaded(
+        self,
+        decoy: Decoy,
+        instance: PexExtensionInferenceFactory,
+        load_service: PexExtensionLoadService,
+    ):
+        instance.create(
+            extension_name="some",
+            extension_llm_model="openai:gpt-4o-mini",
+        )
+
+        decoy.verify(load_service.assert_loaded_extension(extension_name="some"))

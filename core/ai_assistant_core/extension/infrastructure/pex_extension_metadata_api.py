@@ -12,6 +12,13 @@ class PexExtensionApi:
         response = requests.get(metadata_url)
         return response.json()
 
+    def is_up(self) -> bool:
+        try:
+            self.get_metadata()
+            return True
+        except Exception:
+            return False
+
     def get_proxy_openai_chat_client(self, model: str) -> ChatOpenAI:
         return ChatOpenAI(
             base_url=f"{self.uri}/openai/v1",

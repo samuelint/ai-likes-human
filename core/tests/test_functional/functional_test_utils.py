@@ -13,8 +13,8 @@ database_url = "sqlite:///:memory:?check_same_thread=False"
 def create_test_client() -> TestClient:
     app = create_app(
         server_port=8000,
-        database_url=database_url,
         self_host="testserver",
+        database_url=database_url,
     )
 
     return TestClient(app)
@@ -44,7 +44,11 @@ def _run_server(server_port: int):
 
 
 def start_server(server_port: int = 8000) -> threading.Thread:
-    server_thread = threading.Thread(target=_run_server, args=(server_port,))
+    server_thread = threading.Thread(
+        target=_run_server,
+        args=(server_port,),
+        daemon=True,
+    )
     server_thread.start()
 
     assert_http_200_within(f"http://localhost:{server_port}")

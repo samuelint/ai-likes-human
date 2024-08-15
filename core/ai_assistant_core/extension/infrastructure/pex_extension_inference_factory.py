@@ -1,5 +1,8 @@
 from injector import inject
 
+from ai_assistant_core.extension.domain.base_extension_inference_factory import (
+    BaseExtensionInferenceFactory,
+)
 from ai_assistant_core.extension.domain.inferable_extension import InferableExtension
 from ai_assistant_core.extension.infrastructure.pex_extension_api_factory import (
     PexExtensionApiFactory,
@@ -10,7 +13,7 @@ from ai_assistant_core.extension.infrastructure.pex_extension_load_service impor
 
 
 @inject
-class PexExtensionInferenceFactory:
+class PexExtensionInferenceFactory(BaseExtensionInferenceFactory):
     def __init__(
         self,
         extension_api_factory: PexExtensionApiFactory,

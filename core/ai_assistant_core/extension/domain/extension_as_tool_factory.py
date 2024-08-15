@@ -1,10 +1,10 @@
 from injector import inject
 from langchain_core.tools import BaseTool, StructuredTool
+from ai_assistant_core.extension.domain.base_extension_inference_factory import (
+    BaseExtensionInferenceFactory,
+)
 from ai_assistant_core.extension.domain.base_extension_repository import (
     BaseExtensionRepository,
-)
-from ai_assistant_core.extension.infrastructure.pex_extension_inference_factory import (
-    PexExtensionInferenceFactory,
 )
 
 
@@ -13,10 +13,10 @@ class ExtensionAsToolFactory:
     def __init__(
         self,
         extension_repository: BaseExtensionRepository,
-        extension_inference_service: PexExtensionInferenceFactory,
+        extension_inference_factory: BaseExtensionInferenceFactory,
     ) -> None:
         self.extension_repository = extension_repository
-        self.extension_inference_service = extension_inference_service
+        self.extension_inference_service = extension_inference_factory
 
     def create(self, extension_name: str, extension_llm_model: str) -> BaseTool:
         inferable = self.extension_inference_service.create(

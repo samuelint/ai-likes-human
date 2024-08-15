@@ -1,8 +1,14 @@
 from injector import Module, provider, singleton
 
 from ai_assistant_core.app_configuration import AppConfiguration
+from ai_assistant_core.extension.domain.base_extension_inference_factory import (
+    BaseExtensionInferenceFactory,
+)
 from ai_assistant_core.extension.domain.base_extension_repository import (
     BaseExtensionRepository,
+)
+from ai_assistant_core.extension.infrastructure.pex_extension_inference_factory import (
+    PexExtensionInferenceFactory,
 )
 from ai_assistant_core.extension.infrastructure.pex_installed_extension_repository import (
     PexInstalledExtensionRepository,
@@ -27,3 +33,9 @@ class ExtensionModule(Module):
         self, pex_extension_repository: PexInstalledExtensionRepository
     ) -> BaseExtensionRepository:
         return pex_extension_repository
+
+    @provider
+    def provide_base_inference_factory(
+        self, pex_extension_inference_factory: PexExtensionInferenceFactory
+    ) -> BaseExtensionInferenceFactory:
+        return pex_extension_inference_factory

@@ -1,35 +1,41 @@
-from injector import Binder, Module, provider, singleton
+from injector import Module, provider, singleton
 
 from ai_assistant_core.app_configuration import AppConfiguration
+from ai_assistant_core.extension.domain.base_extension_inference_factory import (
+    BaseExtensionInferenceFactory,
+)
 from ai_assistant_core.extension.domain.base_extension_repository import (
     BaseExtensionRepository,
 )
-from ai_assistant_core.extension.domain.base_extension_service import (
-    BaseExtensionService,
+from ai_assistant_core.extension.infrastructure.pex_extension_inference_factory import (
+    PexExtensionInferenceFactory,
 )
-from ai_assistant_core.extension.infrastructure.whl_extension_repository import (
-    WhlExtensionRepository,
-)
-from ai_assistant_core.extension.infrastructure.whl_extension_service import (
-    WhlExtensionService,
+from ai_assistant_core.extension.infrastructure.pex_installed_extension_repository import (
+    PexInstalledExtensionRepository,
 )
 
 
 class ExtensionModule(Module):
-    def configure(self, binder: Binder):
-        binder.bind(BaseExtensionService, to=WhlExtensionService)
 
     @singleton
     @provider
-    def provide_whl_extension_repository(
+    def provide_pex_extension_repository(
         self, configuration: AppConfiguration
-    ) -> WhlExtensionRepository:
+    ) -> PexInstalledExtensionRepository:
         extensions_directory = configuration.extensions_directory
-        return WhlExtensionRepository(extensions_directory=extensions_directory)
+        return PexInstalledExtensionRepository(
+            extensions_directory=extensions_directory
+        )
 
     @singleton
     @provider
     def provide_base_extension_repository(
-        self, whl_extension_repository: WhlExtensionRepository
+        self, pex_extension_repository: PexInstalledExtensionRepository
     ) -> BaseExtensionRepository:
-        return whl_extension_repository
+        return pex_extension_repository
+
+    @provider
+    def provide_base_inference_factory(
+        self, pex_extension_inference_factory: PexExtensionInferenceFactory
+    ) -> BaseExtensionInferenceFactory:
+        return pex_extension_inference_factory

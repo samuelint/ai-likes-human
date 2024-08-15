@@ -3,9 +3,6 @@ from injector import inject
 from ai_assistant_core.extension.domain.base_extension_repository import (
     BaseExtensionRepository,
 )
-from ai_assistant_core.extension.domain.base_extension_service import (
-    BaseExtensionService,
-)
 from ai_assistant_core.extension.domain.extension_as_tool_factory import (
     ExtensionAsToolFactory,
 )
@@ -21,11 +18,9 @@ class ExtensionAgentFactory:
     def __init__(
         self,
         extension_repository: BaseExtensionRepository,
-        extension_service: BaseExtensionService,
         extension_as_tool_factory: ExtensionAsToolFactory,
     ) -> None:
         self.extension_repository = extension_repository
-        self.extension_service = extension_service
         self.extension_as_tool_factory = extension_as_tool_factory
 
     def is_assistant_an_extension(self, assistant_id: str) -> bool:
@@ -34,11 +29,15 @@ class ExtensionAgentFactory:
             return False
         return True
 
-    def create(self, assistant_id: str, llm: BaseChatModel) -> Runnable:
-        extension_info = self.extension_repository.get_by_name(name=assistant_id)
-        extension = self.extension_service.load(extension=extension_info)
+    def create(
+        self,
+        assistant_id: str,
+        llm: BaseChatModel,
+        extension_llm_model: str,
+    ) -> Runnable:
         extension_as_tool = self.extension_as_tool_factory.create(
-            extension=extension, llm=llm
+            extension_name=assistant_id,
+            extension_llm_model=extension_llm_model,
         )
 
         return create_react_agent(

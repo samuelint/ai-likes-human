@@ -1,50 +1,41 @@
-import { useErrorNotification } from '@/app/_components/use-error-notification';
-import { AddLocalExtensionForm } from '@/components/add-local-extension-form';
-import { ExtensionCard } from '@/components/extension-card';
+import { ExtensionTable } from '@/components/extension-table';
 import { Section } from '@/components/section';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ErrorDetails } from '@/components/ui/error';
 import { ThreeDotsLoading } from '@/components/ui/loading';
 import { useExtensions } from '@/lib/extension/use-extensions';
+import { AddExtensionDialog } from './add-extension';
+import { PropsWithChildren } from 'react';
 
 export default function ExtensionsSection() {
   return (
     <Section id='extensions' title="Extensions">
-      <AvailableExtensions />
-      <AddExtensions />
+      <Card>
+        <AvailableExtensions>
+          <AddExtensionDialog />
+        </AvailableExtensions>
+      </Card>
     </Section>
   );
 }
 
-
-export function AvailableExtensions() {
-  const { data, isLoading, error, remove } = useExtensions();
+export function AvailableExtensions({ children }: PropsWithChildren) {
+  const { data, isLoading, error, remove, load, unload } = useExtensions();
 
   return (
-    <>
-      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
-        { data?.map((extension) => (
-          <ExtensionCard key={extension.name} extension={extension}>
-            <Button variant="destructive" onClick={() => remove(extension)}>Delete</Button>
-          </ExtensionCard>
-        ))}
-      </div>
-
+    <ExtensionTable
+      extensions={data}
+      Actions={(extension) => <>
+        <Button onClick={() => extension.status === 'installed' ? load(extension) : unload(extension)}>{extension.status === 'installed' ? 'Load' : 'Unload'}</Button>
+        <Button variant="destructive" onClick={() => remove(extension)}>Delete</Button>
+      </>}
+    >
       { error && <ErrorDetails error={error} /> }
       { isLoading && <ThreeDotsLoading /> }
-    </>
+      { children }
+    </ExtensionTable>
   );
 }
 
-export function AddExtensions() {
-  const { upload, error } = useExtensions();
 
-  useErrorNotification(error);
-
-  return (
-    <Card className='p-6 flex flex-col gap-4'>
-      <AddLocalExtensionForm onSubmit={upload} />
-    </Card>
-  );
-}

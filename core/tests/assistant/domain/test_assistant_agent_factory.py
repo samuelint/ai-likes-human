@@ -86,7 +86,6 @@ class TestAssistantAgentFactory:
         ).then_return(False)
         decoy.when(
             default_agent_factory.create(
-                assistant_id=None,
                 llm=llm,
             )
         ).then_return(some_agent)
@@ -118,7 +117,6 @@ class TestAssistantAgentFactory:
         ).then_return(False)
         decoy.when(
             default_agent_factory.create(
-                assistant_id="",
                 llm=llm,
             )
         ).then_return(some_agent)
@@ -151,6 +149,7 @@ class TestAssistantAgentFactory:
             extension_agent_factory.create(
                 assistant_id="some-extension",
                 llm=llm,
+                extension_llm_model="some:model",
             )
         ).then_return(some_agent)
 
@@ -189,6 +188,7 @@ class TestAssistantAgentFactory:
             extension_agent_factory.create(
                 assistant_id="some-extension",
                 llm=llm,
+                extension_llm_model="some:model",
             )
         ).then_return(some_agent)
 

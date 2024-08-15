@@ -6,14 +6,13 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/ai_assistant_core/main.py",
-            "args": [
-                "--port",
-                "8000"
-            ],
             "env": {
                 "PYTHONPATH": "${workspaceFolder}"
             },
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "pythonArgs": [
+                "-Xfrozen_modules=off"
+            ]
         }
     ]
 }

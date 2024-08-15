@@ -20,10 +20,18 @@ from ai_assistant_core.extension import extension_router, ExtensionModule
 from ai_assistant_core.tools import ToolsModule
 
 
-def create_app(database_url: Optional[str] = None) -> FastAPI:
+def create_app(
+    server_port: int,
+    self_host: str,
+    database_url: Optional[str] = None,
+) -> FastAPI:
     injector = Injector(
         [
-            AppConfigurationModule(database_url=database_url),
+            AppConfigurationModule(
+                database_url=database_url,
+                server_port=server_port,
+                self_host=self_host,
+            ),
             ConfigurationModule(),
             LLMModule(),
             AssistantModule(),
@@ -61,5 +69,8 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, default=8000, help="Port number")
     args = parser.parse_args()
 
-    app = create_app()
-    uvicorn.run(app, host="localhost", port=args.port)
+    server_port = args.port
+    host = "localhost"
+
+    app = create_app(self_host=host, server_port=server_port)
+    uvicorn.run(app, host=host, port=server_port)

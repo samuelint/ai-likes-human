@@ -20,7 +20,7 @@ class DefaultAgentFactory:
         self.tools = tools
         self.prompt_factory = prompt_factory
 
-    def create(self, assistant_id: str, llm: BaseChatModel) -> CompiledGraph:
+    def create(self, llm: BaseChatModel) -> CompiledGraph:
         system_prompt = self.prompt_factory.create()
 
         return create_react_agent(

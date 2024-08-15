@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/form';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { UploadExtensionDto, UploadExtensionSchema } from '@/lib/extension/extension.dto';
+import { ACCEPTED_EXTENSIONS_FILE_EXTENSION, UploadExtensionDto, UploadExtensionSchema } from '@/lib/extension/extension.dto';
 import { useRef } from 'react';
 
 
@@ -18,9 +18,10 @@ export type OnExtensionSubmit = SubmitHandler<UploadExtensionDto>;
 
 interface Props {
   onSubmit?: OnExtensionSubmit
+  acceptedExtensions?: readonly string[]
 }
 
-export function AddLocalExtensionForm({ onSubmit }: Props) {
+export function AddLocalExtensionForm({ onSubmit, acceptedExtensions = ACCEPTED_EXTENSIONS_FILE_EXTENSION }: Props) {
 
   const form = useForm<UploadExtensionDto>({
     resolver: zodResolver(UploadExtensionSchema),
@@ -42,22 +43,23 @@ export function AddLocalExtensionForm({ onSubmit }: Props) {
     reset();
   };
 
-
   return (
     <Form {...form}>
+      <h3 className="mb-4 text-lg font-medium">Add Extension</h3>
       <form onSubmit={onSubmit && form.handleSubmit(handleSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="file"
           render={({ field: { value, onChange, ...fieldProps } }) => (
             <FormItem className="space-y-3">
-              <FormLabel>Extension File</FormLabel>
+              <FormLabel>Extension File ({acceptedExtensions.join(', ')})</FormLabel>
               <FormControl>
                 <Input
                   {...fieldProps}
                   ref={inputFileRef}
                   type="file"
-                  accept=".whl"
+                  className="cursor-pointer"
+                  accept={acceptedExtensions.join(',')}
                   onChange={(event) =>
                     onChange(event.target.files && event.target.files[0])
                   }
@@ -66,9 +68,8 @@ export function AddLocalExtensionForm({ onSubmit }: Props) {
               <FormMessage />
             </FormItem>
           )} />
-        <div className='flex gap-4'>
+        <div className='flex flex-row gap-4'>
           <Button type="submit">Add</Button>
-          <Button type="button" variant='outline' onClick={() => reset()}>Reset</Button>
         </div>
       </form>
     </Form>

@@ -5,15 +5,26 @@ interface CreateApiJsonFetcherArgs {
   queryParams?: Record<string, string>
 }
 
-export function fetchApi(path: string, init?: RequestInit) {
-  return fetch(`${appConfig.api_url}${path}`, init);
+export class FetchError extends Error {
+  public constructor(message: string, public readonly status: number) {
+    super(message);
+  }
 }
 
-export async function fetchApiJson(path: string, init?: RequestInit) {
-  const result = await fetchApi(path, { ...init, headers: { ...init?.headers, 'Content-Type': 'application/json' } });
+export async function fetchApi(path: string, init?: RequestInit) {
+  const result = await fetch(`${appConfig.api_url}${path}`, init);
   if (!result.ok) {
-    throw new Error(await result.text());
+    const msg = await result.text();
+    const error = new FetchError(msg, result.status);
+
+    throw error;
   }
+
+  return result;
+}
+
+export async function fetchApiJson<T = object>(path: string, init?: RequestInit): Promise<T> {
+  const result = await fetchApi(path, { ...init, headers: { ...init?.headers, 'Content-Type': 'application/json' } });
 
   return await result.json();
 }

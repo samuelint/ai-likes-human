@@ -6,7 +6,7 @@ from ai_assistant_core.llm.domain.local_model_index_repository import (
     LocalLLMModelIndexRepository,
 )
 from ai_assistant_core.llm.domain.local_model_service import LocalLLMModelService
-from tests.llm.domain.__dto_factories__ import (
+from tests.test_unit.llm.domain.__dto_factories__ import (
     LLMModelIndexPolyfactory,
 )
 

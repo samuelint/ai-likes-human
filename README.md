@@ -20,9 +20,6 @@ Download the latest version from the release page.
 - ✅ Computer screenshot
 - ✅ Web Search
 - ✅ Image generation
-- 💡 Computer screen recording
-- 💡 Video calls
-- 💡 Local documents, emails, etc..
 
 ### LLM Vendors
 
@@ -34,6 +31,7 @@ Download the latest version from the release page.
 
 - ✅ macOS
 - ✅ Windows
+  - :warning: Extensions are not supported yet
 - ✅ Ubuntu/Debian
 
 https://github.com/samuelint/ai-assistant/assets/5473142/50c44730-1fc7-40d8-9681-78e772fb9bc1
@@ -89,7 +87,6 @@ Extensions need to implement the following project:
 https://github.com/samuelint/ai-assistant-extension
 
 A full example is available here: https://github.com/samuelint/ai-assistant/tree/main/extensions/joke
-
 
 ## What is this project solving?
 

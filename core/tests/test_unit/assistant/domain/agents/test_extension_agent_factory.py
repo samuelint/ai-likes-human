@@ -13,7 +13,9 @@ from ai_assistant_core.extension.domain.extension_as_tool_factory import (
 from ai_assistant_core.extension.infrastructure.pex_extension_install_service import (
     PexExtensionInstallService,
 )
-from tests.extension.domain.__dto_factories__ import ExtensionInfoDtoPolyfactory
+from tests.test_unit.extension.domain.__dto_factories__ import (
+    ExtensionInfoDtoPolyfactory,
+)
 
 
 @pytest.fixture

@@ -1,5 +1,4 @@
-
-
+import { SecretInput } from '@/components/secret.input';
 import { Button } from '@/components/ui/button';
 import { ErrorDetails } from '@/components/ui/error';
 import { Input } from '@/components/ui/input';
@@ -11,9 +10,10 @@ import { useConfigurationKV } from '@/lib/use-configuration-kv';
 interface Props {
   label?: string
   kv_key: string
+  isSecret?: boolean
 }
 
-export function ConfigurationKvEditor({ label, kv_key }: Props) {
+export function ConfigurationKvEditor({ label, kv_key, isSecret }: Props) {
   const { toast } = useToast();
   const { data, error, isLoading, mutate } = useConfigurationKV(kv_key);
 
@@ -35,7 +35,6 @@ export function ConfigurationKvEditor({ label, kv_key }: Props) {
       }));
   };
 
-
   return (
     <>
       <form
@@ -47,7 +46,11 @@ export function ConfigurationKvEditor({ label, kv_key }: Props) {
           <Label htmlFor={kv_key}>{label || kv_key}</Label>
           <ErrorDetails error={error} />
           <div className="flex w-full max-w-sm items-center space-x-2">
-            <Input name={kv_key} id={kv_key} placeholder={kv_key} defaultValue={data?.value} />
+            { isSecret ?
+              <SecretInput name={kv_key} id={kv_key} placeholder={kv_key} defaultValue={data?.value} />
+              :
+              <Input name={kv_key} id={kv_key} placeholder={kv_key} defaultValue={data?.value} />
+            }
             <Button type="submit">Save</Button>
           </div>
         </fieldset>

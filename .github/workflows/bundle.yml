@@ -54,6 +54,7 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           TMP_KEYCHAIN_PASSWORD: some
           APP_PATH: dist/core-aarch64-apple-darwin
+          ENTITLEMENTS_PATH: ./entitlements.plist
         run: |
           echo "Creating a temporary keychain"
           security create-keychain -p $TMP_KEYCHAIN_PASSWORD build.keychain
@@ -66,7 +67,7 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $TMP_KEYCHAIN_PASSWORD build.keychain
 
           echo "Signing the binary"
-          /usr/bin/codesign --force -s $APPLE_SIGNING_IDENTITY $APP_PATH -v
+          /usr/bin/codesign --deep --force --options=runtime -s $APPLE_SIGNING_IDENTITY --entitlements $ENTITLEMENTS_PATH $APP_PATH -v
 
           echo "Deleting the temporary keychain"
           security delete-keychain build.keychain

@@ -21,7 +21,6 @@ lint:
 bundle build:
 	poetry run pyinstaller -y --clean ai-assistant-core.spec
 
-
 # Usage: `make add-migration m="YOUR MIGRATION NAME"`
 .PHONY: add-migration
 add-migration:

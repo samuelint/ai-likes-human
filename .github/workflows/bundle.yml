@@ -40,7 +40,10 @@ jobs:
           pip install poetry
           poetry install
 
-      - run: make bundle
+      - name: Bundle
+        env:
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+        run: make bundle
 
       - name: Sign MacOS App
         if: matrix.platform == 'macos-latest'

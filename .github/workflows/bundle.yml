@@ -40,12 +40,8 @@ jobs:
           pip install poetry
           poetry install
 
-      - name: Bundle
-        env:
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-        run: make bundle
 
-      - name: Sign MacOS App
+      - name: Prepare MacOS Keychain
         if: matrix.platform == 'macos-latest'
         timeout-minutes: 2
         env:
@@ -68,10 +64,17 @@ jobs:
           echo "$APPLE_CERTIFICATE" | base64 --decode > certificate.p12
           security import certificate.p12 -k build.keychain -P $APPLE_CERTIFICATE_PASSWORD -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $TMP_KEYCHAIN_PASSWORD build.keychain
-
-          echo "Signing the binary"
-          /usr/bin/codesign --deep --force --options=runtime -s $APPLE_SIGNING_IDENTITY --entitlements $ENTITLEMENTS_PATH $APP_PATH -v
-
+          
+      - name: Bundle
+        env:
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+        run: |
+          make bundle
+          
+      - name: Teardown MacOS Keychain
+        if: matrix.platform == 'macos-latest'
+        timeout-minutes: 0.5
+        run: |
           echo "Deleting the temporary keychain"
           security delete-keychain build.keychain
 

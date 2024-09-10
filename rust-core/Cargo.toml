@@ -4,3 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+diesel = { version = "2.2.4", features = [
+    "sqlite",
+    "r2d2",
+    "returning_clauses_for_sqlite_3_35",
+] }
+diesel_migrations = "2.2.0"
+r2d2 = "0.8.10"
+shaku = "0.6.2"

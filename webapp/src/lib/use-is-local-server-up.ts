@@ -1,5 +1,5 @@
 import { useIsInDesktopAppFn } from './is-in-desktop-app';
-import { isLocalServerRunning } from './tauri-interrupt/server-status';
+import { isLocalServerRunning } from './tauri-command/server-status';
 import { useCallback, useEffect, useState } from 'react';
 
 

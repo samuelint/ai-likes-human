@@ -1,41 +1,11 @@
-mod app_configuration;
-mod app_container;
-mod configuration;
 mod infrastructure;
 mod schema;
 
-use std::error::Error;
+pub mod app_configuration;
+pub mod app_container;
+pub mod configuration;
 
-use app_configuration::AppConfiguration;
-use app_container::AppContainer;
-use configuration::domain::{
-    configuration_service::Service, dto::NewConfigurationItemDto,
-    repository::ConfigurationRepository,
-};
-use shaku::HasProvider;
+pub use configuration::app::configuration_service::ConfigurationService;
+pub use configuration::domain::dto::{ConfigurationItemDto, NewConfigurationItemDto};
 
-pub fn create_app(config: AppConfiguration) -> AppContainer {
-    AppContainer::create(config)
-}
-
-pub fn start() -> Result<(), Box<dyn Error>> {
-    let app = create_app(AppConfiguration {
-        database_url: "sqlite:///Users/samuel/Desktop/data.db".to_string(),
-    });
-    let mut config_repo: Box<dyn ConfigurationRepository> = app.container.provide().unwrap();
-    let mut service: Box<dyn Service> = app.container.provide().unwrap();
-
-    let model = config_repo.create(NewConfigurationItemDto {
-        key: "key2",
-        value: "value22",
-    })?;
-    println!("Item created! {}: {}", model.key, model.value);
-
-    let existing = config_repo.get_all()?;
-    println!("All existing items from repo {:#?}", existing);
-
-    let existing = service.get_all()?;
-    println!("All existing items from service {:#?}", existing);
-
-    Ok(())
-}
+pub use shaku::HasProvider; // Required for `app.container.provide()`

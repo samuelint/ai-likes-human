@@ -10,5 +10,8 @@ diesel = { version = "2.2.4", features = [
     "returning_clauses_for_sqlite_3_35",
 ] }
 diesel_migrations = "2.2.0"
+platform-dirs = "0.3.0"
 r2d2 = "0.8.10"
+serde = "1.0.210"
+serial_test = "3.1.1"
 shaku = "0.6.2"

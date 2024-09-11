@@ -2,12 +2,14 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 pub mod app_state;
+pub mod core;
 pub mod screencapture;
 pub mod system_tray;
 
 use app_state::app_state::{is_server_up, start_server, stop_server, AppState};
+use core::tauri_command::{find_configuration, upsert_configuration};
 use log::{info, warn};
-use screencapture::command::{assert_screen_capture_permissions, capture_screen};
+use screencapture::tauri_command::{assert_screen_capture_permissions, capture_screen};
 use system_tray::{build_menu, on_system_tray_event};
 use tauri::{Manager, State, SystemTray, WindowEvent};
 use tauri_plugin_log::LogTarget;
@@ -76,6 +78,8 @@ fn main() {
             is_server_up,
             capture_screen,
             assert_screen_capture_permissions,
+            upsert_configuration,
+            find_configuration,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")

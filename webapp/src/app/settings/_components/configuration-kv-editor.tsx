@@ -1,6 +1,6 @@
+import { useErrorNotification } from '@/app/_components/use-error-notification';
 import { SecretInput } from '@/components/secret.input';
 import { Button } from '@/components/ui/button';
-import { ErrorDetails } from '@/components/ui/error';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
@@ -17,6 +17,7 @@ export function ConfigurationKvEditor({ label, kv_key, isSecret }: Props) {
   const { toast } = useToast();
   const { data, error, isLoading, mutate } = useConfigurationKV(kv_key);
 
+  useErrorNotification(error);
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
 
@@ -25,6 +26,7 @@ export function ConfigurationKvEditor({ label, kv_key, isSecret }: Props) {
     const formData = new FormData(form);
     const entries = Object.fromEntries(formData.entries());
     const newValue = entries[kv_key] as string;
+
 
     mutate(newValue)
       .then(() => toast({ title: `${label ?? kv_key} Saved` }))
@@ -44,7 +46,6 @@ export function ConfigurationKvEditor({ label, kv_key, isSecret }: Props) {
       >
         <fieldset disabled={isLoading || error}>
           <Label htmlFor={kv_key}>{label || kv_key}</Label>
-          <ErrorDetails error={error} />
           <div className="flex w-full max-w-sm items-center space-x-2">
             { isSecret ?
               <SecretInput name={kv_key} id={kv_key} placeholder={kv_key} defaultValue={data?.value} />

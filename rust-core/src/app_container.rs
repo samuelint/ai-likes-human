@@ -1,9 +1,9 @@
-use shaku::module;
+pub use shaku::module;
 
 use crate::{
     app_configuration::AppConfiguration,
     configuration::{
-        domain::configuration_service::ServiceImpl,
+        app::configuration_service::ConfigurationServiceImpl,
         infrastructure::repository::DieselConfigurationRepository,
     },
     infrastructure::database::sqlite_connection_factory::{
@@ -14,7 +14,7 @@ use crate::{
 module! {
     pub AppModule {
         components = [SQliteConnectionFactoryImpl],
-        providers = [DieselConfigurationRepository, ServiceImpl]
+        providers = [DieselConfigurationRepository, ConfigurationServiceImpl]
     }
 }
 
@@ -24,7 +24,7 @@ pub struct AppContainer {
 }
 
 impl AppContainer {
-    pub fn create(config: AppConfiguration) -> Self {
+    pub fn new(config: AppConfiguration) -> Self {
         let container = AppModule::builder()
             .with_component_override::<dyn SQliteConnectionFactory>(Box::new(
                 SQliteConnectionFactoryImpl::new(config.database_url.as_str()),

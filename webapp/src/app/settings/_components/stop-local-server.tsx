@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { stopLocalServer } from '@/lib/tauri-interrupt/server-status';
+import { stopLocalServer } from '@/lib/tauri-command/server-status';
 
 
 export default function StopLocalServer() {

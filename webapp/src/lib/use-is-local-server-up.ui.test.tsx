@@ -5,7 +5,7 @@
 import '@testing-library/jest-dom';
 import { cleanup, render, screen, waitFor, act } from '@testing-library/react';
 import { useIsLocalServerUp } from './use-is-local-server-up';
-import { isLocalServerRunning } from './tauri-interrupt/server-status';
+import { isLocalServerRunning } from './tauri-command/server-status';
 import { when } from 'jest-when';
 import { useIsInDesktopAppFn } from './is-in-desktop-app';
 

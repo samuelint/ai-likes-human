@@ -40,6 +40,33 @@ impl ConfigurationRepository for DieselConfigurationRepository {
             .optional()?)
     }
 
+    fn find_by_key(&mut self, key: &str) -> Result<Option<ConfigurationItemDto>, Box<dyn Error>> {
+        let connection = &mut self.connection_factory.get();
+
+        Ok(configuration::table
+            .filter(configuration::key.eq(key))
+            .first::<ConfigurationItemDto>(connection)
+            .optional()?)
+    }
+
+    fn upsert_value_for_key(
+        &mut self,
+        item: NewConfigurationItemDto,
+    ) -> Result<ConfigurationItemDto, Box<dyn Error>> {
+        let connection = &mut self.connection_factory.get();
+
+        Ok(diesel::insert_into(configuration::table)
+            .values(&item)
+            .on_conflict(configuration::key)
+            .do_update()
+            .set((
+                configuration::key.eq(&item.key),
+                configuration::value.eq(&item.value),
+            ))
+            .returning(ConfigurationItemDto::as_returning())
+            .get_result(connection)?)
+    }
+
     fn create(
         &mut self,
         item: NewConfigurationItemDto,

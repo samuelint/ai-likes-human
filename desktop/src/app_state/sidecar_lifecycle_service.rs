@@ -1,10 +1,10 @@
 use std::borrow::BorrowMut;
 
+use log::{error, info};
+use std::io::{BufRead, BufReader};
 use std::process::{Child, Command, Stdio};
-use tauri::api::process::Command as TCommand;
-use log::{info, error};
-use std::io::{BufReader, BufRead};
 use std::thread;
+use tauri::api::process::Command as TCommand;
 
 #[cfg(unix)]
 use command_group::{Signal, UnixChildExt};
@@ -34,7 +34,8 @@ pub struct SidecarLifeCycleService {
 impl SidecarLifeCycleService {
     pub fn new<S: Into<String>>(program: S) -> SidecarLifeCycleService {
         let program_string = program.into();
-        let sidecar_command = TCommand::new_sidecar(&program_string).expect("failed to setup sidecar");
+        let sidecar_command =
+            TCommand::new_sidecar(&program_string).expect("failed to setup sidecar");
         SidecarLifeCycleService {
             program: program_string,
             sidecar_command: sidecar_command.into(),
@@ -57,36 +58,39 @@ impl SidecarLifeCycleService {
                         child = log_child_stderr(child);
 
                         self.child = Some(child);
-                        
+
                         let info = format!("Sidecar {} started - {}", self.program, id);
                         info!("{}", &info);
 
                         Ok(info.into())
                     }
                     Err(e) => {
-                        let info = format!("Sidecar {} start failed - {}", self.program, e.to_string());
+                        let info =
+                            format!("Sidecar {} start failed - {}", self.program, e.to_string());
                         error!("{}", &info);
                         Err(info.into())
                     }
                 }
             }
-        }     
+        }
     }
 
     pub fn stop(&mut self) -> Result<String, String> {
         match self.child.borrow_mut() {
             Some(child) => {
                 let id = child.id();
-                
+
                 #[cfg(unix)]
                 {
                     child
-                    .signal(Signal::SIGTERM)
-                    .expect("Some error happened when killing child process");
+                        .signal(Signal::SIGTERM)
+                        .expect("Some error happened when killing child process");
                 }
                 #[cfg(windows)]
                 {
-                    child.kill().expect("Some error happened when killing child process");
+                    child
+                        .kill()
+                        .expect("Some error happened when killing child process");
                 }
 
                 self.child = None;

@@ -4,12 +4,14 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+async-trait = "0.1.82"
 diesel = { version = "2.2.4", features = [
     "sqlite",
     "r2d2",
     "returning_clauses_for_sqlite_3_35",
 ] }
 diesel_migrations = "2.2.0"
+langchain-rust = { version = "4.4.2", features = ["sqlite"] }
 platform-dirs = "0.3.0"
 r2d2 = "0.8.10"
 serde = "1.0.210"

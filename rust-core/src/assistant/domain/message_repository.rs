@@ -1,11 +1,17 @@
 use std::error::Error;
 
-use super::dto::{MessageDto, NewMessageDto};
+use crate::entities::message;
 
-pub trait MessageRepository {
-    fn find(&mut self, id: &i32) -> Result<Option<MessageDto>, Box<dyn Error>>;
+pub struct NewMessageModel {
+    pub content: String,
+    pub role: String,
+    pub attachments: Option<String>,
+    pub metadata: Option<String>,
+}
 
-    fn upsert(&mut self, message: NewMessageDto) -> Result<MessageDto, Box<dyn Error>>;
-
-    fn delete(&mut self, id: &i32) -> Result<MessageDto, Box<dyn Error>>;
+#[async_trait::async_trait]
+pub trait MessageRepository: Sync + Send {
+    async fn create(&self, message: NewMessageModel) -> Result<message::Model, Box<dyn Error>>;
+    async fn find(&self, id: i32) -> Result<Option<message::Model>, Box<dyn Error>>;
+    async fn delete(&self, id: i32) -> Result<(), Box<dyn Error>>;
 }

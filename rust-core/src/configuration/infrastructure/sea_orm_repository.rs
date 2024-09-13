@@ -4,7 +4,7 @@ use shaku::Provider;
 use std::error::Error;
 use std::sync::Arc;
 
-use crate::configuration::domain::repository::{ConfigurationRepository, NewModel};
+use crate::configuration::domain::{ConfigurationRepository, NewConfigurationModel};
 use crate::entities::configuration;
 use crate::infrastructure::sea_orm::connection_provider::ConnectionProvider;
 
@@ -49,9 +49,9 @@ impl ConfigurationRepository for SeaOrmConfigurationRepository {
         Ok(r)
     }
 
-    async fn upsert_value_for_key(
+    async fn upsert(
         &self,
-        item: NewModel,
+        item: NewConfigurationModel,
     ) -> Result<configuration::Model, Box<dyn Error>> {
         let conn = self.connection.get();
         let model = configuration::ActiveModel {

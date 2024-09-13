@@ -1,7 +1,7 @@
 use super::sidecar_lifecycle_service::SidecarLifeCycleService;
 use app_core::{
-    app_configuration::AppConfiguration,
-    app_container::{AppContainer, AppModule},
+    AppConfiguration,
+    AppContainer, AppModule,
 };
 use log::info;
 use std::sync::Mutex;

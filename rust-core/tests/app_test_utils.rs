@@ -1,4 +1,4 @@
-use app_core::{app_configuration::AppConfiguration, app_container::AppContainer};
+use app_core::{AppConfiguration, AppContainer};
 
 pub fn get_test_db_url() -> String {
     format!("sqlite::memory:")

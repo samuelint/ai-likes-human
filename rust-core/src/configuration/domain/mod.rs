@@ -1,1 +1,3 @@
-pub mod repository;
+mod repository;
+
+pub use repository::{ConfigurationRepository, NewConfigurationModel};

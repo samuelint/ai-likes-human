@@ -2,7 +2,7 @@ use std::error::Error;
 
 use shaku::Provider;
 
-use crate::configuration::domain::repository::{ConfigurationRepository, NewModel};
+use crate::configuration::domain::{ConfigurationRepository, NewConfigurationModel};
 use crate::entities::configuration;
 
 #[async_trait::async_trait]
@@ -37,7 +37,7 @@ impl ConfigurationService for ConfigurationServiceImpl {
     ) -> Result<configuration::Model, Box<dyn Error>> {
         let r = self
             .repository
-            .upsert_value_for_key(NewModel { key, value })
+            .upsert(NewConfigurationModel { key, value })
             .await?;
 
         Ok(r)

@@ -13,6 +13,11 @@ migration_generate_entities:
 	sea-orm-cli migrate refresh -u $(DATABASE_URL)
 	sea-orm-cli generate entity -u $(DATABASE_URL) -o src/entities --with-serde both
 
+.PHONY: test
+test:
+	@cargo test -- --nocapture
+
+
 # %: target is a catch-all pattern rule. It prevents make from failing when you pass additional arguments
 %:
 	@:

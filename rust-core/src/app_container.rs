@@ -4,17 +4,15 @@ pub use shaku::module;
 
 use crate::{
     app_configuration::AppConfiguration,
-    configuration::{
-        app::configuration_service::ConfigurationServiceImpl,
-        infrastructure::sea_orm_repository::SeaOrmConfigurationRepository,
-    },
+    assistant::infrastructure::SeaOrmMessageRepository,
+    configuration::{app::ConfigurationServiceImpl, infrastructure::SeaOrmConfigurationRepository},
     infrastructure::sea_orm,
 };
 
 module! {
     pub AppModule {
         components = [sea_orm::ConnectionProviderImpl],
-        providers = [SeaOrmConfigurationRepository, ConfigurationServiceImpl]
+        providers = [SeaOrmConfigurationRepository, SeaOrmMessageRepository, ConfigurationServiceImpl]
     }
 }
 

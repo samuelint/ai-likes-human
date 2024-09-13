@@ -1,6 +1,6 @@
 use app_core::configuration::domain::repository::{ConfigurationRepository, NewModel};
 use app_core::HasProvider;
-use app_test_utils::{create_app_container, reset_test_environment};
+use app_test_utils::create_app_container;
 use serial_test::serial;
 
 mod app_test_utils;
@@ -8,7 +8,6 @@ mod app_test_utils;
 #[tokio::test]
 #[serial]
 async fn test_configuration_create_read() {
-    reset_test_environment();
     let app = create_app_container().await;
     let config_repo: Box<dyn ConfigurationRepository> = app.container.provide().unwrap();
 
@@ -41,7 +40,6 @@ async fn test_configuration_create_read() {
 #[tokio::test]
 #[serial]
 async fn test_configuration_upsert() {
-    reset_test_environment();
     let app = create_app_container().await;
     let config_repo: Box<dyn ConfigurationRepository> = app.container.provide().unwrap();
 

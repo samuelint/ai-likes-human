@@ -1,1 +1,1 @@
-pub mod database;
+pub mod sea_orm;

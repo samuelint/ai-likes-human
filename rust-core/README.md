@@ -4,14 +4,14 @@ App core in rust
 
 ## Dependencies
 
-### ORM - Diesel
+### ORM - Sea ORM
 
-https://diesel.rs
+https://www.sea-ql.org/SeaORM/
 
-Diesel CLI is mandatory to interract with migration
+CLI is mandatory to interract with migration
 
 ```bash
-cargo install diesel_cli --no-default-features --features sqlite
+cargo install sea-orm-cli
 ```
 
 ### DI Implementation - Shaku

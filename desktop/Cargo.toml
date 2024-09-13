@@ -36,6 +36,8 @@ rayon = "1.10.0"
 fast_image_resize = "4.0.0"
 ureq = "2.10.0"
 libc = "0.2.155"
+futures = "0.3.30"
+tokio = "1.40.0"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.

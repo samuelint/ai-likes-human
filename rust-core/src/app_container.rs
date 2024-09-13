@@ -1,20 +1,20 @@
+use std::error::Error;
+
 pub use shaku::module;
 
 use crate::{
     app_configuration::AppConfiguration,
     configuration::{
         app::configuration_service::ConfigurationServiceImpl,
-        infrastructure::repository::DieselConfigurationRepository,
+        infrastructure::sea_orm_repository::SeaOrmConfigurationRepository,
     },
-    infrastructure::database::sqlite_connection_factory::{
-        SQliteConnectionFactory, SQliteConnectionFactoryImpl,
-    },
+    infrastructure::sea_orm,
 };
 
 module! {
     pub AppModule {
-        components = [SQliteConnectionFactoryImpl],
-        providers = [DieselConfigurationRepository, ConfigurationServiceImpl]
+        components = [sea_orm::ConnectionProviderImpl],
+        providers = [SeaOrmConfigurationRepository, ConfigurationServiceImpl]
     }
 }
 
@@ -24,13 +24,16 @@ pub struct AppContainer {
 }
 
 impl AppContainer {
-    pub fn new(config: AppConfiguration) -> Self {
+    pub async fn create(config: AppConfiguration) -> Result<Self, Box<dyn Error>> {
+        let connection_factory = sea_orm::ConnectionFactory::new(config.database_url.clone());
+        let connection = connection_factory.create().await?;
+
         let container = AppModule::builder()
-            .with_component_override::<dyn SQliteConnectionFactory>(Box::new(
-                SQliteConnectionFactoryImpl::new(config.database_url.as_str()),
-            ))
+            .with_component_parameters::<sea_orm::ConnectionProviderImpl>(
+                sea_orm::ConnectionProviderImplParameters { connection },
+            )
             .build();
 
-        Self { config, container }
+        Ok(Self { config, container })
     }
 }

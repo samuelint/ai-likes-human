@@ -1,21 +1,19 @@
 use std::error::Error;
 
-use super::dto::{ConfigurationItemDto, NewConfigurationItemDto};
+use crate::entities::configuration;
 
-pub trait ConfigurationRepository {
-    fn get_all(&mut self) -> Result<Vec<ConfigurationItemDto>, Box<dyn Error>>;
-    fn find(&mut self, id: &i32) -> Result<Option<ConfigurationItemDto>, Box<dyn Error>>;
-    fn find_by_key(&mut self, key: &str) -> Result<Option<ConfigurationItemDto>, Box<dyn Error>>;
+pub struct NewModel {
+    pub key: String,
+    pub value: String,
+}
 
-    fn upsert_value_for_key(
-        &mut self,
-        item: NewConfigurationItemDto,
-    ) -> Result<ConfigurationItemDto, Box<dyn Error>>;
-
-    fn create(
-        &mut self,
-        item: NewConfigurationItemDto,
-    ) -> Result<ConfigurationItemDto, Box<dyn Error>>;
-
-    fn delete(&mut self, key: &str) -> Result<(), Box<dyn Error>>;
+#[async_trait::async_trait]
+pub trait ConfigurationRepository: Sync + Send {
+    async fn get_all(&self) -> Result<Vec<configuration::Model>, Box<dyn Error>>;
+    async fn find(&self, id: i32) -> Result<Option<configuration::Model>, Box<dyn Error>>;
+    async fn find_by_key(&self, key: &str) -> Result<Option<configuration::Model>, Box<dyn Error>>;
+    async fn upsert_value_for_key(
+        &self,
+        model: NewModel,
+    ) -> Result<configuration::Model, Box<dyn Error>>;
 }

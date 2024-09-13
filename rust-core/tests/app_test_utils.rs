@@ -19,7 +19,7 @@ pub fn get_test_db_file_path() -> String {
 pub fn get_test_db_url() -> String {
     let db_file_path = get_test_db_file_path();
 
-    format!("sqlite://{}", db_file_path)
+    format!("sqlite://{}?mode=rwc", db_file_path)
 }
 
 fn delete_test_db() {
@@ -34,8 +34,10 @@ pub fn reset_test_environment() {
     delete_test_db();
 }
 
-pub fn create_app_container() -> AppContainer {
+pub async fn create_app_container() -> AppContainer {
     let database_url = get_test_db_url();
 
-    AppContainer::new(AppConfiguration { database_url })
+    AppContainer::create(AppConfiguration { database_url })
+        .await
+        .unwrap()
 }

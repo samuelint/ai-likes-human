@@ -15,11 +15,11 @@ pub struct AppState {
 }
 
 impl AppState {
-    pub fn new(port: u16) -> AppState {
+    pub async fn new(port: u16) -> AppState {
         let core_sidecar = SidecarLifeCycleService::new("core");
-        let app = AppContainer::new(AppConfiguration {
-            database_url: "sqlite:///Users/samuel/Desktop/data.db".to_string(),
-        });
+        let app = AppContainer::create(AppConfiguration {
+            database_url: "sqlite:///Users/samuel/Desktop/data.db?mode=rwc".to_string(),
+        }).await.unwrap();
 
         AppState {
             core_server_port: port,

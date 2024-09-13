@@ -1,27 +1,26 @@
-use app_core::configuration::domain::{
-    dto::NewConfigurationItemDto, repository::ConfigurationRepository,
-};
+use app_core::configuration::domain::repository::{ConfigurationRepository, NewModel};
 use app_core::HasProvider;
 use app_test_utils::{create_app_container, reset_test_environment};
 use serial_test::serial;
 
 mod app_test_utils;
 
-#[test]
+#[tokio::test]
 #[serial]
-fn test_configuration_create_read() {
+async fn test_configuration_create_read() {
     reset_test_environment();
-    let app = create_app_container();
-    let mut config_repo: Box<dyn ConfigurationRepository> = app.container.provide().unwrap();
+    let app = create_app_container().await;
+    let config_repo: Box<dyn ConfigurationRepository> = app.container.provide().unwrap();
 
-    let find_result = config_repo.find_by_key("aa").unwrap();
+    let find_result = config_repo.find_by_key("aa").await.unwrap();
     assert!(find_result.is_none());
 
     let upsert_result = config_repo
-        .upsert_value_for_key(NewConfigurationItemDto {
-            key: "aa",
-            value: "AAA",
+        .upsert_value_for_key(NewModel {
+            key: "aa".to_string(),
+            value: "AAA".to_string(),
         })
+        .await
         .unwrap();
 
     assert_eq!(upsert_result.value, "AAA");
@@ -29,6 +28,7 @@ fn test_configuration_create_read() {
 
     let find_result = config_repo
         .find_by_key("aa")
+        .await
         .unwrap()
         .expect("Configuration item is supposed to exist");
 
@@ -38,30 +38,33 @@ fn test_configuration_create_read() {
     );
 }
 
-#[test]
+#[tokio::test]
 #[serial]
-fn test_configuration_upsert() {
+async fn test_configuration_upsert() {
     reset_test_environment();
-    let app = create_app_container();
-    let mut config_repo: Box<dyn ConfigurationRepository> = app.container.provide().unwrap();
+    let app = create_app_container().await;
+    let config_repo: Box<dyn ConfigurationRepository> = app.container.provide().unwrap();
 
     config_repo
-        .upsert_value_for_key(NewConfigurationItemDto {
-            key: "bb",
-            value: "BB",
+        .upsert_value_for_key(NewModel {
+            key: "bb".to_string(),
+            value: "BB".to_string(),
         })
+        .await
         .unwrap();
 
     let upsert_result = config_repo
-        .upsert_value_for_key(NewConfigurationItemDto {
-            key: "bb",
-            value: "Hello",
+        .upsert_value_for_key(NewModel {
+            key: "bb".to_string(),
+            value: "Hello".to_string(),
         })
+        .await
         .unwrap();
     assert_eq!(upsert_result.value, "Hello", "Value should be updated");
 
     let find_result = config_repo
         .find_by_key("bb")
+        .await
         .unwrap()
         .expect("Configuration item is supposed to exist");
 

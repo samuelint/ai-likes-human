@@ -2,18 +2,17 @@ use std::error::Error;
 
 use shaku::Provider;
 
-use crate::configuration::domain::{
-    dto::{ConfigurationItemDto, NewConfigurationItemDto},
-    repository::ConfigurationRepository,
-};
+use crate::configuration::domain::repository::{ConfigurationRepository, NewModel};
+use crate::entities::configuration;
 
-pub trait ConfigurationService {
-    fn find(&mut self, key: String) -> Result<Option<ConfigurationItemDto>, Box<dyn Error>>;
-    fn upsert(
-        &mut self,
+#[async_trait::async_trait]
+pub trait ConfigurationService: Send + Sync {
+    async fn find(&self, key: String) -> Result<Option<configuration::Model>, Box<dyn Error>>;
+    async fn upsert(
+        &self,
         key: String,
         value: String,
-    ) -> Result<ConfigurationItemDto, Box<dyn Error>>;
+    ) -> Result<configuration::Model, Box<dyn Error>>;
 }
 
 #[derive(Provider)]
@@ -23,20 +22,24 @@ pub struct ConfigurationServiceImpl {
     repository: Box<dyn ConfigurationRepository>,
 }
 
+#[async_trait::async_trait]
 impl ConfigurationService for ConfigurationServiceImpl {
-    fn find(&mut self, key: String) -> Result<Option<ConfigurationItemDto>, Box<dyn Error>> {
-        self.repository.find_by_key(key.as_str())
+    async fn find(&self, key: String) -> Result<Option<configuration::Model>, Box<dyn Error>> {
+        let r = self.repository.find_by_key(key.as_str()).await?;
+
+        Ok(r)
     }
 
-    fn upsert(
-        &mut self,
+    async fn upsert(
+        &self,
         key: String,
         value: String,
-    ) -> Result<ConfigurationItemDto, Box<dyn Error>> {
-        self.repository
-            .upsert_value_for_key(NewConfigurationItemDto {
-                key: &key,
-                value: &value,
-            })
+    ) -> Result<configuration::Model, Box<dyn Error>> {
+        let r = self
+            .repository
+            .upsert_value_for_key(NewModel { key, value })
+            .await?;
+
+        Ok(r)
     }
 }

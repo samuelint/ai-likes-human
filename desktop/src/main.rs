@@ -17,10 +17,11 @@ use tauri_plugin_window_state::{AppHandleExt, StateFlags};
 
 static CORE_SERVER_PORT_NUMBER: u16 = 8000;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let tray_menu = build_menu();
 
-    let state = AppState::new(CORE_SERVER_PORT_NUMBER);
+    let state = AppState::new(CORE_SERVER_PORT_NUMBER).await;
 
     let log_builder = tauri_plugin_log::Builder::default().targets([
         LogTarget::LogDir,

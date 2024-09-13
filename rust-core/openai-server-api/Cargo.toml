@@ -13,8 +13,20 @@ axum = "0.7.5"
 futures = "0.3.30"
 http-body-util = "0.1.2"
 hyper = { version = "1.4.1", features = ["full"] }
-serde = "1.0.210"
+serde = { version = "1.0.210", features = ["derive"] }
 tokio = { version = "1.40.0", features = ["full"] }
-tower-http = "0.5.2"
-tower = { version = "0.4", features = ["util"] }
+tower-http = { version = "0.5.2", features = [
+    "add-extension",
+    "auth",
+    "compression-full",
+    "limit",
+    "trace",
+] }
+tower = { version = "0.4", features = [
+    "util",
+    "timeout",
+    "load-shed",
+    "limit",
+] }
 tracing = "0.1.40"
+serde_json = "1.0.128"

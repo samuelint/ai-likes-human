@@ -1,0 +1,20 @@
+[package]
+name = "openai-server-api"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+name = "openai_server_api"
+path = "src/lib.rs"
+
+[dependencies]
+axum = "0.7.5"
+futures = "0.3.30"
+http-body-util = "0.1.2"
+hyper = { version = "1.4.1", features = ["full"] }
+serde = "1.0.210"
+tokio = { version = "1.40.0", features = ["full"] }
+tower-http = "0.5.2"
+tower = { version = "0.4", features = ["util"] }
+tracing = "0.1.40"

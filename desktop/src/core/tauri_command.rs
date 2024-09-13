@@ -4,6 +4,11 @@ use app_core::{entities::configuration, ConfigurationService};
 use tauri::State;
 
 #[tauri::command]
+pub fn is_server_up(app_state: State<'_, AppState>) -> Result<bool, String> {
+    app_state.is_core_server_up().map_err(|err| err.to_string())
+}
+
+#[tauri::command]
 pub async fn find_configuration(
     app_state: State<'_, AppState>,
     key: String,

@@ -2,7 +2,6 @@ import { useIsInDesktopApp } from '@/lib/is-in-desktop-app';
 import ApiKeysSection from './_components/api-keys.section';
 import GeneralSection from './_components/general.section';
 import LocalModelsSection from './_components/local-models.section';
-import StatusSection from './_components/status.section';
 import AdvancedSection from './_components/advanced.section';
 import { PageSection } from '@/components/page-section';
 import { useScrollToSectionUsingRouteHash } from '@/lib/use-scroll-to-id';
@@ -23,7 +22,6 @@ export default function Settings() {
         <ExtensionsSection />
         <AdvancedSection />
         { showLocalModelsSection && <LocalModelsSection />}
-        <StatusSection />
       </div>
     </PageSection>
   );

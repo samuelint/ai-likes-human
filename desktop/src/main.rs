@@ -6,16 +6,17 @@ pub mod core;
 pub mod screencapture;
 pub mod system_tray;
 
-use app_state::app_state::{is_server_up, start_server, stop_server, AppState};
-use core::tauri_command::{find_configuration, upsert_configuration};
-use log::{info, warn};
+use app_core::openai_server_api;
+use app_state::app_state::AppState;
+use core::tauri_command::{find_configuration, is_server_up, upsert_configuration};
+use log::info;
 use screencapture::tauri_command::{assert_screen_capture_permissions, capture_screen};
 use system_tray::{build_menu, on_system_tray_event};
 use tauri::{Manager, State, SystemTray, WindowEvent};
 use tauri_plugin_log::LogTarget;
 use tauri_plugin_window_state::{AppHandleExt, StateFlags};
 
-static CORE_SERVER_PORT_NUMBER: u16 = 8000;
+static CORE_SERVER_PORT_NUMBER: u16 = 1234;
 
 #[tokio::main]
 async fn main() {
@@ -36,20 +37,10 @@ async fn main() {
         .on_system_tray_event(on_system_tray_event)
         .plugin(log_builder.build())
         .plugin(tauri_plugin_window_state::Builder::default().build())
-        .setup(move |app| {
+        .setup(|app| {
             let app_state: State<AppState> = app.state();
 
-            let is_up = app_state.is_core_server_up();
-            if is_up {
-                warn!("Core Sidecar is already running");
-            }
-            if !is_up {
-                app_state
-                    .start_core_server()
-                    .expect("Core Sidecar start failed");
-            }
-
-            Ok(())
+            app_state.start_core_server()
         })
         .on_window_event(move |event| match event.event() {
             WindowEvent::CloseRequested { api, .. } => {
@@ -74,8 +65,6 @@ async fn main() {
             _ => {}
         })
         .invoke_handler(tauri::generate_handler![
-            start_server,
-            stop_server,
             is_server_up,
             capture_screen,
             assert_screen_capture_permissions,
@@ -84,13 +73,7 @@ async fn main() {
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
-        .run(|app_handle, event| match event {
-            tauri::RunEvent::Exit => {
-                let app_state: State<AppState> = app_handle.state();
-                app_state
-                    .stop_core_server()
-                    .expect("Core Sidecar stop failed");
-            }
+        .run(|_app_handle, event| match event {
             tauri::RunEvent::ExitRequested { api, .. } => {
                 api.prevent_exit();
             }

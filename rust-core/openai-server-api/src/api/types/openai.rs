@@ -1,3 +1,7 @@
+#[cfg(test)]
+#[path = "./openai_test.rs"]
+mod openai_test;
+
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
 
@@ -40,16 +44,6 @@ pub struct OpenAIChatCompletionChoice {
     pub finish_reason: Option<String>,
 }
 
-impl OpenAIChatCompletionChoice {
-    pub fn new_stop(index: i32, message: Option<OpenAIMessage>) -> Self {
-        OpenAIChatCompletionChoice {
-            index,
-            message,
-            ..OpenAIChatCompletionChoice::default()
-        }
-    }
-}
-
 impl Default for OpenAIChatCompletionChoice {
     fn default() -> Self {
         OpenAIChatCompletionChoice {
@@ -81,6 +75,19 @@ impl Default for OpenAIChatCompletionObject {
             system_fingerprint: None,
             choices: vec![],
             usage: OpenAIChatCompletionUsage::default(),
+        }
+    }
+}
+
+impl OpenAIChatCompletionObject {
+    pub fn new_single_choice(message: OpenAIMessage) -> Self {
+        OpenAIChatCompletionObject {
+            choices: vec![OpenAIChatCompletionChoice {
+                index: 0,
+                message: Some(message),
+                finish_reason: Some("stop".to_string()),
+            }],
+            ..OpenAIChatCompletionObject::default()
         }
     }
 }
@@ -123,6 +130,20 @@ impl Default for OpenAIChatCompletionChunkObject {
             system_fingerprint: None,
             choices: vec![],
             usage: OpenAIChatCompletionUsage::default(),
+        }
+    }
+}
+
+impl OpenAIChatCompletionChunkObject {
+    pub fn new_assistant_chunk(message: String, model: String) -> Self {
+        let choice = OpenAIChatCompletionChunkChoice {
+            delta: Some(OpenAIMessage::new_assistant(message)),
+            ..OpenAIChatCompletionChunkChoice::default()
+        };
+        OpenAIChatCompletionChunkObject {
+            choices: vec![choice],
+            model: model,
+            ..OpenAIChatCompletionChunkObject::default()
         }
     }
 }

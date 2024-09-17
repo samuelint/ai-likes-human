@@ -1,19 +1,23 @@
-use async_stream::try_stream;
 use axum::{
-    extract,
+    extract::{self},
     response::{
         sse::{Event, KeepAlive, Sse},
         IntoResponse,
     },
     Json,
 };
-use futures::stream::Stream;
+use futures::{
+    stream::{once, Stream},
+    StreamExt,
+};
 use serde::{Deserialize, Serialize};
-use std::convert::Infallible;
+use std::{convert::Infallible, error::Error};
 
-use super::types::{
-    OpenAIChatCompletionChoice, OpenAIChatCompletionObject, OpenAIChatCompletionUsage,
-    OpenAIMessage,
+use crate::app_state::ServerState;
+
+use super::{
+    openai::{OpenAIChatCompletionChunkObject, OpenAIChatCompletionObject, OpenAIMessage},
+    StreamData,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -26,84 +30,57 @@ pub struct ChatCompletionParameters {
 }
 
 pub async fn run_chat_completions(
+    axum::extract::State(state): axum::extract::State<ServerState>,
     extract::Json(payload): extract::Json<ChatCompletionParameters>,
 ) -> impl IntoResponse {
     let use_stream = payload.stream.unwrap_or(false);
 
     if use_stream {
-        return run_stream_chat_completions(payload).await.into_response();
+        return run_stream_chat_completions(state, payload)
+            .await
+            .into_response();
     } else {
-        return run_json_chat_completions(payload).await.into_response();
+        return run_json_chat_completions(state, payload)
+            .await
+            .into_response();
     }
 }
 
 async fn run_json_chat_completions(
+    state: ServerState,
     payload: ChatCompletionParameters,
 ) -> Json<OpenAIChatCompletionObject> {
-    let choice1 = OpenAIChatCompletionChoice {
-        message: Some(OpenAIMessage::new_assistant("salut".to_string())),
-        ..OpenAIChatCompletionChoice::default()
-    };
+    let messages = payload.messages;
+    let invoke_fn = state.invoke_fn.as_ref();
+    let result = invoke_fn(&messages[..]).unwrap();
 
-    let data = OpenAIChatCompletionObject {
-        id: Some("1".to_string()),
-        model: payload.model,
-        choices: vec![choice1],
-        ..OpenAIChatCompletionObject::default()
-    };
+    let message = OpenAIMessage::new_assistant(result.to_string());
+    let data = OpenAIChatCompletionObject::new_single_choice(message);
 
     Json(data)
 }
 
-#[derive(Default, Serialize, Deserialize)]
-pub struct OpenAIChatCompletionChunkChoice {
-    pub index: i32,
-    pub delta: Option<OpenAIMessage>,
-    pub finish_reason: Option<String>,
-}
-
-#[derive(Default, Serialize, Deserialize)]
-pub struct OpenAIChatCompletionChunkObject {
-    pub id: String,
-    pub object: String,
-    pub created: i64,
-    pub model: String,
-    pub system_fingerprint: Option<String>,
-    pub choices: Vec<OpenAIChatCompletionChunkChoice>,
-    pub usage: OpenAIChatCompletionUsage,
-}
-
 async fn run_stream_chat_completions(
+    state: ServerState,
     payload: ChatCompletionParameters,
 ) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
-    let choice1 = OpenAIChatCompletionChunkChoice {
-        delta: Some(OpenAIMessage::new_assistant("salut".to_string())),
-        ..OpenAIChatCompletionChunkChoice::default()
-    };
-    let chunk = OpenAIChatCompletionChunkObject {
-        id: "123".to_string(),
-        model: payload.model.clone(),
-        choices: vec![choice1],
-        ..OpenAIChatCompletionChunkObject::default()
-    };
-    let final_choice = OpenAIChatCompletionChunkChoice {
-        delta: None,
-        ..OpenAIChatCompletionChunkChoice::default()
-    };
-    let final_chunk = OpenAIChatCompletionChunkObject {
-        id: "123".to_string(),
-        model: payload.model,
-        choices: vec![final_choice],
-        ..OpenAIChatCompletionChunkObject::default()
-    };
+    let messages = payload.messages;
+    let create_invoke_stream = state.stream_fn.as_ref();
+    let stream = create_invoke_stream(&messages[..]);
 
-    Sse::new(try_stream! {
-        yield Event::default().data(format!("data: {}", serde_json::to_string(&chunk).unwrap()));
-        yield Event::default().data(format!(
-            "data: {}",
-            serde_json::to_string(&final_chunk).unwrap()
-        ));
-        yield Event::default().data("data: [DONE]");
-    })
-    .keep_alive(KeepAlive::default())
+    let stream = stream.map(move |item: Result<StreamData, Box<dyn Error + Send>>| {
+        let item = item.unwrap();
+        let chunk = OpenAIChatCompletionChunkObject::new_assistant_chunk(
+            item.content,
+            payload.model.clone(),
+        );
+
+        Ok(Event::default().data(format!("data: {}", serde_json::to_string(&chunk).unwrap())))
+    });
+
+    let last_chunk = once(async { Ok(Event::default().data("data: [DONE]")) });
+
+    let stream = stream.chain(last_chunk);
+
+    Sse::new(stream).keep_alive(KeepAlive::default())
 }

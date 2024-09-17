@@ -11,7 +11,6 @@ sea-orm = { version = "^0.12.0", features = [
     "macros",
 ] }
 migration = { path = "./migration" }
-openai-server-api = { path = "./openai-server-api" }
 sea-orm-migration = "^0.12.0"
 # langchain-rust = { version = "4.4.2", features = ["sqlite"] }
 langchain-rust = { version = "4.4.2", features = [] }

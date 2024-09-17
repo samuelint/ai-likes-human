@@ -6,7 +6,6 @@ pub mod core;
 pub mod screencapture;
 pub mod system_tray;
 
-use app_core::openai_server_api;
 use app_state::app_state::AppState;
 use core::tauri_command::{find_configuration, is_server_up, upsert_configuration};
 use log::info;

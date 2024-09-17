@@ -3,12 +3,12 @@ use axum::{
     http::{Request, StatusCode},
 };
 use http_body_util::BodyExt; // for `collect`
-use openai_server_api::create_router;
+use openai_server_api::{create_router, CreateRouterParameters};
 use tower::ServiceExt; // for `oneshot`
 
 #[tokio::test]
 async fn test_health_on_root() {
-    let app = create_router();
+    let app = create_router(CreateRouterParameters::default());
 
     let response = app
         .oneshot(Request::builder().uri("/").body(Body::empty()).unwrap())
@@ -22,7 +22,7 @@ async fn test_health_on_root() {
 
 #[tokio::test]
 async fn test_health_on_route() {
-    let app = create_router();
+    let app = create_router(CreateRouterParameters::default());
 
     let response = app
         .oneshot(

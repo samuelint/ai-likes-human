@@ -20,10 +20,13 @@ pub fn configure_tracing() {
             }),
         )
         .with(tracing_subscriber::fmt::layer())
-        .init();
+        .init()
 }
 
-pub fn with_tracing(router: Router) -> Router {
+pub fn with_tracing<S>(router: Router<S>) -> Router<S>
+where
+    S: Clone + Send + Sync + 'static,
+{
     router.layer(
         TraceLayer::new_for_http().make_span_with(|request: &Request<_>| {
             let matched_path = request

@@ -1,9 +1,9 @@
 use std::sync::Arc;
 
-pub use crate::api::{InvokeFn, StreamFn};
+use app_core::ApiFacade;
 
 #[derive(Clone)]
 pub struct ServerState {
-    pub invoke_fn: Arc<InvokeFn>,
-    pub stream_fn: Arc<StreamFn>,
+    pub core_container: Arc<app_core::AppContainer>,
+    pub api: Arc<ApiFacade>,
 }

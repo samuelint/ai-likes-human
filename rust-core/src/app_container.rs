@@ -31,4 +31,12 @@ impl AppContainer {
             agent_module,
         })
     }
+
+    pub async fn new_in_memory() -> Result<Self, Box<dyn Error>> {
+        let config = AppConfiguration {
+            database_url: "sqlite::memory:".to_string(),
+            ..AppConfiguration::default()
+        };
+        Self::new(config).await
+    }
 }

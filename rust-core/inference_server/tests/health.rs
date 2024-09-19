@@ -1,16 +1,17 @@
+mod test_utils;
 use axum::{
     body::Body,
     http::{Request, StatusCode},
 };
 use http_body_util::BodyExt; // for `collect`
-use inference_server::{create_router, CreateRouterParameters};
+use test_utils::create_test_router;
 use tower::ServiceExt; // for `oneshot`
 
 #[tokio::test]
 async fn test_health_on_root() {
-    let app = create_router(CreateRouterParameters::default());
+    let router = create_test_router().await;
 
-    let response = app
+    let response = router
         .oneshot(Request::builder().uri("/").body(Body::empty()).unwrap())
         .await
         .unwrap();
@@ -22,9 +23,9 @@ async fn test_health_on_root() {
 
 #[tokio::test]
 async fn test_health_on_route() {
-    let app = create_router(CreateRouterParameters::default());
+    let router = create_test_router().await;
 
-    let response = app
+    let response = router
         .oneshot(
             Request::builder()
                 .uri("/health")

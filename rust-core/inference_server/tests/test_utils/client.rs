@@ -13,6 +13,7 @@ pub struct OpenaiClient {
 }
 
 impl OpenaiClient {
+    #[allow(dead_code)]
     pub fn new(server_url: String) -> Self {
         let invoke_client = OpenAIClient::new_with_endpoint(server_url.clone(), "any".to_string());
         let stream_client = ChatCompletionsStreamClient::new_with_api_url(

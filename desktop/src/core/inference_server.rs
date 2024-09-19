@@ -16,17 +16,6 @@ impl InferenceServer {
     pub async fn serve(&self) {
         serve(ServeParameters {
             port: self.port,
-            invoke_fn: Arc::new(|_messages| Ok("It is something".to_string())),
-            stream_fn: Arc::new(|_messages| {
-                let stream = try_stream! {
-                    yield StreamData::new(
-                        serde_json::json!({}),
-                        "Hello world".to_string(),
-                        );
-                };
-
-                Box::pin(stream)
-            }),
             use_trace: false,
             ..ServeParameters::default()
         })

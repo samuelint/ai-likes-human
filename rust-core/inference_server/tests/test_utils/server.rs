@@ -1,6 +1,7 @@
-use std::{future::IntoFuture, sync::Arc};
+use std::future::IntoFuture;
 
-use inference_server::{serve, InvokeFn, ServeParameters, StreamFn};
+use hyper::StatusCode;
+use inference_server::{serve, ServeParameters};
 
 pub async fn with_started_server<F, Fut>(parameters: ServeParameters, f: F)
 where
@@ -12,42 +13,41 @@ where
         serve(parameters).await;
     });
 
+    wait_for_server_to_be_up_for(&format!("http://localhost:{}", port), 5).await;
+
     let server_url = format!("http://localhost:{}/openai/v1", port);
     let f = f(server_url);
 
-    tokio::time::timeout(std::time::Duration::from_secs(5), f)
+    tokio::time::timeout(std::time::Duration::from_secs(15), f)
         .await
         .unwrap();
 
     server.abort();
 }
 
-#[allow(dead_code)]
-pub async fn with_invoke_fn_server<F, Fut>(invoke_fn: Arc<InvokeFn>, f: F)
-where
-    F: Fn(String) -> Fut,
-    Fut: IntoFuture<Output = ()>,
-{
-    with_started_server(
-        ServeParameters {
-            invoke_fn: invoke_fn,
-            use_trace: false,
-            ..ServeParameters::default()
-        },
-        f,
-    )
-    .await;
+pub async fn is_server_up(server_url: &str) -> bool {
+    let response = reqwest::get(server_url).await;
+    match response {
+        Ok(response) => response.status() == StatusCode::OK,
+        Err(_) => false,
+    }
+}
+
+pub async fn wait_for_server_to_be_up_for(server_url: &str, duration_sec: u64) {
+    let start = std::time::Instant::now();
+    while !is_server_up(&server_url).await && start.elapsed().as_secs() < duration_sec {
+        tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+    }
 }
 
 #[allow(dead_code)]
-pub async fn with_stream_fn_server<F, Fut>(stream_fn: Arc<StreamFn>, f: F)
+pub async fn with_default_started_server<F, Fut>(f: F)
 where
     F: Fn(String) -> Fut,
     Fut: IntoFuture<Output = ()>,
 {
     with_started_server(
         ServeParameters {
-            stream_fn: stream_fn,
             use_trace: false,
             ..ServeParameters::default()
         },

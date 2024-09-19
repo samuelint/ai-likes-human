@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use app_core::{ApiFacade, AppContainer};
 use axum::{http::StatusCode, response::IntoResponse, routing::get, Router};
 
 use crate::{
@@ -28,10 +29,13 @@ impl Default for CreateRouterParameters {
 }
 
 #[allow(dead_code)]
-pub fn create_router(parameters: CreateRouterParameters) -> Router {
+pub fn create_router(
+    core_container: Arc<AppContainer>,
+    parameters: CreateRouterParameters,
+) -> Router {
     let state = Arc::new(ServerState {
-        invoke_fn: parameters.invoke_fn,
-        stream_fn: parameters.stream_fn,
+        core_container: Arc::clone(&core_container),
+        api: Arc::new(ApiFacade::new(Arc::clone(&core_container))),
     });
 
     let openai_router = create_openai_v1_router(state);

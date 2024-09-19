@@ -1,15 +1,11 @@
 use std::sync::Arc;
 
-use axum::{
-    http::StatusCode,
-    response::IntoResponse,
-    routing::{get, post},
-    Router,
-};
+use axum::{http::StatusCode, response::IntoResponse, routing::get, Router};
 
 use crate::{
-    api::{chat_completions::run_chat_completions, health::health},
+    api::health::health,
     app_state::ServerState,
+    openai_v1_router::create_openai_v1_router,
     route::{default_invoke, default_stream},
     trace::with_tracing,
     InvokeFn, StreamFn,
@@ -33,14 +29,12 @@ impl Default for CreateRouterParameters {
 
 #[allow(dead_code)]
 pub fn create_router(parameters: CreateRouterParameters) -> Router {
-    let state = ServerState {
+    let state = Arc::new(ServerState {
         invoke_fn: parameters.invoke_fn,
         stream_fn: parameters.stream_fn,
-    };
+    });
 
-    let openai_router = Router::new()
-        .route("/chat/completions", post(run_chat_completions))
-        .with_state(state);
+    let openai_router = create_openai_v1_router(state);
 
     let router = Router::new()
         .route("/", get(health))

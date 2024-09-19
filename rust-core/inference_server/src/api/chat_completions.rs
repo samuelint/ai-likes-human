@@ -11,7 +11,7 @@ use futures::{
     StreamExt,
 };
 use serde::{Deserialize, Serialize};
-use std::{convert::Infallible, error::Error};
+use std::{convert::Infallible, error::Error, sync::Arc};
 
 use crate::app_state::ServerState;
 
@@ -30,7 +30,7 @@ pub struct ChatCompletionParameters {
 }
 
 pub async fn run_chat_completions(
-    axum::extract::State(state): axum::extract::State<ServerState>,
+    axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
     extract::Json(payload): extract::Json<ChatCompletionParameters>,
 ) -> impl IntoResponse {
     let use_stream = payload.stream.unwrap_or(false);
@@ -47,7 +47,7 @@ pub async fn run_chat_completions(
 }
 
 async fn run_json_chat_completions(
-    state: ServerState,
+    state: Arc<ServerState>,
     payload: ChatCompletionParameters,
 ) -> Json<OpenAIChatCompletionObject> {
     let messages = payload.messages;
@@ -61,7 +61,7 @@ async fn run_json_chat_completions(
 }
 
 async fn run_stream_chat_completions(
-    state: ServerState,
+    state: Arc<ServerState>,
     payload: ChatCompletionParameters,
 ) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
     let messages = payload.messages;

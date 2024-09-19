@@ -1,7 +1,10 @@
 use std::error::Error;
 
+use serde::{Deserialize, Serialize};
+
 use crate::entities::message;
 
+#[derive(Default, Serialize, Deserialize)]
 pub struct NewMessageModel {
     pub content: String,
     pub role: String,

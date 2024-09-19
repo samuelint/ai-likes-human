@@ -16,7 +16,7 @@ tauri-build = { version = "1.5.2", features = [] }
 
 [dependencies]
 app-core = { path = "../rust-core" }
-openai-server-api = { path = "../rust-core/openai-server-api" }
+inference-server = { path = "../rust-core/inference_server" }
 command-group = "2.1.0"
 serde_json = "1.0"
 dirs = "5.0"

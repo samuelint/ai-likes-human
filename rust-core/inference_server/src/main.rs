@@ -1,4 +1,4 @@
-use openai_server_api::{serve, ServeParameters};
+use inference_server::{serve, ServeParameters};
 
 #[tokio::main]
 async fn main() {

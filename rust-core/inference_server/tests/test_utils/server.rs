@@ -1,6 +1,6 @@
 use std::{future::IntoFuture, sync::Arc};
 
-use openai_server_api::{serve, InvokeFn, ServeParameters, StreamFn};
+use inference_server::{serve, InvokeFn, ServeParameters, StreamFn};
 
 pub async fn with_started_server<F, Fut>(parameters: ServeParameters, f: F)
 where

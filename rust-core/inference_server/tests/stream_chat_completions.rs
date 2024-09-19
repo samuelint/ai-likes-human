@@ -2,7 +2,7 @@ mod test_utils;
 
 use async_stream::try_stream;
 use futures::stream::StreamExt;
-use openai_server_api::StreamData;
+use inference_server::StreamData;
 use serial_test::serial;
 use std::sync::Arc;
 use test_utils::{with_stream_fn_server, OpenaiClient};

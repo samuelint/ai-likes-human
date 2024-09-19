@@ -1,7 +1,7 @@
 use std::{error::Error, sync::Arc};
 
 use async_stream::try_stream;
-use openai_server_api::{self, serve, ServeParameters, StreamData};
+use inference_server::{self, serve, ServeParameters, StreamData};
 
 #[derive(Clone)]
 pub struct InferenceServer {

@@ -1,11 +1,11 @@
 [package]
-name = "openai-server-api"
+name = "inference-server"
 version = "0.1.0"
 edition = "2021"
 publish = false
 
 [lib]
-name = "openai_server_api"
+name = "inference_server"
 path = "src/lib.rs"
 
 [dependencies]

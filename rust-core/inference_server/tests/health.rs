@@ -3,7 +3,7 @@ use axum::{
     http::{Request, StatusCode},
 };
 use http_body_util::BodyExt; // for `collect`
-use openai_server_api::{create_router, CreateRouterParameters};
+use inference_server::{create_router, CreateRouterParameters};
 use tower::ServiceExt; // for `oneshot`
 
 #[tokio::test]

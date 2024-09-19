@@ -7,7 +7,7 @@ pub fn get_test_db_url() -> String {
 pub async fn create_app_container() -> AppContainer {
     let database_url = get_test_db_url();
 
-    AppContainer::create(AppConfiguration { database_url })
+    AppContainer::new(AppConfiguration { database_url })
         .await
         .unwrap()
 }

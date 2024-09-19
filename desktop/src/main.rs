@@ -39,7 +39,7 @@ async fn main() {
         .setup(|app| {
             let app_state: State<AppState> = app.state();
 
-            app_state.start_core_server()
+            app_state.start_inference_server()
         })
         .on_window_event(move |event| match event.event() {
             WindowEvent::CloseRequested { api, .. } => {

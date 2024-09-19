@@ -4,21 +4,24 @@ mod openai_llm_factory_tests;
 
 use std::error::Error;
 
-use langchain_rust::llm::{OpenAI, OpenAIConfig};
+use langchain_rust::{language_models::llm::LLM, llm::OpenAI};
 
 pub use crate::llm::domain::llm_factory::{CreateLLMParameters, LLMFactory};
 
 pub struct OpenAILLMFactory {}
 
-impl LLMFactory<OpenAI<OpenAIConfig>> for OpenAILLMFactory {
+impl OpenAILLMFactory {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
+
+impl LLMFactory for OpenAILLMFactory {
     fn is_compatible(&self, model: &str) -> bool {
         model.to_lowercase().contains("openai")
     }
 
-    fn create(
-        &self,
-        parameters: CreateLLMParameters,
-    ) -> Result<OpenAI<OpenAIConfig>, Box<dyn Error>> {
+    fn create(&self, parameters: CreateLLMParameters) -> Result<Box<dyn LLM>, Box<dyn Error>> {
         let split_vec: Vec<&str> = parameters.model.split(':').collect();
 
         let model = match split_vec.last() {
@@ -26,6 +29,7 @@ impl LLMFactory<OpenAI<OpenAIConfig>> for OpenAILLMFactory {
             None => return Err("Model is not valid".into()),
         };
 
-        Ok(OpenAI::default().with_model(model))
+        let llm = OpenAI::default().with_model(model);
+        Ok(Box::new(llm))
     }
 }

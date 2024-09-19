@@ -1,5 +1,3 @@
-use app_core::ConfigurationService;
-use app_core::HasProvider;
 use app_test_utils::create_app_container;
 use serial_test::serial;
 
@@ -9,7 +7,7 @@ mod app_test_utils;
 #[serial]
 async fn test_configuration_create_read() {
     let app = create_app_container().await;
-    let service: Box<dyn ConfigurationService> = app.container.provide().unwrap();
+    let service = app.configuration_module.get_configuration_service();
 
     let find_result = service.find("aa".to_string()).await.unwrap();
     assert!(find_result.is_none());
@@ -38,7 +36,7 @@ async fn test_configuration_create_read() {
 #[serial]
 async fn test_configuration_upsert() {
     let app = create_app_container().await;
-    let service: Box<dyn ConfigurationService> = app.container.provide().unwrap();
+    let service = app.configuration_module.get_configuration_service();
 
     service
         .upsert("bb".to_string(), "BB".to_string())

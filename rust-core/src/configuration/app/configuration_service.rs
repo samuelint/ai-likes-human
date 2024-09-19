@@ -1,6 +1,5 @@
 use std::error::Error;
-
-use shaku::Provider;
+use std::sync::Arc;
 
 use crate::configuration::domain::{ConfigurationRepository, NewConfigurationModel};
 use crate::entities::configuration;
@@ -15,11 +14,14 @@ pub trait ConfigurationService: Send + Sync {
     ) -> Result<configuration::Model, Box<dyn Error>>;
 }
 
-#[derive(Provider)]
-#[shaku(interface = ConfigurationService)]
 pub struct ConfigurationServiceImpl {
-    #[shaku(provide)]
-    repository: Box<dyn ConfigurationRepository>,
+    repository: Arc<dyn ConfigurationRepository>,
+}
+
+impl ConfigurationServiceImpl {
+    pub fn new(repository: Arc<dyn ConfigurationRepository>) -> Self {
+        Self { repository }
+    }
 }
 
 #[async_trait::async_trait]

@@ -1,30 +1,31 @@
-use sea_orm::{ActiveValue, EntityTrait};
-use shaku::Provider;
+use sea_orm::{ActiveValue, DatabaseConnection, EntityTrait};
 use std::error::Error;
 use std::sync::Arc;
 
-use crate::assistant::domain::message_repository::{MessageRepository, NewMessageModel};
+use crate::agent::domain::message_repository::{MessageRepository, NewMessageModel};
 use crate::entities::message;
-use crate::infrastructure::sea_orm::connection_provider::ConnectionProvider;
 
-#[derive(Provider)]
-#[shaku(interface = MessageRepository)]
 pub struct SeaOrmMessageRepository {
-    #[shaku(inject)]
-    connection: Arc<dyn ConnectionProvider>,
+    connection: Arc<DatabaseConnection>,
+}
+
+impl SeaOrmMessageRepository {
+    pub fn new(connection: Arc<DatabaseConnection>) -> Self {
+        Self { connection }
+    }
 }
 
 #[async_trait::async_trait]
 impl MessageRepository for SeaOrmMessageRepository {
     async fn find(&self, id: i32) -> Result<Option<message::Model>, Box<dyn Error>> {
-        let conn = self.connection.get();
+        let conn = Arc::clone(&self.connection);
         let r = message::Entity::find_by_id(id).one(conn.as_ref()).await?;
 
         Ok(r)
     }
 
     async fn create(&self, item: NewMessageModel) -> Result<message::Model, Box<dyn Error>> {
-        let conn = self.connection.get();
+        let conn = Arc::clone(&self.connection);
         let model = message::ActiveModel {
             content: ActiveValue::Set(item.content.to_owned()),
             role: ActiveValue::Set(item.role.to_owned()),
@@ -41,7 +42,7 @@ impl MessageRepository for SeaOrmMessageRepository {
     }
 
     async fn delete(&self, id: i32) -> Result<(), Box<dyn Error>> {
-        let conn = self.connection.get();
+        let conn = Arc::clone(&self.connection);
         message::Entity::delete_by_id(id)
             .exec(conn.as_ref())
             .await?;

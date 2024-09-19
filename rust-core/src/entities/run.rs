@@ -4,34 +4,28 @@ use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
-#[sea_orm(table_name = "message")]
+#[sea_orm(table_name = "run")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
     #[sea_orm(column_type = "Text")]
     pub created_at: String,
     #[sea_orm(column_type = "Text")]
-    pub content: String,
-    #[sea_orm(column_type = "Text")]
-    pub role: String,
+    pub assistant_id: String,
     #[sea_orm(column_type = "Text", nullable)]
-    pub attachments: Option<String>,
+    pub instructions: Option<String>,
+    #[sea_orm(column_type = "Text")]
+    pub model: String,
+    #[sea_orm(column_type = "Text")]
+    pub status: String,
+    pub thread_id: Option<i32>,
     #[sea_orm(column_type = "Text", nullable)]
     pub metadata: Option<String>,
-    pub thread_id: Option<i32>,
-    pub run_id: Option<i32>,
+    pub temperature: Option<i32>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-    #[sea_orm(
-        belongs_to = "super::thread::Entity",
-        from = "Column::RunId",
-        to = "super::thread::Column::Id",
-        on_update = "Cascade",
-        on_delete = "Cascade"
-    )]
-    Thread2,
     #[sea_orm(
         belongs_to = "super::thread::Entity",
         from = "Column::ThreadId",
@@ -39,7 +33,13 @@ pub enum Relation {
         on_update = "Cascade",
         on_delete = "Cascade"
     )]
-    Thread1,
+    Thread,
+}
+
+impl Related<super::thread::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Thread.def()
+    }
 }
 
 impl ActiveModelBehavior for ActiveModel {}

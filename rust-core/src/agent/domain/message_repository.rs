@@ -5,6 +5,8 @@ use crate::entities::message;
 pub struct NewMessageModel {
     pub content: String,
     pub role: String,
+    pub thread_id: Option<i32>,
+    pub run_id: Option<i32>,
     pub attachments: Option<String>,
     pub metadata: Option<String>,
 }

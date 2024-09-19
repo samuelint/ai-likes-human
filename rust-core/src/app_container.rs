@@ -21,7 +21,7 @@ impl AppContainer {
 
         let configuration_module = ConfigurationDIModule::new(Arc::clone(&connection));
         let llm_module = LLMDIModule::new();
-        let agent_module = AgentDIModule::new(LLMDIModule::new());
+        let agent_module = AgentDIModule::new(Arc::clone(&connection), LLMDIModule::new());
 
         Ok(Self {
             config,

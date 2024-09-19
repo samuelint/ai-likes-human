@@ -29,6 +29,8 @@ impl MessageRepository for SeaOrmMessageRepository {
         let model = message::ActiveModel {
             content: ActiveValue::Set(item.content.to_owned()),
             role: ActiveValue::Set(item.role.to_owned()),
+            thread_id: ActiveValue::Set(item.thread_id),
+            run_id: ActiveValue::Set(item.run_id),
             attachments: ActiveValue::Set(item.attachments.to_owned()),
             metadata: ActiveValue::Set(item.metadata.to_owned()),
             ..Default::default()

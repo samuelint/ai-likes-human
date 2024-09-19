@@ -2,3 +2,5 @@
 
 pub use super::configuration::Entity as Configuration;
 pub use super::message::Entity as Message;
+pub use super::run::Entity as Run;
+pub use super::thread::Entity as Thread;

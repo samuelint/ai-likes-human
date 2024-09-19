@@ -9,43 +9,39 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table(Message::Table)
+                    .table(Thread::Table)
                     .if_not_exists()
                     .col(
-                        ColumnDef::new(Message::Id)
+                        ColumnDef::new(Thread::Id)
                             .integer()
                             .not_null()
                             .auto_increment()
                             .primary_key(),
                     )
                     .col(
-                        ColumnDef::new(Message::CreatedAt)
+                        ColumnDef::new(Thread::CreatedAt)
                             .timestamp_with_time_zone()
                             .not_null(),
                     )
-                    .col(ColumnDef::new(Message::Content).json().not_null())
-                    .col(ColumnDef::new(Message::Role).string().not_null())
-                    .col(ColumnDef::new(Message::Attachments).json())
-                    .col(ColumnDef::new(Message::Metadata).json())
+                    .col(ColumnDef::new(Thread::Metadata).json())
                     .to_owned(),
             )
-            .await
+            .await?;
+
+        Ok(())
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
-            .drop_table(Table::drop().table(Message::Table).to_owned())
+            .drop_table(Table::drop().table(Thread::Table).to_owned())
             .await
     }
 }
 
 #[derive(DeriveIden)]
-enum Message {
+pub enum Thread {
     Table,
     Id,
     CreatedAt,
-    Attachments,
-    Content,
     Metadata,
-    Role,
 }

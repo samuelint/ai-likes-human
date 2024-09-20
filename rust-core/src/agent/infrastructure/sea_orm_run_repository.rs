@@ -1,18 +1,16 @@
-use sea_orm::{ActiveValue, DatabaseConnection, EntityTrait, QuerySelect};
+use sea_orm::{
+    ActiveValue, ColumnTrait, ConnectionTrait, DatabaseConnection, DeleteResult, EntityTrait,
+    QueryFilter, QuerySelect,
+};
 use std::error::Error;
 use std::sync::Arc;
 
-use crate::agent::domain::run_repository::{ListByPage, NewRunModel, RunRepository};
+use crate::agent::domain::run_repository::{CreateRunDto, RunRepository};
 use crate::entities::run;
+use crate::utils::PageRequest;
 
 pub struct SeaOrmRunRepository {
     connection: Arc<DatabaseConnection>,
-}
-
-impl SeaOrmRunRepository {
-    pub fn new(connection: Arc<DatabaseConnection>) -> Self {
-        Self { connection }
-    }
 }
 
 #[async_trait::async_trait]
@@ -24,7 +22,7 @@ impl RunRepository for SeaOrmRunRepository {
         Ok(r)
     }
 
-    async fn create(&self, item: NewRunModel) -> Result<run::Model, Box<dyn Error>> {
+    async fn create(&self, item: CreateRunDto) -> Result<run::Model, Box<dyn Error>> {
         let conn = Arc::clone(&self.connection);
         let model = run::ActiveModel {
             assistant_id: ActiveValue::Set(item.assistant_id),
@@ -44,12 +42,18 @@ impl RunRepository for SeaOrmRunRepository {
         Ok(r)
     }
 
-    async fn list_by_page(&self, args: ListByPage) -> Result<Vec<run::Model>, Box<dyn Error>> {
+    async fn list_by_thread_paginated(
+        &self,
+        thread_id: i32,
+        page: PageRequest,
+    ) -> Result<Vec<run::Model>, Box<dyn Error>> {
         let conn = Arc::clone(&self.connection);
-        let mut cursor = run::Entity::find().cursor_by(run::Column::Id);
-        cursor.after(args.after).before(args.before);
+        let mut cursor = run::Entity::find()
+            .filter(run::Column::ThreadId.eq(thread_id))
+            .cursor_by(run::Column::Id);
+        cursor.after(page.after).before(page.before);
 
-        let mut cursor = if let Some(limit) = args.limit {
+        let mut cursor = if let Some(limit) = page.limit {
             cursor.limit(limit)
         } else {
             cursor
@@ -65,5 +69,27 @@ impl RunRepository for SeaOrmRunRepository {
         run::Entity::delete_by_id(id).exec(conn.as_ref()).await?;
 
         Ok(())
+    }
+}
+
+impl SeaOrmRunRepository {
+    pub fn new(connection: Arc<DatabaseConnection>) -> Self {
+        Self { connection }
+    }
+
+    pub async fn tx_delete_by_thread_id<'a, C>(
+        &self,
+        conn: &'a C,
+        id: i32,
+    ) -> Result<DeleteResult, Box<dyn Error>>
+    where
+        C: ConnectionTrait,
+    {
+        let result = run::Entity::delete_many()
+            .filter(run::Column::ThreadId.eq(id))
+            .exec(conn)
+            .await?;
+
+        Ok(result)
     }
 }

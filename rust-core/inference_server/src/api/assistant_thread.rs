@@ -1,83 +1,122 @@
-use app_core::agent::domain::message_repository::NewMessageModel;
-use axum::{extract, response::IntoResponse};
+use app_core::{
+    agent::domain::{
+        run_service::CreateThreadRunDto, CreateMessageDto, CreateThreadDto, UpdateThreadDto,
+    },
+    PageRequest,
+};
+use axum::{extract, response::IntoResponse, Json};
+use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 use crate::app_state::ServerState;
 
-#[derive(Default, Serialize, Deserialize)]
-pub struct CreateThreadDto {
-    pub messages: Vec<NewMessageModel>,
-    pub metadata: Option<serde_json::Value>,
-}
-
 pub async fn create_thread(
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
     extract::Json(payload): extract::Json<CreateThreadDto>,
 ) -> impl IntoResponse {
-    todo!()
-}
+    let service = state.core_container.agent_module.get_thread_repository();
 
-#[derive(Default, Serialize, Deserialize)]
-pub struct ListThreadsDto {
-    pub after: Option<i32>,
-    pub before: Option<i32>,
-    pub limit: Option<u64>,
+    match service.create(payload).await {
+        Ok(thread) => return Json(thread).into_response(),
+        Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+    }
 }
 
 pub async fn list_threads(
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
-    extract::Json(payload): extract::Json<ListThreadsDto>,
+    extract::Json(payload): extract::Json<PageRequest>,
 ) -> impl IntoResponse {
-    todo!()
+    let service = state.core_container.agent_module.get_thread_repository();
+
+    match service.list_by_page(payload).await {
+        Ok(thread) => return Json(thread).into_response(),
+        Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+    }
 }
 
 pub async fn find_thread(
     axum::extract::Path(thread_id): axum::extract::Path<i32>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
 ) -> impl IntoResponse {
-    todo!()
+    let service = state.core_container.agent_module.get_thread_repository();
+
+    match service.find(thread_id).await {
+        Ok(thread) => return Json(thread).into_response(),
+        Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+    }
 }
 
 #[derive(Default, Serialize, Deserialize)]
-pub struct UpdateThreadDto {
-    pub metadata: Option<serde_json::Value>,
+pub struct UpdateThreaRequestDto {
+    pub metadata: Option<String>,
 }
 
 pub async fn update_thread(
     axum::extract::Path(thread_id): axum::extract::Path<i32>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
-    extract::Json(payload): extract::Json<UpdateThreadDto>,
+    extract::Json(payload): extract::Json<UpdateThreaRequestDto>,
 ) -> impl IntoResponse {
-    todo!()
+    let service = state.core_container.agent_module.get_thread_repository();
+
+    match service
+        .update(UpdateThreadDto {
+            id: thread_id,
+            metadata: payload.metadata,
+        })
+        .await
+    {
+        Ok(thread) => return Json(thread).into_response(),
+        Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+    }
 }
 
 pub async fn delete_thread(
     axum::extract::Path(thread_id): axum::extract::Path<i32>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
 ) -> impl IntoResponse {
-    todo!()
+    let service = state.core_container.agent_module.get_thread_repository();
+
+    match service.delete(thread_id).await {
+        Ok(_) => return ().into_response(),
+        Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+    }
 }
 
 pub async fn list_thread_messages(
     axum::extract::Path(thread_id): axum::extract::Path<i32>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
 ) -> impl IntoResponse {
-    todo!()
+    let service = state.core_container.agent_module.get_message_repository();
+
+    match service.find_by_thread_id(thread_id).await {
+        Ok(messages) => return Json(messages).into_response(),
+        Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+    }
 }
 
 pub async fn find_thread_message(
-    axum::extract::Path((thread_id, message_id)): axum::extract::Path<(i32, i32)>,
+    axum::extract::Path((_thread_id, message_id)): axum::extract::Path<(i32, i32)>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
 ) -> impl IntoResponse {
-    todo!()
+    let service = state.core_container.agent_module.get_message_repository();
+
+    match service.find(message_id).await {
+        Ok(message) => return Json(message).into_response(),
+        Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+    }
 }
 
 pub async fn delete_thread_message(
-    axum::extract::Path((thread_id, message_id)): axum::extract::Path<(i32, i32)>,
+    axum::extract::Path((_thread_id, message_id)): axum::extract::Path<(i32, i32)>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
 ) -> impl IntoResponse {
-    todo!()
+    let service = state.core_container.agent_module.get_message_repository();
+
+    match service.delete(message_id).await {
+        Ok(_) => return ().into_response(),
+        Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+    }
 }
 
 #[derive(Default, Serialize, Deserialize)]
@@ -89,19 +128,26 @@ pub struct CreateThreadMessageDto {
 }
 
 pub async fn create_thread_message(
-    axum::extract::Path((thread_id, message_id)): axum::extract::Path<(i32, i32)>,
+    axum::extract::Path(thread_id): axum::extract::Path<i32>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
     extract::Json(payload): extract::Json<CreateThreadMessageDto>,
 ) -> impl IntoResponse {
-    todo!()
-}
+    let service = state.core_container.agent_module.get_message_repository();
 
-#[derive(Default, Serialize, Deserialize)]
-pub struct CreateThreadRunDto {
-    pub assistant_id: String,
-    pub model: String,
-    pub temperature: Option<i32>,
-    pub stream: Option<bool>,
+    match service
+        .create(CreateMessageDto {
+            content: payload.content,
+            role: payload.role,
+            thread_id: Some(thread_id),
+            run_id: None,
+            attachments: payload.attachments.as_ref().map(|v| v.to_string()),
+            metadata: payload.metadata.as_ref().map(|v| v.to_string()),
+        })
+        .await
+    {
+        Ok(message) => return Json(message).into_response(),
+        Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+    }
 }
 
 pub async fn create_thread_run(
@@ -109,19 +155,35 @@ pub async fn create_thread_run(
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
     extract::Json(payload): extract::Json<CreateThreadRunDto>,
 ) -> impl IntoResponse {
-    todo!()
+    let service = state.core_container.agent_module.get_run_service();
+
+    match service.create(thread_id, payload).await {
+        Ok(run) => return Json(run).into_response(),
+        Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+    }
 }
 
 pub async fn find_thread_run(
-    axum::extract::Path((thread_id, run_id)): axum::extract::Path<(i32, i32)>,
+    axum::extract::Path((_thread_id, run_id)): axum::extract::Path<(i32, i32)>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
 ) -> impl IntoResponse {
-    todo!()
+    let service = state.core_container.agent_module.get_run_repository();
+
+    match service.find(run_id).await {
+        Ok(run) => return Json(run).into_response(),
+        Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+    }
 }
 
-pub async fn list_thread_run(
-    axum::extract::Path(i32): axum::extract::Path<i32>,
+pub async fn list_thread_runs(
+    axum::extract::Path(thread_id): axum::extract::Path<i32>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
+    extract::Json(page): extract::Json<PageRequest>,
 ) -> impl IntoResponse {
-    todo!()
+    let service = state.core_container.agent_module.get_run_repository();
+
+    match service.list_by_thread_paginated(thread_id, page).await {
+        Ok(run) => return Json(run).into_response(),
+        Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+    }
 }

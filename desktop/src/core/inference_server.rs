@@ -1,7 +1,6 @@
-use std::{error::Error, sync::Arc};
+use std::error::Error;
 
-use async_stream::try_stream;
-use inference_server::{self, serve, ServeParameters, StreamData};
+use inference_server::{self, serve, ServeParameters};
 
 #[derive(Clone)]
 pub struct InferenceServer {

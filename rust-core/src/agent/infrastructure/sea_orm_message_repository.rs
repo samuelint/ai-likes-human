@@ -1,18 +1,15 @@
-use sea_orm::{ActiveValue, DatabaseConnection, EntityTrait};
+use sea_orm::{
+    ActiveValue, ColumnTrait, ConnectionTrait, DatabaseConnection, DeleteResult, EntityTrait,
+    InsertResult, QueryFilter,
+};
 use std::error::Error;
 use std::sync::Arc;
 
-use crate::agent::domain::message_repository::{MessageRepository, NewMessageModel};
+use crate::agent::domain::message_repository::{CreateMessageDto, MessageRepository};
 use crate::entities::message;
 
 pub struct SeaOrmMessageRepository {
     connection: Arc<DatabaseConnection>,
-}
-
-impl SeaOrmMessageRepository {
-    pub fn new(connection: Arc<DatabaseConnection>) -> Self {
-        Self { connection }
-    }
 }
 
 #[async_trait::async_trait]
@@ -24,23 +21,32 @@ impl MessageRepository for SeaOrmMessageRepository {
         Ok(r)
     }
 
-    async fn create(&self, item: NewMessageModel) -> Result<message::Model, Box<dyn Error>> {
+    async fn find_by_thread_id(&self, id: i32) -> Result<Vec<message::Model>, Box<dyn Error>> {
         let conn = Arc::clone(&self.connection);
-        let model = message::ActiveModel {
-            content: ActiveValue::Set(item.content.to_owned()),
-            role: ActiveValue::Set(item.role.to_owned()),
-            thread_id: ActiveValue::Set(item.thread_id),
-            run_id: ActiveValue::Set(item.run_id),
-            attachments: ActiveValue::Set(item.attachments.to_owned()),
-            metadata: ActiveValue::Set(item.metadata.to_owned()),
-            ..Default::default()
-        };
+        let models: Vec<message::Model> = message::Entity::find()
+            .filter(message::Column::ThreadId.eq(id))
+            .all(conn.as_ref())
+            .await?;
+
+        Ok(models)
+    }
+
+    async fn create(&self, item: CreateMessageDto) -> Result<message::Model, Box<dyn Error>> {
+        let conn = Arc::clone(&self.connection);
+        let model = self.to_active_model(&item);
 
         let r = message::Entity::insert(model)
             .exec_with_returning(conn.as_ref())
             .await?;
 
         Ok(r)
+    }
+
+    async fn create_many(&self, messages: Vec<CreateMessageDto>) -> Result<(), Box<dyn Error>> {
+        let conn = Arc::clone(&self.connection);
+        self.tx_create_many(conn.as_ref(), messages).await?;
+
+        Ok(())
     }
 
     async fn delete(&self, id: i32) -> Result<(), Box<dyn Error>> {
@@ -50,5 +56,59 @@ impl MessageRepository for SeaOrmMessageRepository {
             .await?;
 
         Ok(())
+    }
+}
+
+impl SeaOrmMessageRepository {
+    pub fn new(connection: Arc<DatabaseConnection>) -> Self {
+        Self { connection }
+    }
+
+    pub async fn tx_create_many<'a, C>(
+        &self,
+        conn: &'a C,
+        messages: Vec<CreateMessageDto>,
+    ) -> Result<InsertResult<message::ActiveModel>, Box<dyn Error>>
+    where
+        C: ConnectionTrait,
+    {
+        let models: Vec<message::ActiveModel> = messages
+            .iter()
+            .map(move |m| self.to_active_model(m))
+            .collect();
+
+        let insert_result = message::Entity::insert_many(models).exec(conn).await?;
+
+        Ok(insert_result)
+    }
+
+    pub async fn tx_delete_by_thread_id<'a, C>(
+        &self,
+        conn: &'a C,
+        id: i32,
+    ) -> Result<DeleteResult, Box<dyn Error>>
+    where
+        C: ConnectionTrait,
+    {
+        let result = message::Entity::delete_many()
+            .filter(message::Column::ThreadId.eq(id))
+            .exec(conn)
+            .await?;
+
+        Ok(result)
+    }
+}
+
+impl SeaOrmMessageRepository {
+    fn to_active_model(&self, item: &CreateMessageDto) -> message::ActiveModel {
+        message::ActiveModel {
+            content: ActiveValue::Set(item.content.to_owned()),
+            role: ActiveValue::Set(item.role.to_owned()),
+            thread_id: ActiveValue::Set(item.thread_id),
+            run_id: ActiveValue::Set(item.run_id),
+            attachments: ActiveValue::Set(item.attachments.to_owned()),
+            metadata: ActiveValue::Set(item.metadata.to_owned()),
+            ..Default::default()
+        }
     }
 }

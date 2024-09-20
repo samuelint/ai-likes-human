@@ -5,6 +5,7 @@ mod app_container;
 mod configuration;
 mod infrastructure;
 mod llm;
+mod utils;
 
 pub mod entities;
 
@@ -14,3 +15,4 @@ pub use app_configuration::AppConfiguration;
 pub use app_container::AppContainer;
 pub use configuration::app::*;
 pub use entities::configuration::*;
+pub use utils::PageRequest;

@@ -39,7 +39,13 @@ pub async fn find_thread(
     let service = state.core_container.agent_module.get_thread_repository();
 
     match service.find(thread_id).await {
-        Ok(thread) => return Json(thread).into_response(),
+        Ok(thread) => {
+            if thread.is_none() {
+                return (StatusCode::NOT_FOUND, "").into_response();
+            }
+
+            return Json(thread).into_response();
+        }
         Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
     }
 }

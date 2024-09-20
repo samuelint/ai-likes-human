@@ -67,7 +67,7 @@ impl RouterClient {
         &self,
         path: &str,
         body: &TRequestBody,
-    ) -> Result<(serde_json::Value, StatusCode), Infallible>
+    ) -> Result<(Option<serde_json::Value>, StatusCode), Infallible>
     where
         TRequestBody: ?Sized + Serialize,
     {
@@ -79,15 +79,19 @@ impl RouterClient {
         &self,
         path: &str,
         body: &TRequestBody,
-    ) -> Result<(TResponseBody, StatusCode), Infallible>
+    ) -> Result<(Option<TResponseBody>, StatusCode), Infallible>
     where
         TRequestBody: ?Sized + Serialize,
         for<'de> TResponseBody: Deserialize<'de>,
     {
         let (bytes, status) = self.post_as_bytes(path, body).await.unwrap();
+        if bytes.is_empty() {
+            return Ok((None, status));
+        }
+
         let body: TResponseBody = serde_json::from_slice(&bytes).unwrap();
 
-        Ok((body, status))
+        Ok((Some(body), status))
     }
 
     #[allow(dead_code)]
@@ -115,21 +119,46 @@ impl RouterClient {
     pub async fn get<TResponseBody>(
         &self,
         path: &str,
-    ) -> Result<(TResponseBody, StatusCode), Infallible>
+    ) -> Result<(Option<TResponseBody>, StatusCode), Infallible>
     where
         for<'de> TResponseBody: Deserialize<'de>,
     {
         let (bytes, status) = self.get_as_bytes(path).await.unwrap();
+
+        if bytes.is_empty() {
+            return Ok((None, status));
+        }
+
         let body: TResponseBody = serde_json::from_slice(&bytes).unwrap();
 
-        Ok((body, status))
+        Ok((Some(body), status))
     }
 
     #[allow(dead_code)]
     pub async fn get_as_value(
         &self,
         path: &str,
-    ) -> Result<(serde_json::Value, StatusCode), Infallible> {
+    ) -> Result<(Option<serde_json::Value>, StatusCode), Infallible> {
         self.get(path).await
+    }
+
+    #[allow(dead_code)]
+    pub async fn delete(&self, path: &str) -> Result<StatusCode, Infallible> {
+        let router = self.router.clone();
+
+        let response = router
+            .oneshot(
+                Request::builder()
+                    .method("DELETE")
+                    .header("Content-Type", "application/json")
+                    .uri(format!("{}{}", self.base_url, path))
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await?;
+
+        let status: StatusCode = response.status();
+
+        Ok(status)
     }
 }

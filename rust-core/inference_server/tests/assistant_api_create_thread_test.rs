@@ -33,7 +33,7 @@ async fn test_created_thread_have_id() {
         .await
         .unwrap();
 
-    assert!(response.id > 0, "should have an id");
+    assert!(response.unwrap().id > 0, "should have an id");
 }
 
 #[tokio::test]
@@ -48,7 +48,10 @@ async fn test_created_thread_have_created_at_date() {
         .await
         .unwrap();
 
-    assert!(response.created_at.len() > 0, "should have a created date");
+    assert!(
+        response.unwrap().created_at.len() > 0,
+        "should have a created date"
+    );
 }
 
 #[tokio::test]
@@ -63,7 +66,7 @@ async fn test_created_thread_have_empty_metadata() {
         .post::<CreateThreadDto, ThreadDto>("/threads", &body)
         .await
         .unwrap();
-    assert_eq!(response.metadata, "{}", "metadata should be empty");
+    assert_eq!(response.unwrap().metadata, "{}", "metadata should be empty");
 }
 
 #[tokio::test]
@@ -84,7 +87,7 @@ async fn test_created_thread_with_message_is_successful() {
         .await
         .unwrap();
     let (_, status) = client
-        .get_as_value(format!("/threads/{}/messages", response.id).as_str())
+        .get_as_value(format!("/threads/{}/messages", response.unwrap().id).as_str())
         .await
         .unwrap();
 
@@ -109,11 +112,13 @@ async fn test_created_thread_with_message_have_id() {
         .await
         .unwrap();
     let (response, _) = client
-        .get::<Vec<ThreadMessageDto>>(format!("/threads/{}/messages", response.id).as_str())
+        .get::<Vec<ThreadMessageDto>>(
+            format!("/threads/{}/messages", response.unwrap().id).as_str(),
+        )
         .await
         .unwrap();
 
-    assert!(response[0].id > 0, "Message should have an id");
+    assert!(response.unwrap()[0].id > 0, "Message should have an id");
 }
 
 #[tokio::test]
@@ -134,11 +139,13 @@ async fn test_created_thread_with_message_have_same_content() {
         .await
         .unwrap();
     let (response, _status) = client
-        .get::<Vec<ThreadMessageDto>>(format!("/threads/{}/messages", response.id).as_str())
+        .get::<Vec<ThreadMessageDto>>(
+            format!("/threads/{}/messages", response.unwrap().id).as_str(),
+        )
         .await
         .unwrap();
 
-    let first_element = &response[0];
+    let first_element = &response.unwrap()[0];
     assert_eq!(first_element.content, "Say Hello!".to_string());
     assert_eq!(first_element.role, "user".to_string());
 }

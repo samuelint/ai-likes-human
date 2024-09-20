@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use crate::{entities::run, utils::PageRequest};
 
 #[derive(Default, Serialize, Deserialize)]
-pub struct CreateRunDto {
+pub struct CreateRunParams {
     pub assistant_id: String,
     pub thread_id: i32,
     pub model: String,
@@ -17,7 +17,7 @@ pub struct CreateRunDto {
 
 #[async_trait::async_trait]
 pub trait RunRepository: Sync + Send {
-    async fn create(&self, message: CreateRunDto) -> Result<run::Model, Box<dyn Error>>;
+    async fn create(&self, message: CreateRunParams) -> Result<run::Model, Box<dyn Error>>;
     async fn list_by_thread_paginated(
         &self,
         thread_id: i32,

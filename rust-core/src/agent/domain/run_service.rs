@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::{error::Error, sync::Arc};
 
-use super::{run_repository::RunRepository, CreateRunDto};
+use super::{run_repository::RunRepository, CreateRunParams};
 use crate::entities::run;
 
 pub struct RunService {
@@ -29,7 +29,7 @@ impl RunService {
     ) -> Result<run::Model, Box<dyn Error>> {
         let run = self
             .run_repository
-            .create(CreateRunDto {
+            .create(CreateRunParams {
                 assistant_id: new_run.assistant_id,
                 thread_id,
                 model: new_run.model,

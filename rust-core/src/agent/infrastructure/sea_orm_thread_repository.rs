@@ -1,5 +1,9 @@
-use crate::agent::domain::thread_repository::{CreateThreadDto, ThreadRepository, UpdateThreadDto};
+use crate::agent::domain::thread_repository::{
+    CreateThreadParams, ThreadRepository, UpdateThreadParams,
+};
+use crate::agent::domain::CreateMessageParams;
 use crate::entities::thread;
+use crate::utils::time::current_time_with_timezone;
 use crate::utils::PageRequest;
 use sea_orm::TransactionTrait;
 use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, EntityTrait, QuerySelect};
@@ -26,6 +30,13 @@ impl SeaOrmThreadRepository {
             run_repository,
         }
     }
+
+    fn to_concrete_metadata(&self, metadata: Option<String>) -> String {
+        metadata
+            .as_ref()
+            .map(|s| s.clone())
+            .unwrap_or("{}".to_string())
+    }
 }
 
 #[async_trait::async_trait]
@@ -37,23 +48,40 @@ impl ThreadRepository for SeaOrmThreadRepository {
         Ok(r)
     }
 
-    async fn create(&self, new_thread: CreateThreadDto) -> Result<thread::Model, Box<dyn Error>> {
+    async fn create(
+        &self,
+        new_thread: CreateThreadParams,
+    ) -> Result<thread::Model, Box<dyn Error>> {
         let conn = Arc::clone(&self.connection);
 
         let txn = conn.begin().await?;
 
         let model = thread::ActiveModel {
-            metadata: ActiveValue::Set(new_thread.metadata.to_owned()),
+            metadata: ActiveValue::Set(self.to_concrete_metadata(new_thread.metadata)),
+            created_at: ActiveValue::Set(current_time_with_timezone()),
             ..Default::default()
         };
 
-        let model = thread::Entity::insert(model)
+        let model: thread::Model = thread::Entity::insert(model)
             .exec_with_returning(&txn)
             .await?;
 
         if new_thread.messages.len() > 0 {
+            let messages: Vec<CreateMessageParams> = new_thread
+                .messages
+                .iter()
+                .map(|mesg| CreateMessageParams {
+                    content: mesg.content.clone(),
+                    role: mesg.role.clone(),
+                    thread_id: Some(model.id.clone()),
+                    run_id: None,
+                    attachments: None,
+                    metadata: None,
+                })
+                .collect();
+
             self.message_repository
-                .tx_create_many(&txn, new_thread.messages)
+                .tx_create_many(&txn, messages)
                 .await?;
         }
 
@@ -62,7 +90,7 @@ impl ThreadRepository for SeaOrmThreadRepository {
         Ok(model)
     }
 
-    async fn update(&self, thread: UpdateThreadDto) -> Result<thread::Model, Box<dyn Error>> {
+    async fn update(&self, thread: UpdateThreadParams) -> Result<thread::Model, Box<dyn Error>> {
         let conn = Arc::clone(&self.connection);
 
         let existing = thread::Entity::find_by_id(thread.id)
@@ -74,7 +102,7 @@ impl ThreadRepository for SeaOrmThreadRepository {
         }
 
         let mut model: thread::ActiveModel = existing.unwrap().into();
-        model.metadata = ActiveValue::Set(thread.metadata.to_owned());
+        model.metadata = ActiveValue::Set(self.to_concrete_metadata(thread.metadata));
 
         let updated_model = model.update(conn.as_ref()).await?;
 

@@ -20,6 +20,7 @@ tokio = "1.40.0"
 langchain-rust = { git = "https://github.com/samuelint/langchain-rust", branch = "main" }
 mockall = "0.13.0"
 serde_json = "1.0.128"
+chrono = "0.4.38"
 
 [dev-dependencies]
 mockall = "0.13.0"

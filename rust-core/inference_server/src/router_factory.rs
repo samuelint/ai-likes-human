@@ -38,12 +38,10 @@ pub fn create_router(
         api: Arc::new(ApiFacade::new(Arc::clone(&core_container))),
     });
 
-    let openai_router = create_openai_v1_router(state);
-
     let router = Router::new()
         .route("/", get(health))
         .route("/health", get(health))
-        .nest("/openai/v1", openai_router)
+        .nest("/openai/v1", create_openai_v1_router(state))
         .fallback(fallback);
 
     if parameters.use_trace {

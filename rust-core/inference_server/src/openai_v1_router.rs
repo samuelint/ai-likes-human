@@ -22,7 +22,7 @@ pub fn create_openai_v1_router(state: Arc<ServerState>) -> Router {
 
     Router::new()
         .route("/chat/completions", post(run_chat_completions))
-        .nest("/thread", thread_route)
+        .nest("/threads", thread_route)
         .with_state(Arc::clone(&state))
 }
 

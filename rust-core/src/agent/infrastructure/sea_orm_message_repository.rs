@@ -5,8 +5,9 @@ use sea_orm::{
 use std::error::Error;
 use std::sync::Arc;
 
-use crate::agent::domain::message_repository::{CreateMessageDto, MessageRepository};
+use crate::agent::domain::message_repository::{CreateMessageParams, MessageRepository};
 use crate::entities::message;
+use crate::utils::time::current_time_with_timezone;
 
 pub struct SeaOrmMessageRepository {
     connection: Arc<DatabaseConnection>,
@@ -31,7 +32,7 @@ impl MessageRepository for SeaOrmMessageRepository {
         Ok(models)
     }
 
-    async fn create(&self, item: CreateMessageDto) -> Result<message::Model, Box<dyn Error>> {
+    async fn create(&self, item: CreateMessageParams) -> Result<message::Model, Box<dyn Error>> {
         let conn = Arc::clone(&self.connection);
         let model = self.to_active_model(&item);
 
@@ -42,7 +43,7 @@ impl MessageRepository for SeaOrmMessageRepository {
         Ok(r)
     }
 
-    async fn create_many(&self, messages: Vec<CreateMessageDto>) -> Result<(), Box<dyn Error>> {
+    async fn create_many(&self, messages: Vec<CreateMessageParams>) -> Result<(), Box<dyn Error>> {
         let conn = Arc::clone(&self.connection);
         self.tx_create_many(conn.as_ref(), messages).await?;
 
@@ -67,7 +68,7 @@ impl SeaOrmMessageRepository {
     pub async fn tx_create_many<'a, C>(
         &self,
         conn: &'a C,
-        messages: Vec<CreateMessageDto>,
+        messages: Vec<CreateMessageParams>,
     ) -> Result<InsertResult<message::ActiveModel>, Box<dyn Error>>
     where
         C: ConnectionTrait,
@@ -100,8 +101,9 @@ impl SeaOrmMessageRepository {
 }
 
 impl SeaOrmMessageRepository {
-    fn to_active_model(&self, item: &CreateMessageDto) -> message::ActiveModel {
+    fn to_active_model(&self, item: &CreateMessageParams) -> message::ActiveModel {
         message::ActiveModel {
+            created_at: ActiveValue::Set(current_time_with_timezone()),
             content: ActiveValue::Set(item.content.to_owned()),
             role: ActiveValue::Set(item.role.to_owned()),
             thread_id: ActiveValue::Set(item.thread_id),

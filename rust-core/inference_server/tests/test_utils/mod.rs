@@ -1,5 +1,6 @@
 pub mod client;
 pub mod router;
+pub mod router_client;
 pub mod server;
 pub mod stream_chat_completions;
 

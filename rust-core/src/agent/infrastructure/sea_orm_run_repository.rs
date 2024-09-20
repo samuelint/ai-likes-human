@@ -5,8 +5,9 @@ use sea_orm::{
 use std::error::Error;
 use std::sync::Arc;
 
-use crate::agent::domain::run_repository::{CreateRunDto, RunRepository};
+use crate::agent::domain::run_repository::{CreateRunParams, RunRepository};
 use crate::entities::run;
+use crate::utils::time::current_time_with_timezone;
 use crate::utils::PageRequest;
 
 pub struct SeaOrmRunRepository {
@@ -22,9 +23,10 @@ impl RunRepository for SeaOrmRunRepository {
         Ok(r)
     }
 
-    async fn create(&self, item: CreateRunDto) -> Result<run::Model, Box<dyn Error>> {
+    async fn create(&self, item: CreateRunParams) -> Result<run::Model, Box<dyn Error>> {
         let conn = Arc::clone(&self.connection);
         let model = run::ActiveModel {
+            created_at: ActiveValue::Set(current_time_with_timezone()),
             assistant_id: ActiveValue::Set(item.assistant_id),
             thread_id: ActiveValue::Set(Some(item.thread_id)),
             model: ActiveValue::Set(item.model.to_owned()),

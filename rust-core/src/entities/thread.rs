@@ -10,8 +10,8 @@ pub struct Model {
     pub id: i32,
     #[sea_orm(column_type = "Text")]
     pub created_at: String,
-    #[sea_orm(column_type = "Text", nullable)]
-    pub metadata: Option<String>,
+    #[sea_orm(column_type = "Text")]
+    pub metadata: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

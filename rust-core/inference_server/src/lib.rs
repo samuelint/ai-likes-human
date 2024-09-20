@@ -1,4 +1,4 @@
-mod api;
+pub mod api;
 mod app;
 mod app_state;
 mod openai_v1_router;

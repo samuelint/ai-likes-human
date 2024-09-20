@@ -1,15 +1,12 @@
-use app_core::{
-    agent::domain::{
-        run_service::CreateThreadRunDto, CreateMessageDto, CreateThreadDto, UpdateThreadDto,
-    },
-    PageRequest,
-};
+use app_core::agent::domain::{CreateMessageParams, UpdateThreadParams};
+pub use app_core::PageRequest;
 use axum::{extract, response::IntoResponse, Json};
 use hyper::StatusCode;
-use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 use crate::app_state::ServerState;
+
+use super::{CreateMessageDto, CreateThreadDto, CreateThreadRunDto, UpdateThreadDto};
 
 pub async fn create_thread(
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
@@ -17,7 +14,7 @@ pub async fn create_thread(
 ) -> impl IntoResponse {
     let service = state.core_container.agent_module.get_thread_repository();
 
-    match service.create(payload).await {
+    match service.create(payload.into()).await {
         Ok(thread) => return Json(thread).into_response(),
         Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
     }
@@ -47,20 +44,15 @@ pub async fn find_thread(
     }
 }
 
-#[derive(Default, Serialize, Deserialize)]
-pub struct UpdateThreaRequestDto {
-    pub metadata: Option<String>,
-}
-
 pub async fn update_thread(
     axum::extract::Path(thread_id): axum::extract::Path<i32>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
-    extract::Json(payload): extract::Json<UpdateThreaRequestDto>,
+    extract::Json(payload): extract::Json<UpdateThreadDto>,
 ) -> impl IntoResponse {
     let service = state.core_container.agent_module.get_thread_repository();
 
     match service
-        .update(UpdateThreadDto {
+        .update(UpdateThreadParams {
             id: thread_id,
             metadata: payload.metadata,
         })
@@ -119,29 +111,17 @@ pub async fn delete_thread_message(
     }
 }
 
-#[derive(Default, Serialize, Deserialize)]
-pub struct CreateThreadMessageDto {
-    pub content: String,
-    pub role: String,
-    pub attachments: Option<serde_json::Value>,
-    pub metadata: Option<serde_json::Value>,
-}
-
 pub async fn create_thread_message(
     axum::extract::Path(thread_id): axum::extract::Path<i32>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
-    extract::Json(payload): extract::Json<CreateThreadMessageDto>,
+    extract::Json(payload): extract::Json<CreateMessageDto>,
 ) -> impl IntoResponse {
     let service = state.core_container.agent_module.get_message_repository();
 
     match service
-        .create(CreateMessageDto {
-            content: payload.content,
-            role: payload.role,
+        .create(CreateMessageParams {
             thread_id: Some(thread_id),
-            run_id: None,
-            attachments: payload.attachments.as_ref().map(|v| v.to_string()),
-            metadata: payload.metadata.as_ref().map(|v| v.to_string()),
+            ..payload.into()
         })
         .await
     {

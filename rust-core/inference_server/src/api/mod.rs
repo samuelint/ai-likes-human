@@ -6,3 +6,6 @@ pub mod types;
 #[allow(unused_imports)]
 pub use chat_completions::{run_chat_completions, ChatCompletionParameters};
 pub use types::*;
+
+#[allow(unused_imports)]
+pub use types::*;

@@ -6,5 +6,6 @@ pub mod thread;
 
 pub use message::*;
 pub use route::{InvokeFn, StreamData, StreamFn};
-pub use run::CreateThreadRunDto;
+pub use run::CreateRunDto;
+pub use run::*;
 pub use thread::*;

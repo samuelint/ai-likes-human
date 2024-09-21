@@ -63,10 +63,10 @@ impl AgentDIModule {
     }
 
     pub fn get_run_service(&self) -> Arc<RunService> {
-        // let llm_factory: Arc<dyn LLMFactory> = self.llm_module.get_llm_factory();
         let run_repository = self.get_run_repository();
+        let thread_repository = self.get_thread_repository();
 
-        Arc::new(RunService::new(run_repository))
+        Arc::new(RunService::new(run_repository, thread_repository))
     }
 
     pub fn get_agent_factory(&self) -> Arc<dyn AgentFactory> {

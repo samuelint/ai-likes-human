@@ -1,6 +1,7 @@
 mod test_utils;
+use app_core::agent::domain::run_service::CreateThreadAndRunDto;
 use axum::http::StatusCode;
-use inference_server::{CreateMessageDto, CreateThreadDto, ThreadDto, ThreadMessageDto};
+use inference_server::{CreateMessageDto, CreateThreadDto, RunDto, ThreadDto, ThreadMessageDto};
 use test_utils::router_client::RouterClient;
 
 #[tokio::test]
@@ -86,6 +87,42 @@ async fn test_deleted_thread_also_deletes_associated_messages() {
             )
             .as_str(),
         )
+        .await
+        .unwrap();
+
+    assert_eq!(
+        status,
+        StatusCode::NOT_FOUND,
+        "message associated with thread should be deleted with thread"
+    );
+}
+
+#[tokio::test]
+async fn test_deleted_thread_also_deletes_associated_runs() {
+    let client = RouterClient::from_app("/openai/v1").await;
+    let create_thread_run_dto = CreateThreadAndRunDto {
+        model: "openai:gpt-4o-mini".to_string(),
+        ..CreateThreadAndRunDto::default()
+    };
+
+    let run = client
+        .post::<CreateThreadAndRunDto, RunDto>("/threads/runs", &create_thread_run_dto)
+        .await
+        .unwrap()
+        .0
+        .unwrap();
+
+    let thread_id = run.thread_id.unwrap();
+
+    // Delete thread
+    client
+        .delete(format!("/threads/{}", thread_id).as_str())
+        .await
+        .unwrap();
+
+    // Assert run associated with thread is deleted
+    let (_, status) = client
+        .get::<RunDto>(format!("/threads/{}/runs/{}", thread_id, run.id).as_str())
         .await
         .unwrap();
 

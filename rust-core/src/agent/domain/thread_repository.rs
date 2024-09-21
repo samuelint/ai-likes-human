@@ -4,13 +4,13 @@ use serde::{Deserialize, Serialize};
 
 use crate::{entities::thread, utils::PageRequest};
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Default, Serialize, Deserialize, Clone)]
 pub struct CreateThreadMessageParams {
     pub content: String,
     pub role: String,
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Default, Serialize, Deserialize, Clone)]
 pub struct CreateThreadParams {
     pub metadata: Option<String>,
     pub messages: Vec<CreateThreadMessageParams>,

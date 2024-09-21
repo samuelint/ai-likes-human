@@ -1,4 +1,6 @@
-use app_core::agent::domain::{CreateMessageParams, UpdateThreadParams};
+use app_core::agent::domain::{
+    run_service::CreateThreadAndRunDto, CreateMessageParams, UpdateThreadParams,
+};
 pub use app_core::PageRequest;
 use axum::{extract, response::IntoResponse, Json};
 use hyper::StatusCode;
@@ -6,7 +8,7 @@ use std::sync::Arc;
 
 use crate::app_state::ServerState;
 
-use super::{CreateMessageDto, CreateThreadDto, CreateThreadRunDto, UpdateThreadDto};
+use super::{CreateMessageDto, CreateRunDto, CreateThreadDto, UpdateThreadDto};
 
 pub async fn create_thread(
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
@@ -15,6 +17,18 @@ pub async fn create_thread(
     let service = state.core_container.agent_module.get_thread_repository();
 
     match service.create(payload.into()).await {
+        Ok(thread) => return Json(thread).into_response(),
+        Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+    }
+}
+
+pub async fn create_thread_and_run(
+    axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
+    extract::Json(payload): extract::Json<CreateThreadAndRunDto>,
+) -> impl IntoResponse {
+    let service = state.core_container.agent_module.get_run_service();
+
+    match service.create_thread_and_run(payload).await {
         Ok(thread) => return Json(thread).into_response(),
         Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
     }
@@ -145,7 +159,7 @@ pub async fn create_thread_message(
 pub async fn create_thread_run(
     axum::extract::Path(thread_id): axum::extract::Path<i32>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
-    extract::Json(payload): extract::Json<CreateThreadRunDto>,
+    extract::Json(payload): extract::Json<CreateRunDto>,
 ) -> impl IntoResponse {
     let service = state.core_container.agent_module.get_run_service();
 
@@ -162,7 +176,13 @@ pub async fn find_thread_run(
     let service = state.core_container.agent_module.get_run_repository();
 
     match service.find(run_id).await {
-        Ok(run) => return Json(run).into_response(),
+        Ok(run) => {
+            if run.is_none() {
+                return (StatusCode::NOT_FOUND, "").into_response();
+            }
+
+            return Json(run).into_response();
+        }
         Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
     }
 }

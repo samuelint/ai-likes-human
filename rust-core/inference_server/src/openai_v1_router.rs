@@ -8,9 +8,9 @@ use axum::{
 use crate::{
     api::{
         assistant_thread::{
-            create_thread, create_thread_message, create_thread_run, delete_thread,
-            delete_thread_message, find_thread, find_thread_message, find_thread_run,
-            list_thread_messages, list_thread_runs, list_threads, update_thread,
+            create_thread, create_thread_and_run, create_thread_message, create_thread_run,
+            delete_thread, delete_thread_message, find_thread, find_thread_message,
+            find_thread_run, list_thread_messages, list_thread_runs, list_threads, update_thread,
         },
         chat_completions::run_chat_completions,
     },
@@ -29,6 +29,7 @@ pub fn create_openai_v1_router(state: Arc<ServerState>) -> Router {
 fn create_thread_router(state: Arc<ServerState>) -> Router<Arc<ServerState>> {
     Router::new()
         .route("/", post(create_thread))
+        .route("/runs", post(create_thread_and_run))
         .route("/", get(list_threads))
         .route("/:thread_id", get(find_thread))
         .route("/:thread_id", post(update_thread))

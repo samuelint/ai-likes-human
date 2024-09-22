@@ -1,51 +1,10 @@
-use serde::{Deserialize, Serialize};
 use std::{error::Error, sync::Arc};
 
 use super::{
-    run_repository::RunRepository, thread_repository::ThreadRepository, CreateRunParams,
-    CreateThreadParams,
+    dto::{CreateRunDto, CreateThreadAndRunDto}, run_repository::RunRepository, thread_repository::ThreadRepository, CreateRunParams
 };
 use crate::entities::run;
 
-#[derive(Default, Serialize, Deserialize, Clone)]
-pub struct CreateRunDto {
-    pub assistant_id: Option<String>,
-    pub model: String,
-    pub instructions: Option<String>,
-    pub temperature: Option<i32>,
-    pub metadata: Option<String>,
-    pub stream: Option<bool>,
-}
-
-#[derive(Default, Serialize, Deserialize, Clone)]
-pub struct CreateThreadAndRunDto {
-    pub assistant_id: Option<String>,
-    pub thread: CreateThreadParams,
-    pub model: String,
-    pub instructions: Option<String>,
-    pub metadata: Option<String>,
-    pub temperature: Option<i32>,
-    pub stream: Option<bool>,
-}
-
-impl From<CreateThreadAndRunDto> for CreateThreadParams {
-    fn from(dto: CreateThreadAndRunDto) -> Self {
-        dto.thread
-    }
-}
-
-impl From<CreateThreadAndRunDto> for CreateRunDto {
-    fn from(dto: CreateThreadAndRunDto) -> Self {
-        CreateRunDto {
-            assistant_id: dto.assistant_id,
-            model: dto.model,
-            instructions: dto.instructions,
-            temperature: dto.temperature,
-            metadata: dto.metadata,
-            stream: dto.stream,
-        }
-    }
-}
 
 pub struct RunService {
     run_repository: Arc<dyn RunRepository>,

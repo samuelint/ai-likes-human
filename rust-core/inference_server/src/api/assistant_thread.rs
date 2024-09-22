@@ -1,14 +1,19 @@
 use app_core::agent::domain::{
-    run_service::CreateThreadAndRunDto, CreateMessageParams, UpdateThreadParams,
+    dto::{
+        CreateMessageDto, CreateRunDto, CreateThreadAndRunDto, CreateThreadDto, UpdateThreadDto,
+    },
+    CreateMessageParams, UpdateThreadParams,
 };
 pub use app_core::PageRequest;
-use axum::{extract, response::IntoResponse, Json};
+use axum::{
+    extract::{self, Query},
+    response::IntoResponse,
+    Json,
+};
 use hyper::StatusCode;
 use std::sync::Arc;
 
 use crate::app_state::ServerState;
-
-use super::{CreateMessageDto, CreateRunDto, CreateThreadDto, UpdateThreadDto};
 
 pub async fn create_thread(
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
@@ -36,11 +41,11 @@ pub async fn create_thread_and_run(
 
 pub async fn list_threads(
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
-    extract::Json(payload): extract::Json<PageRequest>,
+    Query(page_request): Query<PageRequest>,
 ) -> impl IntoResponse {
     let service = state.core_container.agent_module.get_thread_repository();
 
-    match service.list_by_page(payload).await {
+    match service.list_by_page(page_request).await {
         Ok(thread) => return Json(thread).into_response(),
         Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
     }
@@ -190,11 +195,14 @@ pub async fn find_thread_run(
 pub async fn list_thread_runs(
     axum::extract::Path(thread_id): axum::extract::Path<i32>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
-    extract::Json(page): extract::Json<PageRequest>,
+    Query(page_request): Query<PageRequest>,
 ) -> impl IntoResponse {
     let service = state.core_container.agent_module.get_run_repository();
 
-    match service.list_by_thread_paginated(thread_id, page).await {
+    match service
+        .list_by_thread_paginated(thread_id, page_request)
+        .await
+    {
         Ok(run) => return Json(run).into_response(),
         Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
     }

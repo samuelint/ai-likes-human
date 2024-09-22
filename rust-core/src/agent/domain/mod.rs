@@ -1,4 +1,5 @@
 pub mod agent_factory;
+pub mod dto;
 pub mod message_repository;
 pub mod run_repository;
 pub mod run_service;

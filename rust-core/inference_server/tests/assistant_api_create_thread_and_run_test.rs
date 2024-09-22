@@ -1,6 +1,5 @@
 mod test_utils;
-use app_core::agent::domain::run_service::CreateThreadAndRunDto;
-use inference_server::RunDto;
+use app_core::agent::domain::dto::{CreateThreadAndRunDto, CreateThreadDto, RunDto};
 use test_utils::router_client::RouterClient;
 
 #[tokio::test]

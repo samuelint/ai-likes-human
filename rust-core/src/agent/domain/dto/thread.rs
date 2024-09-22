@@ -1,9 +1,10 @@
-use app_core::agent::domain::CreateThreadParams;
 use serde::{Deserialize, Serialize};
+
+use crate::agent::domain::CreateThreadParams;
 
 use super::message::CreateMessageDto;
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Default, Serialize, Deserialize, Clone)]
 pub struct CreateThreadDto {
     pub metadata: Option<String>,
     pub messages: Vec<CreateMessageDto>,

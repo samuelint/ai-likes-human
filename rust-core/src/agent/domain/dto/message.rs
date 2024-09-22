@@ -1,7 +1,8 @@
-use app_core::agent::domain::{thread_repository::CreateThreadMessageParams, CreateMessageParams};
 use serde::{Deserialize, Serialize};
 
-#[derive(Default, Serialize, Deserialize)]
+use crate::agent::domain::{thread_repository::CreateThreadMessageParams, CreateMessageParams};
+
+#[derive(Default, Serialize, Deserialize, Clone)]
 pub struct CreateMessageDto {
     pub content: String,
     pub role: String,

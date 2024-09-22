@@ -1,7 +1,8 @@
 mod test_utils;
-use app_core::agent::domain::run_service::CreateThreadAndRunDto;
+use app_core::agent::domain::dto::{
+    CreateMessageDto, CreateThreadAndRunDto, CreateThreadDto, RunDto, ThreadDto, ThreadMessageDto,
+};
 use axum::http::StatusCode;
-use inference_server::{CreateMessageDto, CreateThreadDto, RunDto, ThreadDto, ThreadMessageDto};
 use test_utils::router_client::RouterClient;
 
 #[tokio::test]

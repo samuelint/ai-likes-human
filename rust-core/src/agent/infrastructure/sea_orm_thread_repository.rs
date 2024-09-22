@@ -112,7 +112,13 @@ impl ThreadRepository for SeaOrmThreadRepository {
     async fn list_by_page(&self, args: PageRequest) -> Result<Vec<thread::Model>, Box<dyn Error>> {
         let conn = Arc::clone(&self.connection);
         let mut cursor = thread::Entity::find().cursor_by(thread::Column::Id);
-        cursor.after(args.after).before(args.before);
+
+        if args.after.is_some() {
+            cursor.after(args.after);
+        }
+        if args.before.is_some() {
+            cursor.after(args.after);
+        }
 
         let mut cursor = if let Some(limit) = args.limit {
             cursor.limit(limit)

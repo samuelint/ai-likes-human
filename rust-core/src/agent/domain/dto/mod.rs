@@ -1,3 +1,4 @@
+pub mod chat_completion;
 pub mod message;
 pub mod run;
 pub mod run_step;

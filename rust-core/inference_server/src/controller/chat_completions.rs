@@ -1,3 +1,6 @@
+use app_core::agent::domain::dto::chat_completion::{
+    ChatCompletionChunkObject, ChatCompletionMessageDto, ChatCompletionObject,
+};
 use async_stream::try_stream;
 use axum::{
     extract::{self},
@@ -12,19 +15,13 @@ use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
 use std::{convert::Infallible, error::Error, sync::Arc};
 
-use crate::{
-    app_state::ServerState,
-    openai::{
-        to_langchain_messages, OpenAIChatCompletionChunkObject, OpenAIChatCompletionObject,
-        OpenAIMessage,
-    },
-};
+use crate::app_state::ServerState;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct ChatCompletionParameters {
     pub model: String,
     pub stream: Option<bool>,
-    pub messages: Vec<OpenAIMessage>,
+    pub messages: Vec<ChatCompletionMessageDto>,
     pub max_tokens: Option<i32>,
     pub temperature: Option<f32>,
 }
@@ -48,8 +45,9 @@ pub async fn run_chat_completions(
 async fn run_json_chat_completions(
     state: Arc<ServerState>,
     payload: ChatCompletionParameters,
-) -> Result<Json<OpenAIChatCompletionObject>, Box<dyn Error>> {
-    let messages: Vec<langchain_rust::schemas::Message> = to_langchain_messages(payload.messages);
+) -> Result<Json<ChatCompletionObject>, Box<dyn Error>> {
+    let messages: Vec<langchain_rust::schemas::Message> =
+        payload.messages.iter().map(|m| m.clone().into()).collect();
     let llm = state
         .api
         .get_llm_client(&payload.model)
@@ -57,8 +55,8 @@ async fn run_json_chat_completions(
 
     let result = llm.generate(&messages[..]).await?;
 
-    let message = OpenAIMessage::new_assistant(result.generation);
-    let data = OpenAIChatCompletionObject::new_single_choice(message, payload.model);
+    let message = ChatCompletionMessageDto::new_assistant(result.generation);
+    let data = ChatCompletionObject::new_single_choice(message, payload.model);
 
     Ok(Json(data))
 }
@@ -68,7 +66,8 @@ fn run_stream_chat_completions(
     payload: ChatCompletionParameters,
 ) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
     let model = payload.model.clone();
-    let messages: Vec<langchain_rust::schemas::Message> = to_langchain_messages(payload.messages);
+    let messages: Vec<langchain_rust::schemas::Message> =
+        payload.messages.iter().map(|m| m.clone().into()).collect();
 
     Sse::new(try_stream! {
         let llm = match state.api.get_llm_client(&model) {
@@ -88,7 +87,7 @@ fn run_stream_chat_completions(
 
         while let Some(chunk) = stream.next().await {
             let chunk = chunk.unwrap();
-            let chunk = OpenAIChatCompletionChunkObject::new_assistant_chunk(chunk.content, &model);
+            let chunk = ChatCompletionChunkObject::new_assistant_chunk(chunk.content, &model);
             let json_chunk = serde_json::to_string(&chunk).unwrap();
 
             yield Event::default().data(json_chunk)

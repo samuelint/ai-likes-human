@@ -1,3 +1,5 @@
+use std::error::Error;
+
 use super::{stream_error::StreamErrorDto, RunDto, ThreadDto};
 use serde::{Deserialize, Serialize};
 
@@ -54,5 +56,13 @@ impl ThreadEventDto<StreamErrorDto> {
             data,
             event: "error".to_string(),
         }
+    }
+
+    pub fn std_error(error: Box<dyn Error>) -> Self {
+        Self::error(StreamErrorDto {
+            message: error.to_string(),
+            r#type: "error".to_string(),
+            ..StreamErrorDto::default()
+        })
     }
 }

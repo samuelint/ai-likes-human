@@ -12,23 +12,19 @@ pub struct CreateAgentParameters {
     pub model: String,
 }
 
-#[async_trait::async_trait]
-pub trait AgentFactory: Send + Sync {
-    fn create(&self, parameters: CreateAgentParameters) -> Result<Box<dyn Chain>, Box<dyn Error>>;
-}
-
-pub struct AgentFactoryImpl {
+pub struct AgentFactory {
     llm_factory: Arc<dyn LLMFactory>,
 }
 
-impl AgentFactoryImpl {
+impl AgentFactory {
     pub fn new(llm_factory: Arc<dyn LLMFactory>) -> Self {
         Self { llm_factory }
     }
-}
 
-impl AgentFactory for AgentFactoryImpl {
-    fn create(&self, parameters: CreateAgentParameters) -> Result<Box<dyn Chain>, Box<dyn Error>> {
+    pub fn create(
+        &self,
+        parameters: CreateAgentParameters,
+    ) -> Result<Box<dyn Chain>, Box<dyn Error + Send>> {
         let llm: Box<dyn LLM> = self.llm_factory.create(CreateLLMParameters {
             model: parameters.model,
         })?;

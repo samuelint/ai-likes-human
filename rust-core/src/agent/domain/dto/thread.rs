@@ -36,6 +36,16 @@ impl From<thread::Model> for ThreadDto {
     }
 }
 
+impl From<ThreadDto> for thread::Model {
+    fn from(dto: ThreadDto) -> Self {
+        thread::Model {
+            id: dto.id.parse().expect("thread id should be a number"),
+            created_at: dto.created_at,
+            metadata: dto.metadata,
+        }
+    }
+}
+
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
 pub struct UpdateThreadDto {
     pub metadata: Option<String>,

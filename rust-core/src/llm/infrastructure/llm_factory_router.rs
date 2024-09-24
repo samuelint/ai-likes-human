@@ -1,7 +1,7 @@
 #[cfg(test)]
 #[path = "./llm_factory_router_test.rs"]
 mod llm_factory_router_test;
-
+use anyhow::anyhow;
 use langchain_rust::language_models::llm::LLM;
 use std::{error::Error, sync::Arc};
 
@@ -38,13 +38,16 @@ impl LLMFactory for LLMFactoryRouter {
         false
     }
 
-    fn create(&self, parameters: CreateLLMParameters) -> Result<Box<dyn LLM>, Box<dyn Error>> {
+    fn create(
+        &self,
+        parameters: CreateLLMParameters,
+    ) -> Result<Box<dyn LLM>, Box<dyn Error + Send>> {
         let factory = self.find_factory(&parameters.model);
 
         if let Some(factory) = factory {
             return factory.create(parameters);
         }
 
-        Err(format!("No corresponding LLM for {}", parameters.model).into())
+        Err(anyhow!("No corresponding LLM for {}", parameters.model).into())
     }
 }

@@ -1,3 +1,4 @@
+use crate::agent::domain::dto::ThreadDto;
 use crate::agent::domain::thread_repository::{
     CreateThreadParams, ThreadRepository, UpdateThreadParams,
 };
@@ -42,17 +43,23 @@ impl SeaOrmThreadRepository {
 
 #[async_trait::async_trait]
 impl ThreadRepository for SeaOrmThreadRepository {
-    async fn find(&self, id: i32) -> Result<Option<thread::Model>, Box<dyn Error>> {
+    async fn find(&self, id: String) -> Result<Option<ThreadDto>, Box<dyn Error>> {
         let conn = Arc::clone(&self.connection);
+        let id: i32 = id.parse()?;
         let r = thread::Entity::find_by_id(id).one(conn.as_ref()).await?;
 
-        Ok(r)
+        if r.is_none() {
+            return Ok(None);
+        }
+        let r: ThreadDto = r.unwrap().into();
+
+        Ok(Some(r))
     }
 
     async fn create(
         &self,
         new_thread: CreateThreadParams,
-    ) -> Result<thread::Model, Box<dyn Error + Send>> {
+    ) -> Result<ThreadDto, Box<dyn Error + Send>> {
         let conn = Arc::clone(&self.connection);
 
         let txn = conn.begin().await.map_err(|e| anyhow!(e))?;
@@ -75,7 +82,7 @@ impl ThreadRepository for SeaOrmThreadRepository {
                 .map(|mesg| CreateMessageParams {
                     content: mesg.content.clone(),
                     role: mesg.role.clone(),
-                    thread_id: Some(model.id.clone()),
+                    thread_id: Some(model.id.to_string()),
                     run_id: None,
                     attachments: None,
                     metadata: None,
@@ -89,13 +96,14 @@ impl ThreadRepository for SeaOrmThreadRepository {
 
         txn.commit().await.map_err(|e| anyhow!(e))?;
 
-        Ok(model)
+        Ok(model.into())
     }
 
-    async fn update(&self, thread: UpdateThreadParams) -> Result<thread::Model, Box<dyn Error>> {
+    async fn update(&self, thread: UpdateThreadParams) -> Result<ThreadDto, Box<dyn Error>> {
         let conn = Arc::clone(&self.connection);
+        let thread_id: i32 = thread.id.parse()?;
 
-        let existing = thread::Entity::find_by_id(thread.id)
+        let existing = thread::Entity::find_by_id(thread_id)
             .one(conn.as_ref())
             .await?;
 
@@ -108,10 +116,10 @@ impl ThreadRepository for SeaOrmThreadRepository {
 
         let updated_model = model.update(conn.as_ref()).await?;
 
-        Ok(updated_model)
+        Ok(updated_model.into())
     }
 
-    async fn list_by_page(&self, args: PageRequest) -> Result<Vec<thread::Model>, Box<dyn Error>> {
+    async fn list_by_page(&self, args: PageRequest) -> Result<Vec<ThreadDto>, Box<dyn Error>> {
         let conn = Arc::clone(&self.connection);
         let mut cursor = thread::Entity::find().cursor_by(thread::Column::Id);
 
@@ -130,10 +138,11 @@ impl ThreadRepository for SeaOrmThreadRepository {
 
         let result = cursor.all(conn.as_ref()).await?;
 
-        Ok(result)
+        Ok(result.iter().map(|r| r.clone().into()).collect())
     }
 
-    async fn delete(&self, id: i32) -> Result<(), Box<dyn Error>> {
+    async fn delete(&self, id: String) -> Result<(), Box<dyn Error>> {
+        let id = id.parse()?;
         let conn = Arc::clone(&self.connection);
 
         let txn = conn.begin().await?;

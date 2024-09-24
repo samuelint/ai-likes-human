@@ -5,7 +5,7 @@ mod openai_test;
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct OpenAIMessage {
     pub role: String,
     pub content: String,
@@ -167,14 +167,14 @@ impl Default for OpenAIChatCompletionChunkObject {
 }
 
 impl OpenAIChatCompletionChunkObject {
-    pub fn new_assistant_chunk(message: String, model: String) -> Self {
+    pub fn new_assistant_chunk(message: String, model: &String) -> Self {
         let choice = OpenAIChatCompletionChunkChoice {
             delta: Some(OpenAIMessage::new_assistant(message)),
             ..OpenAIChatCompletionChunkChoice::default()
         };
         OpenAIChatCompletionChunkObject {
             choices: vec![choice],
-            model: model,
+            model: model.clone(),
             ..OpenAIChatCompletionChunkObject::default()
         }
     }

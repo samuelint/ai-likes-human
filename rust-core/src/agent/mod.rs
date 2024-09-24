@@ -1,16 +1,13 @@
 use std::sync::Arc;
 
 use domain::{
-    agent_factory::AgentFactoryImpl, message_repository::MessageRepository,
-    run_factory::RunFactory, run_repository::RunRepository, stream_run_service::StreamRunService,
+    agent_factory::AgentFactory, message_repository::MessageRepository, run_factory::RunFactory,
+    run_repository::RunRepository, stream_run_service::StreamRunService,
     thread_repository::ThreadRepository,
 };
 use infrastructure::{SeaOrmMessageRepository, SeaOrmRunRepository, SeaOrmThreadRepository};
 
-use crate::{
-    llm::{domain::llm_factory::LLMFactory, LLMDIModule},
-    AgentFactory,
-};
+use crate::llm::{domain::llm_factory::LLMFactory, LLMDIModule};
 
 pub mod app;
 pub mod domain;
@@ -72,13 +69,14 @@ impl AgentDIModule {
 
     pub fn get_stream_run_service(&self) -> Arc<StreamRunService> {
         let run_factory = self.get_run_factory();
+        let llm_factory = self.llm_module.get_llm_factory();
 
-        Arc::new(StreamRunService::new(run_factory))
+        Arc::new(StreamRunService::new(run_factory, llm_factory))
     }
 
-    pub fn get_agent_factory(&self) -> Arc<dyn AgentFactory> {
+    pub fn get_agent_factory(&self) -> Arc<AgentFactory> {
         let llm_factory: Arc<dyn LLMFactory> = self.llm_module.get_llm_factory();
 
-        Arc::new(AgentFactoryImpl::new(llm_factory))
+        Arc::new(AgentFactory::new(llm_factory))
     }
 }

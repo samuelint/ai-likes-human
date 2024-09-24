@@ -33,6 +33,22 @@ impl From<run::Model> for RunDto {
     }
 }
 
+impl From<RunDto> for run::Model {
+    fn from(dto: RunDto) -> Self {
+        run::Model {
+            id: dto.id.parse().unwrap(),
+            created_at: dto.created_at,
+            assistant_id: dto.assistant_id,
+            thread_id: dto.thread_id.map(|id| id.parse().unwrap()),
+            instructions: dto.instructions,
+            model: dto.model,
+            status: dto.status,
+            metadata: dto.metadata,
+            temperature: dto.temperature,
+        }
+    }
+}
+
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct CreateRunDto {
     pub assistant_id: Option<String>,

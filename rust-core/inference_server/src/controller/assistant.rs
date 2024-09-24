@@ -49,7 +49,7 @@ pub async fn create_thread_and_run(
 }
 
 pub async fn create_thread_run(
-    axum::extract::Path(thread_id): axum::extract::Path<i32>,
+    axum::extract::Path(thread_id): axum::extract::Path<String>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
     extract::Json(payload): extract::Json<CreateRunDto>,
 ) -> impl IntoResponse {
@@ -68,7 +68,7 @@ pub async fn create_thread_run(
             .into_response();
     }
 
-    match service.create_run(thread_id, payload).await {
+    match service.create_run(&thread_id, &payload).await {
         Ok(run) => return Json::<RunDto>(run.into()).into_response(),
         Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
     }
@@ -95,7 +95,7 @@ pub async fn list_threads(
 }
 
 pub async fn find_thread(
-    axum::extract::Path(thread_id): axum::extract::Path<i32>,
+    axum::extract::Path(thread_id): axum::extract::Path<String>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
 ) -> impl IntoResponse {
     let service = state.core_container.agent_module.get_thread_repository();
@@ -113,7 +113,7 @@ pub async fn find_thread(
 }
 
 pub async fn update_thread(
-    axum::extract::Path(thread_id): axum::extract::Path<i32>,
+    axum::extract::Path(thread_id): axum::extract::Path<String>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
     extract::Json(payload): extract::Json<UpdateThreadDto>,
 ) -> impl IntoResponse {
@@ -132,7 +132,7 @@ pub async fn update_thread(
 }
 
 pub async fn delete_thread(
-    axum::extract::Path(thread_id): axum::extract::Path<i32>,
+    axum::extract::Path(thread_id): axum::extract::Path<String>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
 ) -> impl IntoResponse {
     let service = state.core_container.agent_module.get_thread_repository();
@@ -144,7 +144,7 @@ pub async fn delete_thread(
 }
 
 pub async fn list_thread_messages(
-    axum::extract::Path(thread_id): axum::extract::Path<i32>,
+    axum::extract::Path(thread_id): axum::extract::Path<String>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
 ) -> impl IntoResponse {
     let service = state.core_container.agent_module.get_message_repository();
@@ -164,7 +164,7 @@ pub async fn list_thread_messages(
 }
 
 pub async fn find_thread_message(
-    axum::extract::Path((_thread_id, message_id)): axum::extract::Path<(i32, i32)>,
+    axum::extract::Path((_thread_id, message_id)): axum::extract::Path<(String, String)>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
 ) -> impl IntoResponse {
     let service = state.core_container.agent_module.get_message_repository();
@@ -182,7 +182,7 @@ pub async fn find_thread_message(
 }
 
 pub async fn delete_thread_message(
-    axum::extract::Path((_thread_id, message_id)): axum::extract::Path<(i32, i32)>,
+    axum::extract::Path((_thread_id, message_id)): axum::extract::Path<(String, String)>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
 ) -> impl IntoResponse {
     let service = state.core_container.agent_module.get_message_repository();
@@ -194,7 +194,7 @@ pub async fn delete_thread_message(
 }
 
 pub async fn create_thread_message(
-    axum::extract::Path(thread_id): axum::extract::Path<i32>,
+    axum::extract::Path(thread_id): axum::extract::Path<String>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
     extract::Json(payload): extract::Json<CreateMessageDto>,
 ) -> impl IntoResponse {
@@ -213,7 +213,7 @@ pub async fn create_thread_message(
 }
 
 pub async fn find_thread_run(
-    axum::extract::Path((_thread_id, run_id)): axum::extract::Path<(i32, i32)>,
+    axum::extract::Path((_thread_id, run_id)): axum::extract::Path<(String, String)>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
 ) -> impl IntoResponse {
     let service = state.core_container.agent_module.get_run_repository();
@@ -231,7 +231,7 @@ pub async fn find_thread_run(
 }
 
 pub async fn list_thread_runs(
-    axum::extract::Path(thread_id): axum::extract::Path<i32>,
+    axum::extract::Path(thread_id): axum::extract::Path<String>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
     Query(page_request): Query<PageRequest>,
 ) -> impl IntoResponse {

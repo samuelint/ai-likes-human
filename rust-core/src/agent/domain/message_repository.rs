@@ -1,6 +1,5 @@
-use std::error::Error;
-
 use serde::{Deserialize, Serialize};
+use std::error::Error;
 
 use crate::entities::message;
 
@@ -8,8 +7,8 @@ use crate::entities::message;
 pub struct CreateMessageParams {
     pub content: String,
     pub role: String,
-    pub thread_id: Option<i32>,
-    pub run_id: Option<i32>,
+    pub thread_id: Option<String>,
+    pub run_id: Option<String>,
     pub attachments: Option<String>,
     pub metadata: Option<String>,
 }
@@ -25,8 +24,8 @@ pub trait MessageRepository: Sync + Send {
         messages: Vec<CreateMessageParams>,
     ) -> Result<(), Box<dyn Error + Send>>;
 
-    async fn find(&self, id: i32) -> Result<Option<message::Model>, Box<dyn Error>>;
-    async fn find_by_thread_id(&self, id: i32) -> Result<Vec<message::Model>, Box<dyn Error>>;
+    async fn find(&self, id: String) -> Result<Option<message::Model>, Box<dyn Error>>;
+    async fn find_by_thread_id(&self, id: String) -> Result<Vec<message::Model>, Box<dyn Error>>;
 
-    async fn delete(&self, id: i32) -> Result<(), Box<dyn Error>>;
+    async fn delete(&self, id: String) -> Result<(), Box<dyn Error>>;
 }

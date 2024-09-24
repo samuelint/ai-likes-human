@@ -1,12 +1,11 @@
 use std::{error::Error, sync::Arc};
 
 use super::{
-    dto::{CreateRunDto, CreateThreadAndRunDto},
+    dto::{CreateRunDto, CreateThreadAndRunDto, RunDto, ThreadDto},
     run_repository::RunRepository,
     thread_repository::ThreadRepository,
     CreateRunParams,
 };
-use crate::entities::{run, thread};
 
 pub struct RunFactory {
     run_repository: Arc<dyn RunRepository>,
@@ -24,27 +23,30 @@ impl RunFactory {
         }
     }
 
-    pub async fn create_thread_and_run<'a>(
+    pub async fn create_thread_and_run(
         &self,
         dto: &CreateThreadAndRunDto,
-    ) -> Result<(thread::Model, run::Model), Box<dyn std::error::Error + Send>> {
-        let thread = self.thread_repository.create(dto.clone().into()).await?;
-        let run = self.create_run(thread.id, dto.clone().into()).await?;
+    ) -> Result<(ThreadDto, RunDto), Box<dyn std::error::Error + Send>> {
+        let dto = dto.clone();
+        let create_run_dto: CreateRunDto = dto.clone().into();
+        let thread = self.thread_repository.create(dto.into()).await?;
+        let run = self.create_run(&thread.id, &create_run_dto).await?;
 
         Ok((thread, run))
     }
 
     pub async fn create_run(
         &self,
-        thread_id: i32,
-        new_run: CreateRunDto,
-    ) -> Result<run::Model, Box<dyn Error + Send>> {
+        thread_id: &String,
+        new_run: &CreateRunDto,
+    ) -> Result<RunDto, Box<dyn Error + Send>> {
+        let new_run = new_run.clone();
         let assistant_id = new_run.assistant_id.unwrap_or("default".to_string());
         let run = self
             .run_repository
             .create(CreateRunParams {
                 assistant_id,
-                thread_id,
+                thread_id: thread_id.clone(),
                 model: new_run.model,
                 status: "queued".to_string(),
                 instructions: None,

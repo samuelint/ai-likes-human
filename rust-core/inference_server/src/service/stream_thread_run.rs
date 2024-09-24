@@ -16,7 +16,7 @@ pub fn stream_create_thread_and_run(
     let service = state.core_container.agent_module.get_stream_run_service();
     let dto = dto.clone();
     Sse::new(try_stream! {
-        let mut stream = service.create_thread_run_and_stream(dto);
+        let mut stream = service.stream_new_thread(dto);
         while let Some(item) = stream.next().await {
             let data = item.unwrap();
             let json_data = serde_json::to_string(&data).unwrap();

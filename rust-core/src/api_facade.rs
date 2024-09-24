@@ -13,9 +13,9 @@ impl ApiFacade {
         Self { container }
     }
 
-    pub fn get_llm_client(&self, model: String) -> Result<Box<dyn LLM>, Box<dyn Error>> {
+    pub fn get_llm_client<'a>(&self, model: &'a str) -> Result<Box<dyn LLM>, Box<dyn Error + Send>> {
         let factory = self.container.llm_module.get_llm_factory();
 
-        factory.create(CreateLLMParameters { model })
+        factory.create(CreateLLMParameters { model: model.to_string() })
     }
 }

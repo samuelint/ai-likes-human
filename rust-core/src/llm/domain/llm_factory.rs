@@ -11,5 +11,8 @@ pub struct CreateLLMParameters {
 #[automock]
 pub trait LLMFactory: Send + Sync {
     fn is_compatible(&self, model: &str) -> bool;
-    fn create(&self, parameters: CreateLLMParameters) -> Result<Box<dyn LLM>, Box<dyn Error>>;
+    fn create(
+        &self,
+        parameters: CreateLLMParameters,
+    ) -> Result<Box<dyn LLM>, Box<dyn Error + Send>>;
 }

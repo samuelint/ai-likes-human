@@ -4,6 +4,7 @@ mod openai_llm_factory_tests;
 
 use std::error::Error;
 
+use anyhow::anyhow;
 use langchain_rust::{language_models::llm::LLM, llm::OpenAI};
 
 pub use crate::llm::domain::llm_factory::{CreateLLMParameters, LLMFactory};
@@ -21,12 +22,15 @@ impl LLMFactory for OpenAILLMFactory {
         model.to_lowercase().contains("openai")
     }
 
-    fn create(&self, parameters: CreateLLMParameters) -> Result<Box<dyn LLM>, Box<dyn Error>> {
+    fn create(
+        &self,
+        parameters: CreateLLMParameters,
+    ) -> Result<Box<dyn LLM>, Box<dyn Error + Send>> {
         let split_vec: Vec<&str> = parameters.model.split(':').collect();
 
         let model = match split_vec.last() {
             Some(&model) => model,
-            None => return Err("Model is not valid".into()),
+            None => return Err(anyhow!("Invalid model format").into()),
         };
 
         let llm = OpenAI::default().with_model(model);

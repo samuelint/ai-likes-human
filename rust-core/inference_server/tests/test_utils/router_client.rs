@@ -7,7 +7,7 @@ use axum::{
 use bytes::Bytes;
 use futures::{Stream, StreamExt};
 use http_body_util::BodyExt; // for `collect`
-use serde::{Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std::{convert::Infallible, pin::Pin};
 use tower::ServiceExt; // for `oneshot`
 
@@ -139,6 +139,30 @@ impl RouterClient {
         };
 
         Box::pin(stream)
+    }
+
+    #[allow(dead_code)]
+    pub fn post_json_stream<TRequestBody, TResponseBody>(
+        &self,
+        path: &str,
+        body: &TRequestBody,
+    ) -> impl Stream<Item = Result<TResponseBody, axum::Error>>
+    where
+        TRequestBody: ?Sized + Serialize,
+        TResponseBody: DeserializeOwned,
+    {
+        let stream = self.post_stream(path, body);
+
+        let stream = stream.map(|item| match item {
+            Ok(text) => {
+                let text = text.trim_start_matches("data: ");
+                let chunk: TResponseBody = serde_json::from_str(text).unwrap();
+                Ok(chunk)
+            }
+            Err(e) => Err(axum::Error::new(e)),
+        });
+
+        stream
     }
 
     #[allow(dead_code)]

@@ -21,7 +21,7 @@ pub fn stream_create_thread_and_run(
             let data = item.unwrap();
             let json_data = serde_json::to_string(&data).unwrap();
 
-            yield Event::default().data(format!("data: {}", json_data))
+            yield Event::default().data(json_data)
         }
     })
     .keep_alive(KeepAlive::default())

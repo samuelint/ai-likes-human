@@ -38,7 +38,6 @@ impl StreamRunService {
             let thread_dto: ThreadDto = thread.into();
             let run_dto: RunDto = run.into();
 
-
             yield ThreadEvent::ThreadCreated(ThreadEventDto::created_thread(thread_dto));
             yield ThreadEvent::ThreadRunCreated(ThreadEventDto::created_run(run_dto));
         };

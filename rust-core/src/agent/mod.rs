@@ -2,7 +2,8 @@ use std::sync::Arc;
 
 use domain::{
     agent_factory::AgentFactoryImpl, message_repository::MessageRepository,
-    run_repository::RunRepository, run_service::RunService, thread_repository::ThreadRepository,
+    run_factory::RunFactory, run_repository::RunRepository, stream_run_service::StreamRunService,
+    thread_repository::ThreadRepository,
 };
 use infrastructure::{SeaOrmMessageRepository, SeaOrmRunRepository, SeaOrmThreadRepository};
 
@@ -62,11 +63,17 @@ impl AgentDIModule {
         ))
     }
 
-    pub fn get_run_service(&self) -> Arc<RunService> {
+    pub fn get_run_factory(&self) -> Arc<RunFactory> {
         let run_repository = self.get_run_repository();
         let thread_repository = self.get_thread_repository();
 
-        Arc::new(RunService::new(run_repository, thread_repository))
+        Arc::new(RunFactory::new(run_repository, thread_repository))
+    }
+
+    pub fn get_stream_run_service(&self) -> Arc<StreamRunService> {
+        let run_factory = self.get_run_factory();
+
+        Arc::new(StreamRunService::new(run_factory))
     }
 
     pub fn get_agent_factory(&self) -> Arc<dyn AgentFactory> {

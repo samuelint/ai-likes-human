@@ -5,6 +5,7 @@ use crate::agent::domain::CreateMessageParams;
 use crate::entities::thread;
 use crate::utils::time::current_time_with_timezone;
 use crate::utils::PageRequest;
+use anyhow::anyhow;
 use sea_orm::TransactionTrait;
 use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, EntityTrait, QuerySelect};
 use std::error::Error;
@@ -51,10 +52,10 @@ impl ThreadRepository for SeaOrmThreadRepository {
     async fn create(
         &self,
         new_thread: CreateThreadParams,
-    ) -> Result<thread::Model, Box<dyn Error>> {
+    ) -> Result<thread::Model, Box<dyn Error + Send>> {
         let conn = Arc::clone(&self.connection);
 
-        let txn = conn.begin().await?;
+        let txn = conn.begin().await.map_err(|e| anyhow!(e))?;
 
         let model = thread::ActiveModel {
             metadata: ActiveValue::Set(self.to_concrete_metadata(new_thread.metadata)),
@@ -64,7 +65,8 @@ impl ThreadRepository for SeaOrmThreadRepository {
 
         let model: thread::Model = thread::Entity::insert(model)
             .exec_with_returning(&txn)
-            .await?;
+            .await
+            .map_err(|e| anyhow!(e))?;
 
         if new_thread.messages.len() > 0 {
             let messages: Vec<CreateMessageParams> = new_thread
@@ -85,7 +87,7 @@ impl ThreadRepository for SeaOrmThreadRepository {
                 .await?;
         }
 
-        txn.commit().await?;
+        txn.commit().await.map_err(|e| anyhow!(e))?;
 
         Ok(model)
     }

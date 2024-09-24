@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::agent::domain::CreateThreadParams;
+use crate::{agent::domain::CreateThreadParams, entities::thread};
 
 use super::message::CreateMessageDto;
 
@@ -19,21 +19,24 @@ impl From<CreateThreadDto> for CreateThreadParams {
     }
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Default, Serialize, Deserialize, Clone, Debug)]
 pub struct ThreadDto {
-    pub id: i64,
+    pub id: String,
     pub created_at: String,
     pub metadata: String,
 }
 
-#[derive(Default, Serialize, Deserialize)]
-pub struct UpdateThreadDto {
-    pub metadata: Option<String>,
+impl From<thread::Model> for ThreadDto {
+    fn from(model: thread::Model) -> Self {
+        ThreadDto {
+            id: model.id.to_string(),
+            created_at: model.created_at.to_string(),
+            metadata: model.metadata,
+        }
+    }
 }
 
-#[derive(Default, Serialize, Deserialize)]
-pub struct ThreadMessageDto {
-    pub id: i64,
-    pub content: String,
-    pub role: String,
+#[derive(Default, Serialize, Deserialize, Clone, Debug)]
+pub struct UpdateThreadDto {
+    pub metadata: Option<String>,
 }

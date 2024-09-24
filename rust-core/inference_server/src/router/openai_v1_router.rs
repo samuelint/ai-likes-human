@@ -6,15 +6,12 @@ use axum::{
 };
 
 use crate::{
-    api::{
-        assistant_thread::{
-            create_thread, create_thread_and_run, create_thread_message, create_thread_run,
-            delete_thread, delete_thread_message, find_thread, find_thread_message,
-            find_thread_run, list_thread_messages, list_thread_runs, list_threads, update_thread,
-        },
-        chat_completions::run_chat_completions,
-    },
     app_state::ServerState,
+    controller::{
+        create_thread, create_thread_and_run, create_thread_message, create_thread_run,
+        delete_thread, delete_thread_message, find_thread, find_thread_message, find_thread_run,
+        list_thread_messages, list_thread_runs, list_threads, run_chat_completions, update_thread,
+    },
 };
 
 pub fn create_openai_v1_router(state: Arc<ServerState>) -> Router {

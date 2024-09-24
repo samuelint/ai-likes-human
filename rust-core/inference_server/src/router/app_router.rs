@@ -4,13 +4,14 @@ use app_core::{ApiFacade, AppContainer};
 use axum::{http::StatusCode, response::IntoResponse, routing::get, Router};
 
 use crate::{
-    api::health::health,
+    controller::health,
     app_state::ServerState,
-    openai_v1_router::create_openai_v1_router,
     route::{default_invoke, default_stream},
     trace::with_tracing,
     InvokeFn, StreamFn,
 };
+
+use super::openai_v1_router::create_openai_v1_router;
 
 pub struct CreateRouterParameters {
     pub invoke_fn: Arc<InvokeFn>,

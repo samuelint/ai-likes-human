@@ -8,7 +8,7 @@ use test_utils::{with_default_started_server, OpenaiClient};
 #[serial]
 async fn test_stream_chat_completions_result() {
     with_default_started_server(|server_url| async move {
-        let client = OpenaiClient::new(server_url);
+        let client = OpenaiClient::new_with_endpoint(server_url);
         let mut stream = client
             .user_stream(
                 "openai:gpt-4o-mini",

@@ -17,7 +17,7 @@ pub struct CreateRunParams {
 
 #[async_trait::async_trait]
 pub trait RunRepository: Sync + Send {
-    async fn create(&self, message: CreateRunParams) -> Result<run::Model, Box<dyn Error>>;
+    async fn create(&self, message: CreateRunParams) -> Result<run::Model, Box<dyn Error + Send>>;
     async fn list_by_thread_paginated(
         &self,
         thread_id: i32,

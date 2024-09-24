@@ -1,14 +1,14 @@
+use crate::agent::domain::run_repository::{CreateRunParams, RunRepository};
+use crate::entities::run;
+use crate::utils::time::current_time_with_timezone;
+use crate::utils::PageRequest;
+use anyhow::anyhow;
 use sea_orm::{
     ActiveValue, ColumnTrait, ConnectionTrait, DatabaseConnection, DeleteResult, EntityTrait,
     QueryFilter, QuerySelect,
 };
 use std::error::Error;
 use std::sync::Arc;
-
-use crate::agent::domain::run_repository::{CreateRunParams, RunRepository};
-use crate::entities::run;
-use crate::utils::time::current_time_with_timezone;
-use crate::utils::PageRequest;
 
 pub struct SeaOrmRunRepository {
     connection: Arc<DatabaseConnection>,
@@ -23,7 +23,7 @@ impl RunRepository for SeaOrmRunRepository {
         Ok(r)
     }
 
-    async fn create(&self, item: CreateRunParams) -> Result<run::Model, Box<dyn Error>> {
+    async fn create(&self, item: CreateRunParams) -> Result<run::Model, Box<dyn Error + Send>> {
         let conn = Arc::clone(&self.connection);
         let model = run::ActiveModel {
             created_at: ActiveValue::Set(current_time_with_timezone()),
@@ -39,7 +39,8 @@ impl RunRepository for SeaOrmRunRepository {
 
         let r = run::Entity::insert(model)
             .exec_with_returning(conn.as_ref())
-            .await?;
+            .await
+            .map_err(|e| anyhow!(e))?;
 
         Ok(r)
     }

@@ -14,11 +14,12 @@ use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
 use std::{convert::Infallible, error::Error, sync::Arc};
 
-use crate::app_state::ServerState;
-
-use super::openai::{
-    to_langchain_messages, OpenAIChatCompletionChunkObject, OpenAIChatCompletionObject,
-    OpenAIMessage,
+use crate::{
+    app_state::ServerState,
+    openai::{
+        to_langchain_messages, OpenAIChatCompletionChunkObject, OpenAIChatCompletionObject,
+        OpenAIMessage,
+    },
 };
 
 #[derive(Serialize, Deserialize)]

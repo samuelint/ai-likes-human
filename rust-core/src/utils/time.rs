@@ -6,3 +6,9 @@ pub fn current_time_with_timezone() -> String {
 
     local_time.format("%Y-%m-%d %H:%M:%S %z").to_string()
 }
+
+pub fn current_unix_time() -> i64 {
+    let local_time = Utc::now().with_timezone(&Local);
+
+    local_time.timestamp()
+}

@@ -16,8 +16,14 @@ pub struct CreateMessageParams {
 
 #[async_trait::async_trait]
 pub trait MessageRepository: Sync + Send {
-    async fn create(&self, message: CreateMessageParams) -> Result<message::Model, Box<dyn Error>>;
-    async fn create_many(&self, messages: Vec<CreateMessageParams>) -> Result<(), Box<dyn Error>>;
+    async fn create(
+        &self,
+        message: CreateMessageParams,
+    ) -> Result<message::Model, Box<dyn Error + Send>>;
+    async fn create_many(
+        &self,
+        messages: Vec<CreateMessageParams>,
+    ) -> Result<(), Box<dyn Error + Send>>;
 
     async fn find(&self, id: i32) -> Result<Option<message::Model>, Box<dyn Error>>;
     async fn find_by_thread_id(&self, id: i32) -> Result<Vec<message::Model>, Box<dyn Error>>;

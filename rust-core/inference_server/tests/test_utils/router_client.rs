@@ -1,5 +1,3 @@
-use std::convert::Infallible;
-
 use super::create_test_router;
 use axum::{
     body::Body,
@@ -7,9 +5,10 @@ use axum::{
     Router,
 };
 use bytes::Bytes;
+use futures::{Stream, StreamExt};
 use http_body_util::BodyExt; // for `collect`
 use serde::{Deserialize, Serialize};
-
+use std::{convert::Infallible, pin::Pin};
 use tower::ServiceExt; // for `oneshot`
 
 #[allow(dead_code)]
@@ -92,6 +91,54 @@ impl RouterClient {
         let body: TResponseBody = serde_json::from_slice(&bytes).unwrap();
 
         Ok((Some(body), status))
+    }
+
+    #[allow(dead_code)]
+    pub fn post_stream<TRequestBody>(
+        &self,
+        path: &str,
+        body: &TRequestBody,
+    ) -> Pin<Box<dyn Stream<Item = Result<String, axum::Error>> + Send>>
+    where
+        TRequestBody: ?Sized + Serialize,
+    {
+        let body_json = serde_json::to_string(&body).unwrap();
+        let router = self.router.clone();
+        let base_url = self.base_url.clone();
+        let path = path.to_string();
+
+        let stream = async_stream::stream! {
+            let response = match router.oneshot(Request::builder()
+                .method("POST")
+                .header("Content-Type", "application/json")
+                .header("Accept", "text/event-stream")
+                .uri(format!("{}{}", base_url, path))
+                .body(Body::from(body_json))
+                .unwrap(),).await {
+              Ok(response) => response,
+              Err(_) => {
+                  return;
+              }
+            };
+
+            let mut stream = response.into_data_stream();
+            while let Some(chunk) = stream.next().await {
+                match chunk {
+                    Ok(chunk) => {
+                        let text = String::from_utf8(chunk.to_vec()).unwrap();
+                        yield Ok(text);
+                    }
+                    Err(e) => {
+                        yield Err(e);
+
+                        return;
+                    },
+                }
+            };
+
+        };
+
+        Box::pin(stream)
     }
 
     #[allow(dead_code)]

@@ -1,11 +1,19 @@
-pub mod api;
+pub mod controller;
+pub mod router;
+mod service;
+pub mod types;
+
+#[allow(unused_imports)]
+pub use controller::chat_completions::{run_chat_completions, ChatCompletionParameters};
+pub use types::*;
+
+#[allow(unused_imports)]
+pub use types::*;
+
 mod app;
 mod app_state;
-mod openai_v1_router;
-mod router_factory;
 mod trace;
 
-pub use api::types::*;
 pub use app::{serve, ServeParameters};
 pub use axum::*;
-pub use router_factory::{create_router, CreateRouterParameters};
+pub use router::{create_router, CreateRouterParameters};

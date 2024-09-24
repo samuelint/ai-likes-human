@@ -4,7 +4,7 @@ use std::sync::Arc;
 use app_core::{AppConfiguration, AppContainer};
 use tokio::net::TcpListener;
 
-use crate::router_factory::{create_router, CreateRouterParameters};
+use crate::router::{create_router, CreateRouterParameters};
 use crate::trace::configure_tracing;
 
 pub struct ServeParameters {

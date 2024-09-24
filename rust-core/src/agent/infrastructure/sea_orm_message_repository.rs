@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use sea_orm::{
     ActiveValue, ColumnTrait, ConnectionTrait, DatabaseConnection, DeleteResult, EntityTrait,
     InsertResult, QueryFilter,
@@ -32,18 +33,25 @@ impl MessageRepository for SeaOrmMessageRepository {
         Ok(models)
     }
 
-    async fn create(&self, item: CreateMessageParams) -> Result<message::Model, Box<dyn Error>> {
+    async fn create(
+        &self,
+        item: CreateMessageParams,
+    ) -> Result<message::Model, Box<dyn Error + Send>> {
         let conn = Arc::clone(&self.connection);
         let model = self.to_active_model(&item);
 
         let r = message::Entity::insert(model)
             .exec_with_returning(conn.as_ref())
-            .await?;
+            .await
+            .map_err(|e| anyhow!(e))?;
 
         Ok(r)
     }
 
-    async fn create_many(&self, messages: Vec<CreateMessageParams>) -> Result<(), Box<dyn Error>> {
+    async fn create_many(
+        &self,
+        messages: Vec<CreateMessageParams>,
+    ) -> Result<(), Box<dyn Error + Send>> {
         let conn = Arc::clone(&self.connection);
         self.tx_create_many(conn.as_ref(), messages).await?;
 
@@ -69,7 +77,7 @@ impl SeaOrmMessageRepository {
         &self,
         conn: &'a C,
         messages: Vec<CreateMessageParams>,
-    ) -> Result<InsertResult<message::ActiveModel>, Box<dyn Error>>
+    ) -> Result<InsertResult<message::ActiveModel>, Box<dyn Error + Send>>
     where
         C: ConnectionTrait,
     {
@@ -78,7 +86,10 @@ impl SeaOrmMessageRepository {
             .map(move |m| self.to_active_model(m))
             .collect();
 
-        let insert_result = message::Entity::insert_many(models).exec(conn).await?;
+        let insert_result = message::Entity::insert_many(models)
+            .exec(conn)
+            .await
+            .map_err(|e| anyhow!(e))?;
 
         Ok(insert_result)
     }

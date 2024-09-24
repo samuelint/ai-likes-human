@@ -32,7 +32,7 @@ async fn test_created_thread_have_id() {
         .await
         .unwrap();
 
-    assert!(response.unwrap().id > 0, "should have an id");
+    assert!(response.unwrap().id.len() > 0, "should have an id");
 }
 
 #[tokio::test]
@@ -133,18 +133,20 @@ async fn test_created_thread_with_message_have_id() {
         ..CreateThreadDto::default()
     };
 
-    let (response, _status) = client
+    let thread = client
         .post::<CreateThreadDto, ThreadDto>("/threads", &body)
         .await
+        .unwrap()
+        .0
         .unwrap();
-    let (response, _) = client
-        .get::<Vec<ThreadMessageDto>>(
-            format!("/threads/{}/messages", response.unwrap().id).as_str(),
-        )
+    let messages = client
+        .get::<Vec<ThreadMessageDto>>(format!("/threads/{}/messages", thread.id).as_str())
         .await
+        .unwrap()
+        .0
         .unwrap();
 
-    assert!(response.unwrap()[0].id > 0, "Message should have an id");
+    assert!(messages[0].id.len() > 0, "Message should have an id");
 }
 
 #[tokio::test]

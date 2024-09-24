@@ -1,4 +1,5 @@
 pub mod client;
+pub mod prompt_validator;
 pub mod router;
 pub mod router_client;
 pub mod server;

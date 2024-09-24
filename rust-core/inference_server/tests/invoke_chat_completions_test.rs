@@ -7,7 +7,7 @@ use test_utils::{with_default_started_server, OpenaiClient};
 #[serial]
 async fn test_chat_completions_result() {
     with_default_started_server(|server_url| async move {
-        let client = OpenaiClient::new(server_url);
+        let client = OpenaiClient::new_with_endpoint(server_url);
 
         let result = client.user_invoke("openai:gpt-4o-mini", "Say hi!").await;
 
@@ -21,7 +21,7 @@ async fn test_chat_completions_result() {
 #[serial]
 async fn test_chat_completions_result_contains_model() {
     with_default_started_server(|server_url| async move {
-        let client = OpenaiClient::new(server_url);
+        let client = OpenaiClient::new_with_endpoint(server_url);
 
         let result = client.user_invoke("openai:gpt-4o-mini", "Say hi!").await;
 
@@ -36,7 +36,7 @@ async fn test_chat_completions_result_contains_model() {
 #[serial]
 async fn test_chat_completions_result_object_is_chat_completion() {
     with_default_started_server(|server_url| async move {
-        let client = OpenaiClient::new(server_url);
+        let client = OpenaiClient::new_with_endpoint(server_url);
 
         let result = client.user_invoke("openai:gpt-4o-mini", "Say hi!").await;
 

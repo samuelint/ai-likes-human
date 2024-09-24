@@ -1,9 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    agent::domain::{thread_repository::CreateThreadMessageParams, CreateMessageParams},
-    entities::message,
-};
+use crate::agent::domain::{thread_repository::CreateThreadMessageParams, CreateMessageParams};
 
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct AnnotationDto {
@@ -35,23 +32,6 @@ pub struct ThreadMessageDto {
     pub assistant_id: Option<String>,
     pub run_id: Option<String>,
     pub metadata: Option<String>,
-}
-
-impl From<message::Model> for ThreadMessageDto {
-    fn from(model: message::Model) -> Self {
-        ThreadMessageDto {
-            id: model.id.to_string(),
-            object: "thread.message".to_string(),
-            created_at: model.created_at,
-            thread_id: model.thread_id.map(|id| id.to_string()),
-            status: "completed".to_string(),
-            role: model.role,
-            content: model.content,
-            assistant_id: None,
-            run_id: model.run_id.map(|id| id.to_string()),
-            metadata: model.metadata,
-        }
-    }
 }
 
 #[derive(Default, Serialize, Deserialize, Clone)]

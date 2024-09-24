@@ -70,10 +70,10 @@ pub struct CreateThreadAndRunDto {
     pub stream: Option<bool>,
 }
 
-impl From<CreateThreadAndRunDto> for CreateThreadParams {
-    fn from(dto: CreateThreadAndRunDto) -> Self {
+impl From<&CreateThreadAndRunDto> for CreateThreadParams {
+    fn from(dto: &CreateThreadAndRunDto) -> Self {
         CreateThreadParams {
-            metadata: dto.thread.metadata,
+            metadata: dto.thread.metadata.clone(),
             messages: dto
                 .thread
                 .messages
@@ -84,20 +84,20 @@ impl From<CreateThreadAndRunDto> for CreateThreadParams {
     }
 }
 
-impl From<CreateThreadAndRunDto> for CreateThreadDto {
-    fn from(dto: CreateThreadAndRunDto) -> Self {
-        dto.thread
+impl From<&CreateThreadAndRunDto> for CreateThreadDto {
+    fn from(dto: &CreateThreadAndRunDto) -> Self {
+        dto.thread.clone()
     }
 }
 
-impl From<CreateThreadAndRunDto> for CreateRunDto {
-    fn from(dto: CreateThreadAndRunDto) -> Self {
+impl From<&CreateThreadAndRunDto> for CreateRunDto {
+    fn from(dto: &CreateThreadAndRunDto) -> Self {
         CreateRunDto {
-            assistant_id: dto.assistant_id,
-            model: dto.model,
-            instructions: dto.instructions,
+            assistant_id: dto.assistant_id.clone(),
+            model: dto.model.clone(),
+            instructions: dto.instructions.clone(),
             temperature: dto.temperature,
-            metadata: dto.metadata,
+            metadata: dto.metadata.clone(),
             stream: dto.stream,
         }
     }

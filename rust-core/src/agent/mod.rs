@@ -70,8 +70,13 @@ impl AgentDIModule {
     pub fn get_stream_run_service(&self) -> Arc<StreamRunService> {
         let run_factory = self.get_run_factory();
         let llm_factory = self.llm_module.get_llm_factory();
+        let thread_repository = self.get_thread_repository();
 
-        Arc::new(StreamRunService::new(run_factory, llm_factory))
+        Arc::new(StreamRunService::new(
+            run_factory,
+            llm_factory,
+            thread_repository,
+        ))
     }
 
     pub fn get_agent_factory(&self) -> Arc<AgentFactory> {

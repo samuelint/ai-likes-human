@@ -27,17 +27,16 @@ impl RunFactory {
         &self,
         dto: &CreateThreadAndRunDto,
     ) -> Result<(ThreadDto, RunDto), Box<dyn std::error::Error + Send>> {
-        let dto = dto.clone();
-        let create_run_dto: CreateRunDto = dto.clone().into();
+        let create_run_dto: CreateRunDto = dto.into();
         let thread = self.thread_repository.create(dto.into()).await?;
         let run = self.create_run(&thread.id, &create_run_dto).await?;
 
         Ok((thread, run))
     }
 
-    pub async fn create_run(
+    pub async fn create_run<'a>(
         &self,
-        thread_id: &String,
+        thread_id: &'a str,
         new_run: &CreateRunDto,
     ) -> Result<RunDto, Box<dyn Error + Send>> {
         let new_run = new_run.clone();
@@ -46,7 +45,7 @@ impl RunFactory {
             .run_repository
             .create(CreateRunParams {
                 assistant_id,
-                thread_id: thread_id.clone(),
+                thread_id: thread_id.to_string(),
                 model: new_run.model,
                 status: "queued".to_string(),
                 instructions: None,

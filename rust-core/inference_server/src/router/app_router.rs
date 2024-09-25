@@ -2,10 +2,11 @@ use std::sync::Arc;
 
 use app_core::{ApiFacade, AppContainer};
 use axum::{http::StatusCode, response::IntoResponse, routing::get, Router};
+use tower_http::cors::CorsLayer;
 
 use crate::{
-    controller::health,
     app_state::ServerState,
+    controller::health,
     route::{default_invoke, default_stream},
     trace::with_tracing,
     InvokeFn, StreamFn,
@@ -43,6 +44,7 @@ pub fn create_router(
         .route("/", get(health))
         .route("/health", get(health))
         .nest("/openai/v1", create_openai_v1_router(state))
+        .layer(CorsLayer::permissive())
         .fallback(fallback);
 
     if parameters.use_trace {

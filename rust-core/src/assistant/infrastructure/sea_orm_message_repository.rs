@@ -49,10 +49,13 @@ impl MessageRepository for SeaOrmMessageRepository {
 
     async fn update(
         &self,
-        message: UpdateThreadMessageDto,
+        update_dto: UpdateThreadMessageDto,
     ) -> Result<ThreadMessageDto, Box<dyn Error + Send>> {
         let conn = Arc::clone(&self.connection);
-        let id: i32 = message.id.parse().map_err(|e: ParseIntError| anyhow!(e))?;
+        let id: i32 = update_dto
+            .id
+            .parse()
+            .map_err(|e: ParseIntError| anyhow!(e))?;
 
         let existing = message::Entity::find_by_id(id)
             .one(conn.as_ref())
@@ -63,18 +66,33 @@ impl MessageRepository for SeaOrmMessageRepository {
             return Err(anyhow!("Message not found").into());
         }
 
-        let mut model: message::ActiveModel = existing.unwrap().into();
+        let mut model: message::ActiveModel = match existing {
+            Some(m) => m.into(),
+            None => return Err(anyhow!("Message not found").into()),
+        };
 
-        if message.status.is_some() {
-            model.status = ActiveValue::Set(message.status.unwrap());
+        if update_dto.status.is_some() {
+            let new_status = match update_dto.status {
+                Some(s) => s.to_owned(),
+                None => return Err(anyhow!("Status not found").into()),
+            };
+            model.status = ActiveValue::Set(new_status);
         }
 
-        if message.content.is_some() {
-            model.content = ActiveValue::Set(message.content.unwrap());
+        if update_dto.content.is_some() {
+            let json_content = match update_dto.content {
+                Some(content) => match serde_json::to_string(&content) {
+                    Ok(content) => content,
+                    Err(_) => return Err(anyhow!("Content cannot be serialized to json").into()),
+                },
+                None => return Err(anyhow!("Content not found").into()),
+            };
+
+            model.content = ActiveValue::Set(json_content);
         }
 
-        if message.assistant_id.is_some() {
-            let assistant_id = message.assistant_id.unwrap();
+        if update_dto.assistant_id.is_some() {
+            let assistant_id = update_dto.assistant_id.unwrap();
 
             model.assistant_id = if assistant_id.is_some() {
                 let assistant_id = assistant_id
@@ -88,8 +106,8 @@ impl MessageRepository for SeaOrmMessageRepository {
             }
         }
 
-        if message.metadata.is_some() {
-            let metadata = message.metadata.unwrap();
+        if update_dto.metadata.is_some() {
+            let metadata = update_dto.metadata.unwrap();
             model.metadata = ActiveValue::Set(Some(to_concrete_metadata(metadata)));
         }
 

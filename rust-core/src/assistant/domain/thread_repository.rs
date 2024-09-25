@@ -3,19 +3,13 @@ use std::error::Error;
 use mockall::automock;
 use serde::{Deserialize, Serialize};
 
-use super::dto::{ThreadDto, ThreadMessageDto};
+use super::dto::{CreateThreadMessageDto, ThreadDto, ThreadMessageDto};
 use crate::utils::PageRequest;
-
-#[derive(Default, Serialize, Deserialize, Clone)]
-pub struct CreateThreadMessageParams {
-    pub content: String,
-    pub role: String,
-}
 
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct CreateThreadParams {
     pub metadata: Option<String>,
-    pub messages: Vec<CreateThreadMessageParams>,
+    pub messages: Vec<CreateThreadMessageDto>,
 }
 
 #[derive(Default, Serialize, Deserialize)]

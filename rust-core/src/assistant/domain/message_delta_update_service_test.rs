@@ -4,7 +4,10 @@ mod tests {
 
     use crate::{
         assistant::domain::{
-            dto::{message_delta::MessageContentDelta, ThreadMessageDto, UpdateThreadMessageDto},
+            dto::{
+                message_delta::MessageContentDelta, MessageContent, ThreadMessageDto,
+                UpdateThreadMessageDto,
+            },
             message_delta_update_service::MessageDeltaUpdateService,
             message_repository::MockMessageRepository,
         },
@@ -14,18 +17,19 @@ mod tests {
     };
 
     #[tokio::test]
-    async fn test_updated_message_from_chunk_contains_full_message() {
+    async fn test_updated_message_from_chunk_contains_full_message_in_single_text_block() {
+        // Given new chunk adding "World! to existing message"
         let thread_id = "some_thread_id";
         let message_id = "some_message_id";
         let expected_update_message = UpdateThreadMessageDto {
             id: message_id.to_string(),
-            content: Some("Hello World!".to_string()),
+            content: Some(vec![MessageContent::new_text_content("Hello World!")]),
             ..UpdateThreadMessageDto::default()
         };
         let existing_message = ThreadMessageDto {
             id: message_id.to_string(),
             thread_id: Some(thread_id.to_string()),
-            content: "Hello ".to_string(),
+            content: vec![MessageContent::new_text_content("Hello ")],
             ..ThreadMessageDto::default()
         };
         let chunk = ChatCompletionChunkObject {
@@ -38,16 +42,30 @@ mod tests {
             }],
             ..ChatCompletionChunkObject::default()
         };
-
         let repository = message_repository_mocking_update(&thread_id, &expected_update_message);
         let instance = MessageDeltaUpdateService::new(Arc::new(repository));
 
+        // When updating message already containing "Hello" from chunk
         let (_delta, message) = instance
             .from_chunk(&chunk, &existing_message)
             .await
             .unwrap();
 
-        assert_eq!(message.content, "Hello World!");
+        // Then message should contain a single Text Block Content
+        let text_blocks = message
+            .content
+            .iter()
+            .filter_map(|c| match c {
+                MessageContent::Text(block) => Some(block),
+                _ => None,
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(text_blocks.len(), 1);
+
+        // Then message Text Block Content should contain "Hello World!"
+        let text_block = text_blocks[0];
+
+        assert_eq!(text_block.text.value, "Hello World!");
     }
 
     #[tokio::test]
@@ -56,13 +74,13 @@ mod tests {
         let message_id = "some_message_id";
         let expected_update_message = UpdateThreadMessageDto {
             id: message_id.to_string(),
-            content: Some("Hello World!".to_string()),
+            content: Some(vec![MessageContent::new_text_content("Hello World!")]),
             ..UpdateThreadMessageDto::default()
         };
         let existing_message = ThreadMessageDto {
             id: message_id.to_string(),
             thread_id: Some(thread_id.to_string()),
-            content: "Hello ".to_string(),
+            content: vec![MessageContent::new_text_content("Hello ")],
             ..ThreadMessageDto::default()
         };
         let chunk = ChatCompletionChunkObject {
@@ -101,13 +119,13 @@ mod tests {
         let message_id = "some_message_id";
         let expected_update_message = UpdateThreadMessageDto {
             id: message_id.to_string(),
-            content: Some("Hello World!".to_string()),
+            content: Some(vec![MessageContent::new_text_content("Hello World!")]),
             ..UpdateThreadMessageDto::default()
         };
         let existing_message = ThreadMessageDto {
             id: message_id.to_string(),
             thread_id: Some(thread_id.to_string()),
-            content: "Hello ".to_string(),
+            content: vec![MessageContent::new_text_content("Hello ")],
             role: "assistant".to_string(),
             ..ThreadMessageDto::default()
         };
@@ -155,7 +173,7 @@ mod tests {
                         thread_id: Some(thread_id),
                         status: update_message_dto.status.unwrap_or("".to_string()),
                         role: "assistant".to_string(),
-                        content: update_message_dto.content.unwrap_or("".to_string()),
+                        content: vec![MessageContent::new_text_content("Hello World!")],
                         ..ThreadMessageDto::default()
                     })
                 })

@@ -1,7 +1,7 @@
 use crate::test_utils;
 use app_core::assistant::domain::dto::{
-    CreateThreadAndRunDto, CreateThreadDto, CreateThreadMessageDto, RunDto, ThreadDto,
-    ThreadMessageDto,
+    CreateThreadAndRunDto, CreateThreadDto, CreateThreadMessageDto, MessageContent, RunDto,
+    ThreadDto, ThreadMessageDto,
 };
 use axum::http::StatusCode;
 use test_utils::router_client::RouterClient;
@@ -54,7 +54,7 @@ async fn test_deleted_thread_also_deletes_associated_messages() {
 
     // Create thread with message
     let message1 = CreateThreadMessageDto {
-        content: "Say Hello!".to_string(),
+        content: vec![MessageContent::new_text_content("Say Hello!")],
         role: "user".to_string(),
         ..CreateThreadMessageDto::default()
     };

@@ -1,6 +1,6 @@
 use crate::test_utils;
 use app_core::assistant::domain::dto::{
-    CreateThreadDto, CreateThreadMessageDto, ThreadDto, ThreadMessageDto,
+    CreateThreadDto, CreateThreadMessageDto, MessageContent, ThreadDto, ThreadMessageDto,
 };
 use axum::http::StatusCode;
 use test_utils::router_client::RouterClient;
@@ -99,7 +99,7 @@ async fn test_created_threads_are_listed() {
 async fn test_created_thread_with_message_is_successful() {
     let client = RouterClient::from_app("/openai/v1").await;
     let message1 = CreateThreadMessageDto {
-        content: "Say Hello!".to_string(),
+        content: vec![MessageContent::new_text_content("Say Hello!")],
         role: "user".to_string(),
         ..CreateThreadMessageDto::default()
     };
@@ -124,7 +124,7 @@ async fn test_created_thread_with_message_is_successful() {
 async fn test_created_thread_with_message_have_id() {
     let client = RouterClient::from_app("/openai/v1").await;
     let message1 = CreateThreadMessageDto {
-        content: "Say Hello!".to_string(),
+        content: vec![MessageContent::new_text_content("Say Hello!")],
         role: "user".to_string(),
         ..CreateThreadMessageDto::default()
     };
@@ -153,7 +153,7 @@ async fn test_created_thread_with_message_have_id() {
 async fn test_created_thread_with_message_have_same_content() {
     let client = RouterClient::from_app("/openai/v1").await;
     let message1 = CreateThreadMessageDto {
-        content: "Say Hello!".to_string(),
+        content: vec![MessageContent::new_text_content("Say Hello!")],
         role: "user".to_string(),
         ..CreateThreadMessageDto::default()
     };
@@ -174,7 +174,7 @@ async fn test_created_thread_with_message_have_same_content() {
         .unwrap();
 
     let first_element = &response.unwrap()[0];
-    assert_eq!(first_element.content, "Say Hello!".to_string());
+    assert_eq!(first_element.to_string_content(), "Say Hello!".to_string());
     assert_eq!(first_element.role, "user".to_string());
 }
 
@@ -184,7 +184,7 @@ async fn test_created_thread_with_message_can_be_retrieved() {
 
     // Create thread with message
     let message1 = CreateThreadMessageDto {
-        content: "Say Hello!".to_string(),
+        content: vec![MessageContent::new_text_content("Say Hello!")],
         role: "user".to_string(),
         ..CreateThreadMessageDto::default()
     };
@@ -218,5 +218,5 @@ async fn test_created_thread_with_message_can_be_retrieved() {
     let message = response.unwrap();
 
     assert_eq!(status, StatusCode::OK);
-    assert_eq!(message.content, "Say Hello!");
+    assert_eq!(message.to_string_content(), "Say Hello!");
 }

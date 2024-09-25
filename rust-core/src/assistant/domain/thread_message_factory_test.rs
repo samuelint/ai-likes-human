@@ -13,7 +13,6 @@ mod tests {
             role: "assistant".to_string(),
             thread_id: Some("some_thread_id".to_string()),
             run_id: Some("some_run_id".to_string()),
-            content: "".to_string(),
             ..ThreadMessageDto::default()
         };
         let message_repository = message_repository_mocking_create(&repository_created_message);
@@ -33,7 +32,6 @@ mod tests {
             role: "assistant".to_string(),
             thread_id: Some("some_thread_id".to_string()),
             run_id: Some("some_run_id".to_string()),
-            content: "".to_string(),
             ..ThreadMessageDto::default()
         };
         let message_repository = message_repository_mocking_create(&repository_created_message);
@@ -53,7 +51,6 @@ mod tests {
             role: "assistant".to_string(),
             thread_id: Some("some_thread_id".to_string()),
             run_id: Some("some_run_id".to_string()),
-            content: "".to_string(),
             ..ThreadMessageDto::default()
         };
         let message_repository = message_repository_mocking_create(&repository_created_message);
@@ -73,7 +70,6 @@ mod tests {
             role: "assistant".to_string(),
             thread_id: Some("some_thread_id".to_string()),
             run_id: Some("some_run_id".to_string()),
-            content: "".to_string(),
             ..ThreadMessageDto::default()
         };
         let message_repository = message_repository_mocking_create(&repository_created_message);

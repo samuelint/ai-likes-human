@@ -1,6 +1,6 @@
 use crate::test_utils;
 use app_core::assistant::domain::dto::{
-    CreateThreadAndRunDto, CreateThreadDto, CreateThreadMessageDto, ThreadEvent,
+    CreateThreadAndRunDto, CreateThreadDto, CreateThreadMessageDto, MessageContent, ThreadEvent,
 };
 use futures::{Stream, StreamExt};
 use test_utils::router_client::RouterClient;
@@ -14,7 +14,7 @@ async fn create_run_stream(prompt: &str) -> impl Stream<Item = Result<ThreadEven
         model: LLM_MODEL.to_string(),
         thread: CreateThreadDto {
             messages: vec![CreateThreadMessageDto {
-                content: prompt.to_string(),
+                content: vec![MessageContent::new_text_content(prompt)],
                 ..CreateThreadMessageDto::user()
             }],
             ..CreateThreadDto::default()
@@ -122,7 +122,7 @@ async fn test_run_stream_starts_with_thread_created() {
     let chunk = &chunks[0];
 
     let chunk = match chunk {
-        ThreadEvent::ThreadRunCreated(event) => event,
+        ThreadEvent::ThreadCreated(event) => event,
         _ => panic!("Expected ThreadCreated event"),
     };
 
@@ -135,7 +135,7 @@ async fn test_run_stream_thread_created_contains_new_thread_data() {
     let chunk = &chunks[0];
 
     let chunk = match chunk {
-        ThreadEvent::ThreadRunCreated(event) => event,
+        ThreadEvent::ThreadCreated(event) => event,
         _ => panic!("Expected ThreadCreated event"),
     };
 

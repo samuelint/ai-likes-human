@@ -13,7 +13,7 @@ use super::{
         message_delta::{
             MessageContentDelta, MessageDeltaDto, TextDeltaDto, ThreadMessageDeltaDto,
         },
-        ThreadMessageDto,
+        MessageContent, TextContentBlock, ThreadMessageDto,
     },
     message_repository::MessageRepository,
 };
@@ -32,8 +32,8 @@ impl MessageDeltaUpdateService {
         chunk: &ChatCompletionChunkObject,
         message: &ThreadMessageDto,
     ) -> Result<(ThreadMessageDeltaDto, ThreadMessageDto), Box<dyn Error + Send>> {
-        let chunk_content = chunk.to_content_string();
-        let new_content = format!("{}{}", message.content, chunk_content);
+        let new_content_text = self.get_new_text_content(chunk, message);
+        let new_content = self.create_updated_text_content(&message.content, &new_content_text);
 
         let message = self
             .message_repository
@@ -49,7 +49,7 @@ impl MessageDeltaUpdateService {
                 delta: MessageDeltaDto {
                     role: message.role.clone(),
                     content: vec![MessageContentDelta::Text(TextDeltaDto {
-                        value: Some(new_content),
+                        value: Some(new_content_text),
                         ..TextDeltaDto::default()
                     })],
                 },
@@ -57,5 +57,36 @@ impl MessageDeltaUpdateService {
             },
             message,
         ))
+    }
+
+    fn get_new_text_content(
+        &self,
+        chunk: &ChatCompletionChunkObject,
+        message: &ThreadMessageDto,
+    ) -> String {
+        let chunk_content = chunk.to_content_string();
+        let existing_content = message.to_string_content();
+
+        format!("{existing_content}{chunk_content}")
+    }
+
+    fn create_updated_text_content(
+        &self,
+        existing_content: &Vec<MessageContent>,
+        new_content: &str,
+    ) -> Vec<MessageContent> {
+        let new_text_block = TextContentBlock::new(&new_content);
+
+        let mut content: Vec<MessageContent> = existing_content
+            .iter()
+            .filter_map(|c| match c {
+                MessageContent::Text(_) => None,
+                c => Some(c.clone()),
+            })
+            .collect();
+
+        content.push(MessageContent::Text(new_text_block));
+
+        content
     }
 }

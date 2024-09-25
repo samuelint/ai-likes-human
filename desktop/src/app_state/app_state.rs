@@ -28,6 +28,10 @@ impl AppState {
         self.inference_server.is_core_server_up()
     }
 
+    pub fn get_inference_server_url(&self) -> String {
+        self.inference_server.get_url()
+    }
+
     pub fn start_inference_server(&self) -> Result<(), Box<dyn Error>> {
         let inference_server = Arc::clone(&self.inference_server);
         tauri::async_runtime::spawn(async move {

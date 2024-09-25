@@ -10,6 +10,11 @@ pub fn is_server_up(app_state: State<'_, AppState>) -> Result<bool, String> {
 }
 
 #[tauri::command]
+pub fn get_inference_server_url(app_state: State<'_, AppState>) -> String {
+    app_state.get_inference_server_url()
+}
+
+#[tauri::command]
 pub async fn find_configuration(
     app_state: State<'_, AppState>,
     key: String,

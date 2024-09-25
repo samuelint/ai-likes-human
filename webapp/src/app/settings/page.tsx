@@ -6,11 +6,11 @@ import AdvancedSection from './_components/advanced.section';
 import { PageSection } from '@/components/page-section';
 import { useScrollToSectionUsingRouteHash } from '@/lib/use-scroll-to-id';
 import ExtensionsSection from './_components/extensions-section';
+import InferenceServerSection from './_components/inference-server';
 
 
 export default function Settings() {
   const isInDesktopApp = useIsInDesktopApp();
-  const showLocalModelsSection = isInDesktopApp || process.env.NODE_ENV === 'development';
 
   useScrollToSectionUsingRouteHash();
 
@@ -20,8 +20,9 @@ export default function Settings() {
         <GeneralSection />
         <ApiKeysSection />
         <ExtensionsSection />
+        { isInDesktopApp && <LocalModelsSection />}
         <AdvancedSection />
-        { showLocalModelsSection && <LocalModelsSection />}
+        { isInDesktopApp && <InferenceServerSection /> }
       </div>
     </PageSection>
   );

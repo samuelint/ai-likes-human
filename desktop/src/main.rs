@@ -7,7 +7,9 @@ pub mod screencapture;
 pub mod system_tray;
 
 use app_state::app_state::AppState;
-use core::tauri_command::{find_configuration, is_server_up, upsert_configuration};
+use core::tauri_command::{
+    find_configuration, get_inference_server_url, is_server_up, upsert_configuration,
+};
 use log::info;
 use screencapture::tauri_command::{assert_screen_capture_permissions, capture_screen};
 use system_tray::{build_menu, on_system_tray_event};
@@ -69,6 +71,7 @@ async fn main() {
             assert_screen_capture_permissions,
             upsert_configuration,
             find_configuration,
+            get_inference_server_url,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")

@@ -12,6 +12,10 @@ impl InferenceServer {
         InferenceServer { port }
     }
 
+    pub fn get_url(&self) -> String {
+        format!("http://localhost:{}", self.port)
+    }
+
     pub async fn serve(&self) {
         serve(ServeParameters {
             port: self.port,
@@ -22,7 +26,8 @@ impl InferenceServer {
     }
 
     pub fn is_core_server_up(&self) -> Result<bool, Box<dyn Error>> {
-        let response = ureq::get(&format!("http://localhost:{}", self.port)).call()?;
+        let url = self.get_url();
+        let response = ureq::get(&url).call()?;
         let status = response.status();
 
         return Ok(status == 200);

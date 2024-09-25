@@ -1,5 +1,5 @@
 import { useIsInDesktopAppFn } from './is-in-desktop-app';
-import { isLocalServerRunning } from './tauri-command/server-status';
+import { isInferenceServerRunning } from './tauri-command';
 import { useCallback, useEffect, useState } from 'react';
 
 
@@ -13,7 +13,7 @@ export function useIsLocalServerUp ({ refreshInterval = 2000 }: Props = {}) {
   const [hasAlreadyBeenUp, setHasAlreadyBeenUp] = useState(false);
 
   const update = useCallback(async () => {
-    const newIsUp = await isLocalServerRunning();
+    const newIsUp = await isInferenceServerRunning();
     setIsUp(newIsUp);
     if (!hasAlreadyBeenUp && newIsUp) {
       setHasAlreadyBeenUp(true);

@@ -5,7 +5,7 @@
 import '@testing-library/jest-dom';
 import { cleanup, render, screen, waitFor, act } from '@testing-library/react';
 import { useIsLocalServerUp } from './use-is-local-server-up';
-import { isLocalServerRunning } from './tauri-command/server-status';
+import { isInferenceServerRunning } from './tauri-command/inference-server';
 import { when } from 'jest-when';
 import { useIsInDesktopAppFn } from './is-in-desktop-app';
 
@@ -35,7 +35,7 @@ describe('new-conversation', () => {
 
   describe('is up', () => {
     it('should be up when is up at mount', async () => {
-      when(isLocalServerRunning).mockResolvedValue(true);
+      when(isInferenceServerRunning).mockResolvedValue(true);
 
       render(<TestComponent />);
 
@@ -49,7 +49,7 @@ describe('new-conversation', () => {
     });
 
     it('should be up when is up after a while', async () => {
-      when(isLocalServerRunning).mockImplementation(async () => new Promise(resolve => setTimeout(() => resolve(true), 200)));
+      when(isInferenceServerRunning).mockImplementation(async () => new Promise(resolve => setTimeout(() => resolve(true), 200)));
 
       render(<TestComponent />);
 
@@ -63,7 +63,7 @@ describe('new-conversation', () => {
     });
 
     it('should not be up when never set to up', async () => {
-      when(isLocalServerRunning).mockImplementation(async () => new Promise(resolve => setTimeout(() => resolve(false), 200)));
+      when(isInferenceServerRunning).mockImplementation(async () => new Promise(resolve => setTimeout(() => resolve(false), 200)));
 
       render(<TestComponent />);
 
@@ -77,13 +77,13 @@ describe('new-conversation', () => {
     });
 
     it('should be down when is down after being up', async () => {
-      when(isLocalServerRunning).mockResolvedValue(true);
+      when(isInferenceServerRunning).mockResolvedValue(true);
 
       render(<TestComponent />);
 
       await act(async () => {
         await new Promise(resolve => setTimeout(resolve, 150));
-        when(isLocalServerRunning).mockResolvedValue(false);
+        when(isInferenceServerRunning).mockResolvedValue(false);
         await new Promise(resolve => setTimeout(resolve, 100));
       });
 
@@ -100,7 +100,7 @@ describe('new-conversation', () => {
   describe('is already been up', () => {
 
     it('should be already been up when up', async () => {
-      when(isLocalServerRunning).mockResolvedValue(true);
+      when(isInferenceServerRunning).mockResolvedValue(true);
 
       render(<TestComponent />);
 
@@ -113,13 +113,13 @@ describe('new-conversation', () => {
     });
 
     it('should be already been up when been up at least one time', async () => {
-      when(isLocalServerRunning).mockResolvedValue(true);
+      when(isInferenceServerRunning).mockResolvedValue(true);
 
       render(<TestComponent />);
 
       await act(async () => {
         await new Promise(resolve => setTimeout(resolve, 150));
-        when(isLocalServerRunning).mockResolvedValue(false);
+        when(isInferenceServerRunning).mockResolvedValue(false);
         await new Promise(resolve => setTimeout(resolve, 100));
       });
 

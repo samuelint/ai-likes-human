@@ -13,7 +13,6 @@ pub mod entities;
 pub use api_facade::ApiFacade;
 pub use app_configuration::AppConfiguration;
 pub use app_container::AppContainer;
-pub use assistant::domain::agent_factory::AgentFactory;
 pub use configuration::app::*;
 pub use entities::configuration::*;
 pub use utils::PageRequest;

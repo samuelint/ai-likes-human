@@ -1,7 +1,7 @@
 use std::{error::Error, sync::Arc};
 
 use crate::{
-    assistant::AgentDIModule, app_configuration::AppConfiguration,
+    app_configuration::AppConfiguration, assistant::AgentDIModule,
     chat_completion::ChatCompletionDIModule, configuration::ConfigurationDIModule,
     infrastructure::sea_orm::ConnectionFactory, llm::LLMDIModule,
 };
@@ -11,7 +11,7 @@ pub struct AppContainer {
     pub sea_orm_connection: Arc<::sea_orm::DatabaseConnection>,
     pub configuration_module: ConfigurationDIModule,
     pub llm_module: Arc<LLMDIModule>,
-    pub chat_completion_module: ChatCompletionDIModule,
+    pub chat_completion_module: Arc<ChatCompletionDIModule>,
     pub agent_module: AgentDIModule,
 }
 
@@ -22,9 +22,9 @@ impl AppContainer {
 
         let configuration_module = ConfigurationDIModule::new(Arc::clone(&connection));
         let llm_module = Arc::new(LLMDIModule::new());
-        let chat_completion_module = ChatCompletionDIModule::new(Arc::clone(&llm_module));
+        let chat_completion_module = Arc::new(ChatCompletionDIModule::new(Arc::clone(&llm_module)));
         let agent_module: AgentDIModule =
-            AgentDIModule::new(Arc::clone(&connection), Arc::clone(&llm_module));
+            AgentDIModule::new(Arc::clone(&connection), Arc::clone(&chat_completion_module));
 
         Ok(Self {
             config,

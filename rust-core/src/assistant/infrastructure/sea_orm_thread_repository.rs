@@ -1,14 +1,16 @@
-use crate::assistant::domain::dto::ThreadDto;
+use crate::assistant::domain::dto::{ThreadDto, ThreadMessageDto};
 use crate::assistant::domain::thread_repository::{
     CreateThreadParams, ThreadRepository, UpdateThreadParams,
 };
 use crate::assistant::domain::CreateMessageParams;
-use crate::entities::thread;
+use crate::entities::{message, thread};
 use crate::utils::time::current_time_with_timezone;
 use crate::utils::PageRequest;
 use anyhow::anyhow;
-use sea_orm::TransactionTrait;
-use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, EntityTrait, QuerySelect};
+use sea_orm::{
+    ActiveModelTrait, ActiveValue, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter,
+    QuerySelect, TransactionTrait,
+};
 use std::error::Error;
 use std::sync::Arc;
 
@@ -43,7 +45,7 @@ impl SeaOrmThreadRepository {
 
 #[async_trait::async_trait]
 impl ThreadRepository for SeaOrmThreadRepository {
-    async fn find(&self, id: String) -> Result<Option<ThreadDto>, Box<dyn Error>> {
+    async fn find(&self, id: &str) -> Result<Option<ThreadDto>, Box<dyn Error>> {
         let conn = Arc::clone(&self.connection);
         let id: i32 = id.parse()?;
         let r = thread::Entity::find_by_id(id).one(conn.as_ref()).await?;
@@ -54,6 +56,23 @@ impl ThreadRepository for SeaOrmThreadRepository {
         let r: ThreadDto = r.unwrap().into();
 
         Ok(Some(r))
+    }
+
+    async fn find_messages(
+        &self,
+        id: &str,
+    ) -> Result<Vec<ThreadMessageDto>, Box<dyn Error + Send>> {
+        let conn = Arc::clone(&self.connection);
+        let models: Vec<message::Model> = message::Entity::find()
+            .filter(message::Column::ThreadId.eq(id))
+            .all(conn.as_ref())
+            .await
+            .map_err(|e| anyhow!(e))?;
+
+        let models: Vec<ThreadMessageDto> =
+            models.iter().map(|model| model.clone().into()).collect();
+
+        Ok(models)
     }
 
     async fn create(
@@ -141,7 +160,7 @@ impl ThreadRepository for SeaOrmThreadRepository {
         Ok(result.iter().map(|r| r.clone().into()).collect())
     }
 
-    async fn delete(&self, id: String) -> Result<(), Box<dyn Error>> {
+    async fn delete(&self, id: &str) -> Result<(), Box<dyn Error>> {
         let id = id.parse()?;
         let conn = Arc::clone(&self.connection);
 

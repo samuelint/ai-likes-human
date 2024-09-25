@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::assistant::domain::{thread_repository::CreateThreadMessageParams, CreateMessageParams};
+use crate::{assistant::domain::{thread_repository::CreateThreadMessageParams, CreateMessageParams}, chat_completion::ChatCompletionMessageDto};
 
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct AnnotationDto {
@@ -32,6 +32,15 @@ pub struct ThreadMessageDto {
     pub assistant_id: Option<String>,
     pub run_id: Option<String>,
     pub metadata: Option<String>,
+}
+
+impl From<ThreadMessageDto> for ChatCompletionMessageDto {
+    fn from(dto: ThreadMessageDto) -> Self {
+        ChatCompletionMessageDto {
+            content: dto.content,
+            role: dto.role,
+        }
+    }
 }
 
 #[derive(Default, Serialize, Deserialize, Clone)]

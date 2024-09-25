@@ -1,29 +1,30 @@
 use std::sync::Arc;
 
 use domain::{
-    agent_factory::AgentFactory, message_repository::MessageRepository, run_factory::RunFactory,
-    run_repository::RunRepository, stream_run_service::StreamRunService,
+    message_repository::MessageRepository, run_factory::RunFactory, run_repository::RunRepository,
+    stream_inference_service::StreamInferenceService,
+    thread_chat_completions_inference::ThreadChatCompletionInference,
     thread_repository::ThreadRepository,
 };
 use infrastructure::{SeaOrmMessageRepository, SeaOrmRunRepository, SeaOrmThreadRepository};
 
-use crate::llm::{domain::llm_factory::LLMFactory, LLMDIModule};
+use crate::chat_completion::ChatCompletionDIModule;
 
 pub mod domain;
 pub mod infrastructure;
 
 pub struct AgentDIModule {
-    llm_module: Arc<LLMDIModule>,
+    chat_completion_module: Arc<ChatCompletionDIModule>,
     connection: Arc<::sea_orm::DatabaseConnection>,
 }
 
 impl AgentDIModule {
     pub fn new(
         connection: Arc<::sea_orm::DatabaseConnection>,
-        llm_module: Arc<LLMDIModule>,
+        chat_completion_module: Arc<ChatCompletionDIModule>,
     ) -> Self {
         Self {
-            llm_module,
+            chat_completion_module,
             connection,
         }
     }
@@ -69,21 +70,23 @@ impl AgentDIModule {
         Arc::new(RunFactory::new(run_repository, thread_repository))
     }
 
-    pub fn get_stream_run_service(&self) -> Arc<StreamRunService> {
-        let run_factory = self.get_run_factory();
-        let llm_factory = self.llm_module.get_llm_factory();
-        let thread_repository = self.get_thread_repository();
+    pub fn get_thread_inference_service(&self) -> Arc<ThreadChatCompletionInference> {
+        let chat_completion_inference_service = self.chat_completion_module.get_inference_factory();
 
-        Arc::new(StreamRunService::new(
-            run_factory,
-            llm_factory,
-            thread_repository,
+        Arc::new(ThreadChatCompletionInference::new(
+            chat_completion_inference_service,
         ))
     }
 
-    pub fn get_agent_factory(&self) -> Arc<AgentFactory> {
-        let llm_factory: Arc<dyn LLMFactory> = self.llm_module.get_llm_factory();
+    pub fn get_stream_run_service(&self) -> Arc<StreamInferenceService> {
+        let run_factory = self.get_run_factory();
+        let interence_service = self.get_thread_inference_service();
+        let thread_repository = self.get_thread_repository();
 
-        Arc::new(AgentFactory::new(llm_factory))
+        Arc::new(StreamInferenceService::new(
+            run_factory,
+            interence_service,
+            thread_repository,
+        ))
     }
 }

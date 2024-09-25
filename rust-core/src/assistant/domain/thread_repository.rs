@@ -2,7 +2,7 @@ use std::error::Error;
 
 use serde::{Deserialize, Serialize};
 
-use super::dto::ThreadDto;
+use super::dto::{ThreadDto, ThreadMessageDto};
 use crate::utils::PageRequest;
 
 #[derive(Default, Serialize, Deserialize, Clone)]
@@ -28,6 +28,7 @@ pub trait ThreadRepository: Sync + Send {
     async fn create(&self, thread: CreateThreadParams) -> Result<ThreadDto, Box<dyn Error + Send>>;
     async fn update(&self, thread: UpdateThreadParams) -> Result<ThreadDto, Box<dyn Error>>;
     async fn list_by_page(&self, args: PageRequest) -> Result<Vec<ThreadDto>, Box<dyn Error>>;
-    async fn find(&self, id: String) -> Result<Option<ThreadDto>, Box<dyn Error>>;
-    async fn delete(&self, id: String) -> Result<(), Box<dyn Error>>;
+    async fn find(&self, id: &str) -> Result<Option<ThreadDto>, Box<dyn Error>>;
+    async fn find_messages(&self, id: &str) -> Result<Vec<ThreadMessageDto>, Box<dyn Error + Send>>;
+    async fn delete(&self, id: &str) -> Result<(), Box<dyn Error>>;
 }

@@ -100,7 +100,7 @@ pub async fn find_thread(
 ) -> impl IntoResponse {
     let service = state.core_container.agent_module.get_thread_repository();
 
-    match service.find(thread_id).await {
+    match service.find(&thread_id).await {
         Ok(thread) => {
             if thread.is_none() {
                 return (StatusCode::NOT_FOUND, "").into_response();
@@ -137,7 +137,7 @@ pub async fn delete_thread(
 ) -> impl IntoResponse {
     let service = state.core_container.agent_module.get_thread_repository();
 
-    match service.delete(thread_id).await {
+    match service.delete(&thread_id).await {
         Ok(_) => return ().into_response(),
         Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
     }

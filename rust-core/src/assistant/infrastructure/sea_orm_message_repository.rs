@@ -13,7 +13,7 @@ use crate::assistant::domain::dto::{
 use crate::assistant::domain::message_repository::MessageRepository;
 use crate::entities::message;
 
-use super::metadata::to_concrete_metadata;
+use super::metadata::serialize_metadata_opt;
 
 pub struct SeaOrmMessageRepository {
     connection: Arc<DatabaseConnection>,
@@ -108,7 +108,7 @@ impl MessageRepository for SeaOrmMessageRepository {
 
         if update_dto.metadata.is_some() {
             let metadata = update_dto.metadata.unwrap();
-            model.metadata = ActiveValue::Set(Some(to_concrete_metadata(metadata)));
+            model.metadata = ActiveValue::Set(Some(serialize_metadata_opt(metadata)));
         }
 
         let updated_model = model.update(conn.as_ref()).await.map_err(|e| anyhow!(e))?;

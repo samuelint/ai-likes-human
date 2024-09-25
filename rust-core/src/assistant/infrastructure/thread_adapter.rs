@@ -6,6 +6,8 @@ use crate::{
     entities::thread,
 };
 
+use super::metadata::{deserialize_metadata, serialize_metadata};
+
 impl From<CreateThreadDto> for CreateThreadParams {
     fn from(dto: CreateThreadDto) -> Self {
         CreateThreadParams {
@@ -20,7 +22,7 @@ impl From<thread::Model> for ThreadDto {
         ThreadDto {
             id: model.id.to_string(),
             created_at: model.created_at.to_string(),
-            metadata: model.metadata,
+            metadata: deserialize_metadata(&model.metadata),
         }
     }
 }
@@ -30,7 +32,7 @@ impl From<ThreadDto> for thread::Model {
         thread::Model {
             id: dto.id.parse().expect("thread id should be a number"),
             created_at: dto.created_at,
-            metadata: dto.metadata,
+            metadata: serialize_metadata(&dto.metadata),
         }
     }
 }

@@ -1,6 +1,7 @@
 import useSWR from 'swr';
 import { createApiJsonFetcher } from '../api-fetcher';
 import { toThreadPreview } from './thread.type';
+import { openai_api_url } from '@/app.config';
 
 
 interface Props {
@@ -8,7 +9,7 @@ interface Props {
 }
 
 export function useListThreads({ limit = '10' }: Props = {}) {
-  const { data, error, isLoading, mutate } = useSWR('/assistant/openai/v1/threads', createApiJsonFetcher({ queryParams: { limit } }));
+  const { data, error, isLoading, mutate } = useSWR(`${openai_api_url}/threads`, createApiJsonFetcher({ queryParams: { limit } }));
 
   return {
     data: data?.data.map(toThreadPreview),

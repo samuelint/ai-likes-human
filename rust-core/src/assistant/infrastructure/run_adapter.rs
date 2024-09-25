@@ -1,5 +1,7 @@
 use crate::{assistant::domain::dto::RunDto, entities::run};
 
+use super::metadata::{deserialize_metadata, serialize_metadata};
+
 impl From<run::Model> for RunDto {
     fn from(model: run::Model) -> Self {
         RunDto {
@@ -10,7 +12,7 @@ impl From<run::Model> for RunDto {
             instructions: model.instructions,
             model: model.model,
             status: model.status,
-            metadata: model.metadata,
+            metadata: model.metadata.map(|m| deserialize_metadata(&m)),
             temperature: model.temperature,
         }
     }
@@ -26,7 +28,7 @@ impl From<RunDto> for run::Model {
             instructions: dto.instructions,
             model: dto.model,
             status: dto.status,
-            metadata: dto.metadata,
+            metadata: dto.metadata.map(|m| serialize_metadata(&m)),
             temperature: dto.temperature,
         }
     }

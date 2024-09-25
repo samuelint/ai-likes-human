@@ -6,7 +6,7 @@ use crate::chat_completion::ChatCompletionMessageDto;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
-use super::annotation::MessageAnnotation;
+use super::{annotation::MessageAnnotation, Metadata};
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
 pub struct TextContentDto {
@@ -31,7 +31,7 @@ pub struct ThreadMessageDto {
     pub content: Vec<MessageContent>,
     pub assistant_id: Option<String>,
     pub run_id: Option<String>,
-    pub metadata: Option<String>,
+    pub metadata: Option<Metadata>,
 }
 
 impl ThreadMessageDto {
@@ -135,7 +135,7 @@ pub struct UpdateThreadMessageDto {
     pub status: Option<String>,
     pub content: Option<Vec<MessageContent>>,
     pub assistant_id: Option<Option<String>>,
-    pub metadata: Option<Option<String>>,
+    pub metadata: Option<Option<Metadata>>,
 }
 
 impl From<ThreadMessageDto> for ChatCompletionMessageDto {
@@ -155,7 +155,7 @@ pub struct CreateThreadMessageDto {
     pub thread_id: Option<String>,
     pub run_id: Option<String>,
     pub attachments: Option<String>,
-    pub metadata: Option<String>,
+    pub metadata: Option<Metadata>,
 }
 
 impl CreateThreadMessageDto {

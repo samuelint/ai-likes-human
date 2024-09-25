@@ -1,8 +1,10 @@
 use crate::test_utils;
 use app_core::assistant::domain::dto::{
-    CreateThreadDto, CreateThreadMessageDto, MessageContent, ThreadDto, ThreadMessageDto,
+    CreateThreadDto, CreateThreadMessageDto, MessageContent, MetadataBuilder, ThreadDto,
+    ThreadMessageDto,
 };
 use axum::http::StatusCode;
+use serde_json::Value;
 use test_utils::router_client::RouterClient;
 
 #[tokio::test]
@@ -65,7 +67,11 @@ async fn test_created_thread_have_empty_metadata() {
         .post::<CreateThreadDto, ThreadDto>("/threads", &body)
         .await
         .unwrap();
-    assert_eq!(response.unwrap().metadata, "{}", "metadata should be empty");
+    assert_eq!(
+        response.unwrap().metadata.len(),
+        0,
+        "metadata should be empty"
+    );
 }
 
 #[tokio::test]
@@ -219,4 +225,32 @@ async fn test_created_thread_with_message_can_be_retrieved() {
 
     assert_eq!(status, StatusCode::OK);
     assert_eq!(message.to_string_content(), "Say Hello!");
+}
+
+#[tokio::test]
+async fn test_created_thread_with_metadata_can_be_retrieved() {
+    let client = RouterClient::from_app("/openai/v1").await;
+    let mut metadata = MetadataBuilder::create_empty();
+    metadata.insert("key".to_string(), Value::String("value".to_string()));
+
+    // Create thread with message
+    let body = CreateThreadDto {
+        metadata: Some(metadata),
+        ..CreateThreadDto::default()
+    };
+    let (response, status) = client
+        .post::<CreateThreadDto, ThreadDto>("/threads", &body)
+        .await
+        .unwrap();
+    assert_eq!(status, StatusCode::OK);
+    let created_thread = response.unwrap();
+    assert_eq!(
+        created_thread
+            .metadata
+            .get("key")
+            .unwrap()
+            .as_str()
+            .unwrap(),
+        "value"
+    );
 }

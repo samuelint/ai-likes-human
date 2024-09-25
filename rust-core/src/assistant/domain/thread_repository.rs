@@ -2,20 +2,21 @@ use std::error::Error;
 
 use mockall::automock;
 use serde::{Deserialize, Serialize};
+use serde_json::{Map, Value};
 
 use super::dto::{CreateThreadMessageDto, ThreadDto, ThreadMessageDto};
 use crate::utils::PageRequest;
 
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct CreateThreadParams {
-    pub metadata: Option<String>,
+    pub metadata: Option<Map<String, Value>>,
     pub messages: Vec<CreateThreadMessageDto>,
 }
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct UpdateThreadParams {
     pub id: String,
-    pub metadata: Option<String>,
+    pub metadata: Option<Map<String, Value>>,
 }
 
 #[async_trait::async_trait]

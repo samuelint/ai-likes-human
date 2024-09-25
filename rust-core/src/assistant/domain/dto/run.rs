@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::assistant::domain::CreateThreadParams;
 
-use super::CreateThreadDto;
+use super::{CreateThreadDto, Metadata};
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
 pub struct RunDto {
@@ -13,7 +13,7 @@ pub struct RunDto {
     pub instructions: Option<String>,
     pub model: String,
     pub status: String,
-    pub metadata: Option<String>,
+    pub metadata: Option<Metadata>,
     pub temperature: Option<i32>,
 }
 
@@ -23,7 +23,7 @@ pub struct CreateRunDto {
     pub model: String,
     pub instructions: Option<String>,
     pub temperature: Option<i32>,
-    pub metadata: Option<String>,
+    pub metadata: Option<Metadata>,
     pub stream: Option<bool>,
 }
 
@@ -33,7 +33,7 @@ pub struct CreateThreadAndRunDto {
     pub thread: CreateThreadDto,
     pub model: String,
     pub instructions: Option<String>,
-    pub metadata: Option<String>,
+    pub metadata: Option<Metadata>,
     pub temperature: Option<i32>,
     pub stream: Option<bool>,
 }

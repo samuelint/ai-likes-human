@@ -1,10 +1,10 @@
 use serde::{Deserialize, Serialize};
 
-use super::message::CreateThreadMessageDto;
+use super::{message::CreateThreadMessageDto, Metadata};
 
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct CreateThreadDto {
-    pub metadata: Option<String>,
+    pub metadata: Option<Metadata>,
     pub messages: Vec<CreateThreadMessageDto>,
 }
 
@@ -12,10 +12,10 @@ pub struct CreateThreadDto {
 pub struct ThreadDto {
     pub id: String,
     pub created_at: String,
-    pub metadata: String,
+    pub metadata: Metadata,
 }
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
 pub struct UpdateThreadDto {
-    pub metadata: Option<String>,
+    pub metadata: Option<Metadata>,
 }

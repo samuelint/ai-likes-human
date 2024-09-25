@@ -1,7 +1,7 @@
 use sea_orm::ActiveValue;
 
 use crate::{
-    agent::domain::{dto::ThreadMessageDto, CreateMessageParams},
+    assistant::domain::{dto::ThreadMessageDto, CreateMessageParams},
     entities::message,
     utils::time::current_time_with_timezone,
 };

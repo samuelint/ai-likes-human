@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::agent::domain::CreateThreadParams;
+use crate::assistant::domain::CreateThreadParams;
 
 use super::CreateThreadDto;
 

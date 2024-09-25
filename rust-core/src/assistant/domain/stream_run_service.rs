@@ -7,7 +7,7 @@ use super::{
     thread_repository::ThreadRepository,
 };
 use crate::{
-    agent::domain::dto::ThreadEventDto,
+    assistant::domain::dto::ThreadEventDto,
     llm::domain::llm_factory::{CreateLLMParameters, LLMFactory},
 };
 use futures::StreamExt;

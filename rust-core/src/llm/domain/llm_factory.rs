@@ -15,4 +15,10 @@ pub trait LLMFactory: Send + Sync {
         &self,
         parameters: CreateLLMParameters,
     ) -> Result<Box<dyn LLM>, Box<dyn Error + Send>>;
+
+    fn from_model(&self, model: &str) -> Result<Box<dyn LLM>, Box<dyn Error + Send>> {
+        self.create(CreateLLMParameters {
+            model: model.to_string(),
+        })
+    }
 }

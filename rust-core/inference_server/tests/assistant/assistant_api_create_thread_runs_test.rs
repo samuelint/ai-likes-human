@@ -1,5 +1,5 @@
-mod test_utils;
-use app_core::agent::domain::dto::{CreateRunDto, CreateThreadDto, RunDto, ThreadDto};
+use crate::test_utils;
+use app_core::assistant::domain::dto::{CreateRunDto, CreateThreadDto, RunDto, ThreadDto};
 use axum::http::StatusCode;
 use test_utils::router_client::RouterClient;
 

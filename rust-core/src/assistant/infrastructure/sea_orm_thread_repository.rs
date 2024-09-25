@@ -1,8 +1,8 @@
-use crate::agent::domain::dto::ThreadDto;
-use crate::agent::domain::thread_repository::{
+use crate::assistant::domain::dto::ThreadDto;
+use crate::assistant::domain::thread_repository::{
     CreateThreadParams, ThreadRepository, UpdateThreadParams,
 };
-use crate::agent::domain::CreateMessageParams;
+use crate::assistant::domain::CreateMessageParams;
 use crate::entities::thread;
 use crate::utils::time::current_time_with_timezone;
 use crate::utils::PageRequest;

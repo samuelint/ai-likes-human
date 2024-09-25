@@ -9,17 +9,19 @@ use infrastructure::{SeaOrmMessageRepository, SeaOrmRunRepository, SeaOrmThreadR
 
 use crate::llm::{domain::llm_factory::LLMFactory, LLMDIModule};
 
-pub mod app;
 pub mod domain;
 pub mod infrastructure;
 
 pub struct AgentDIModule {
-    llm_module: LLMDIModule,
+    llm_module: Arc<LLMDIModule>,
     connection: Arc<::sea_orm::DatabaseConnection>,
 }
 
 impl AgentDIModule {
-    pub fn new(connection: Arc<::sea_orm::DatabaseConnection>, llm_module: LLMDIModule) -> Self {
+    pub fn new(
+        connection: Arc<::sea_orm::DatabaseConnection>,
+        llm_module: Arc<LLMDIModule>,
+    ) -> Self {
         Self {
             llm_module,
             connection,

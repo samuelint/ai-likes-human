@@ -1,4 +1,4 @@
-use app_core::agent::domain::agent_factory::CreateAgentParameters;
+use app_core::assistant::domain::agent_factory::CreateAgentParameters;
 use app_test_utils::create_app_container;
 use langchain_rust::prompt_args;
 use serial_test::serial;

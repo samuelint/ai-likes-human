@@ -1,5 +1,5 @@
 use crate::{
-    agent::domain::{
+    assistant::domain::{
         dto::{CreateThreadDto, ThreadDto},
         CreateThreadParams,
     },

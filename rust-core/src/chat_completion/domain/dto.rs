@@ -1,6 +1,6 @@
 #[cfg(test)]
-#[path = "./chat_completion_test.rs"]
-mod chat_completion_test;
+#[path = "./dto_test.rs"]
+mod dto_test;
 
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
@@ -14,10 +14,10 @@ pub struct ChatCompletionMessageDto {
 }
 
 impl ChatCompletionMessageDto {
-    pub fn new_assistant(content: String) -> Self {
+    pub fn new_assistant(content: &str) -> Self {
         ChatCompletionMessageDto {
             role: "assistant".to_string(),
-            content,
+            content: content.to_string(),
         }
     }
 }
@@ -94,14 +94,14 @@ impl Default for ChatCompletionObject {
 }
 
 impl ChatCompletionObject {
-    pub fn new_single_choice(message: ChatCompletionMessageDto, model: String) -> Self {
+    pub fn new_single_choice(message: ChatCompletionMessageDto, model: &str) -> Self {
         ChatCompletionObject {
             choices: vec![ChatCompletionChoice {
                 index: 0,
                 message: Some(message),
                 finish_reason: Some("stop".to_string()),
             }],
-            model,
+            model: model.to_string(),
             ..ChatCompletionObject::default()
         }
     }
@@ -150,14 +150,14 @@ impl Default for ChatCompletionChunkObject {
 }
 
 impl ChatCompletionChunkObject {
-    pub fn new_assistant_chunk(message: String, model: &String) -> Self {
+    pub fn new_assistant_chunk(message: &str, model: &str) -> Self {
         let choice = ChatCompletionChunkChoice {
             delta: Some(ChatCompletionMessageDto::new_assistant(message)),
             ..ChatCompletionChunkChoice::default()
         };
         ChatCompletionChunkObject {
             choices: vec![choice],
-            model: model.clone(),
+            model: model.to_string(),
             ..ChatCompletionChunkObject::default()
         }
     }

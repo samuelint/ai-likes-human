@@ -1,4 +1,4 @@
-use crate::{agent::domain::dto::RunDto, entities::run};
+use crate::{assistant::domain::dto::RunDto, entities::run};
 
 impl From<run::Model> for RunDto {
     fn from(model: run::Model) -> Self {

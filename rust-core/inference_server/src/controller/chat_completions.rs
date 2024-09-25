@@ -1,6 +1,4 @@
-use app_core::agent::domain::dto::chat_completion::{
-    ChatCompletionChunkObject, ChatCompletionMessageDto, ChatCompletionObject,
-};
+use app_core::chat_completion::{ChatCompletionMessageDto, ChatCompletionObject};
 use async_stream::try_stream;
 use axum::{
     extract::{self},
@@ -46,19 +44,12 @@ async fn run_json_chat_completions(
     state: Arc<ServerState>,
     payload: ChatCompletionParameters,
 ) -> Result<Json<ChatCompletionObject>, Box<dyn Error>> {
-    let messages: Vec<langchain_rust::schemas::Message> =
-        payload.messages.iter().map(|m| m.clone().into()).collect();
-    let llm = state
+    let result = state
         .api
-        .get_llm_client(&payload.model)
-        .map_err(|e| e as Box<dyn Error>)?;
+        .chat_completion_invoke(&payload.model, &payload.messages)
+        .await?;
 
-    let result = llm.generate(&messages[..]).await?;
-
-    let message = ChatCompletionMessageDto::new_assistant(result.generation);
-    let data = ChatCompletionObject::new_single_choice(message, payload.model);
-
-    Ok(Json(data))
+    Ok(Json(result))
 }
 
 fn run_stream_chat_completions(
@@ -66,36 +57,20 @@ fn run_stream_chat_completions(
     payload: ChatCompletionParameters,
 ) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
     let model = payload.model.clone();
-    let messages: Vec<langchain_rust::schemas::Message> =
-        payload.messages.iter().map(|m| m.clone().into()).collect();
 
     Sse::new(try_stream! {
-        let llm = match state.api.get_llm_client(&model) {
-            Ok(llm) => llm,
-            Err(e) => {
-                yield Event::default().data(format!("Error: {}", e));
-                return;
-            }
-        };
-        let mut stream = match llm.stream(&messages[..]).await {
-            Ok(stream) => stream,
-            Err(e) => {
-                yield Event::default().data(format!("Error: {}", e));
-                return;
-            }
-        };
-
+        let mut stream = state.api.chat_completion_stream(&model, &payload.messages);
         while let Some(chunk) = stream.next().await {
-            let chunk = chunk.unwrap();
-            let chunk = ChatCompletionChunkObject::new_assistant_chunk(chunk.content, &model);
-            let json_chunk = serde_json::to_string(&chunk).unwrap();
-
-            yield Event::default().data(json_chunk)
+            match chunk {
+                Ok(chunk) => {
+                    let json_chunk = serde_json::to_string(&chunk).unwrap();
+                    yield Event::default().data(json_chunk);
+                },
+                Err(e) => yield Event::default().data(format!("Error: {}", e)),
+            }
         }
 
         yield Event::default().data("[DONE]");
-
-
     })
     .keep_alive(KeepAlive::default())
 }

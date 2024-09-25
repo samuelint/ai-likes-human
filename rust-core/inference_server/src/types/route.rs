@@ -1,4 +1,4 @@
-use app_core::agent::domain::dto::chat_completion::ChatCompletionMessageDto;
+use app_core::chat_completion::ChatCompletionMessageDto;
 use async_stream::try_stream;
 use futures::Stream;
 use serde_json::Value;

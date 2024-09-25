@@ -1,5 +1,5 @@
-mod test_utils;
-use app_core::agent::domain::dto::{
+use crate::test_utils;
+use app_core::assistant::domain::dto::{
     CreateMessageDto, CreateThreadDto, ThreadDto, ThreadMessageDto,
 };
 use axum::http::StatusCode;

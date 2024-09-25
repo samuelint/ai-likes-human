@@ -1,5 +1,5 @@
-use crate::agent::domain::dto::RunDto;
-use crate::agent::domain::run_repository::{CreateRunParams, RunRepository};
+use crate::assistant::domain::dto::RunDto;
+use crate::assistant::domain::run_repository::{CreateRunParams, RunRepository};
 use crate::entities::run;
 use crate::utils::time::current_time_with_timezone;
 use crate::utils::PageRequest;

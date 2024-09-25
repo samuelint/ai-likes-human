@@ -1,8 +1,9 @@
-use std::{error::Error, sync::Arc};
+use std::sync::Arc;
 
-use langchain_rust::language_models::llm::LLM;
-
-use crate::{llm::domain::llm_factory::CreateLLMParameters, AppContainer};
+use crate::{
+    chat_completion::{ChatCompletionMessageDto, ChatCompletionResult, ChatCompletionStream},
+    AppContainer,
+};
 
 pub struct ApiFacade {
     container: Arc<AppContainer>,
@@ -13,9 +14,29 @@ impl ApiFacade {
         Self { container }
     }
 
-    pub fn get_llm_client<'a>(&self, model: &'a str) -> Result<Box<dyn LLM>, Box<dyn Error + Send>> {
-        let factory = self.container.llm_module.get_llm_factory();
+    pub async fn chat_completion_invoke(
+        &self,
+        model: &str,
+        messages: &Vec<ChatCompletionMessageDto>,
+    ) -> ChatCompletionResult {
+        let factory = self
+            .container
+            .chat_completion_module
+            .get_inference_factory();
 
-        factory.create(CreateLLMParameters { model: model.to_string() })
+        factory.invoke(model, messages).await
+    }
+
+    pub fn chat_completion_stream(
+        &self,
+        model: &str,
+        messages: &Vec<ChatCompletionMessageDto>,
+    ) -> ChatCompletionStream {
+        let factory = self
+            .container
+            .chat_completion_module
+            .get_inference_factory();
+
+        factory.stream(model, messages)
     }
 }

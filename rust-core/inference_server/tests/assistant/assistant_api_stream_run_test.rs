@@ -1,5 +1,5 @@
-mod test_utils;
-use app_core::agent::domain::dto::{
+use crate::test_utils;
+use app_core::assistant::domain::dto::{
     CreateMessageDto, CreateThreadAndRunDto, CreateThreadDto, ThreadEvent,
 };
 use futures::{Stream, StreamExt};

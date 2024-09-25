@@ -6,7 +6,7 @@ use sea_orm::{
 use std::error::Error;
 use std::sync::Arc;
 
-use crate::agent::domain::message_repository::{CreateMessageParams, MessageRepository};
+use crate::assistant::domain::message_repository::{CreateMessageParams, MessageRepository};
 use crate::entities::message;
 
 pub struct SeaOrmMessageRepository {

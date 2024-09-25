@@ -1,5 +1,4 @@
-mod test_utils;
-
+use crate::test_utils;
 use serial_test::serial;
 use test_utils::{with_default_started_server, OpenaiClient};
 

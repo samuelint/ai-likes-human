@@ -1,4 +1,4 @@
-use app_core::agent::domain::{
+use app_core::assistant::domain::{
     dto::{
         CreateMessageDto, CreateRunDto, CreateThreadAndRunDto, CreateThreadDto, RunDto, ThreadDto,
         ThreadMessageDto, UpdateThreadDto,

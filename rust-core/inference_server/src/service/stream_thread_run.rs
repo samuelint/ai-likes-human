@@ -1,4 +1,4 @@
-use app_core::agent::domain::dto::CreateThreadAndRunDto;
+use app_core::assistant::domain::dto::CreateThreadAndRunDto;
 use async_stream::try_stream;
 use axum::response::{
     sse::{Event, KeepAlive},

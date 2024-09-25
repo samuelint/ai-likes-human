@@ -1,4 +1,4 @@
-mod test_utils;
+use crate::test_utils;
 
 use futures::stream::StreamExt;
 use serial_test::serial;

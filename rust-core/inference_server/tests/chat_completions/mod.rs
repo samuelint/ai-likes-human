@@ -1,0 +1,2 @@
+mod invoke_chat_completions_test;
+mod stream_chat_completions_test;

@@ -1,4 +1,5 @@
 mod message_adapter;
+mod metadata;
 mod run_adapter;
 mod sea_orm_message_repository;
 mod sea_orm_run_repository;

@@ -1,10 +1,11 @@
 use std::sync::Arc;
 
 use domain::{
-    message_repository::MessageRepository, run_factory::RunFactory, run_repository::RunRepository,
-    stream_inference_service::StreamInferenceService,
+    message_delta_update_service::MessageDeltaUpdateService, message_repository::MessageRepository,
+    run_factory::RunFactory, run_repository::RunRepository,
+    stream_thread_run_service::StreamThreadRunService,
     thread_chat_completions_inference::ThreadChatCompletionInference,
-    thread_repository::ThreadRepository,
+    thread_message_factory::ThreadMessageFactory, thread_repository::ThreadRepository,
 };
 use infrastructure::{SeaOrmMessageRepository, SeaOrmRunRepository, SeaOrmThreadRepository};
 
@@ -78,15 +79,23 @@ impl AgentDIModule {
         ))
     }
 
-    pub fn get_stream_run_service(&self) -> Arc<StreamInferenceService> {
+    pub fn get_stream_run_service(&self) -> Arc<StreamThreadRunService> {
         let run_factory = self.get_run_factory();
         let interence_service = self.get_thread_inference_service();
         let thread_repository = self.get_thread_repository();
+        let message_repository = self.get_message_repository();
+        let thread_message_factory =
+            Arc::new(ThreadMessageFactory::new(Arc::clone(&message_repository)));
+        let message_delta_update_service = Arc::new(MessageDeltaUpdateService::new(Arc::clone(
+            &message_repository,
+        )));
 
-        Arc::new(StreamInferenceService::new(
+        Arc::new(StreamThreadRunService::new(
             run_factory,
             interence_service,
             thread_repository,
+            thread_message_factory,
+            message_delta_update_service,
         ))
     }
 }

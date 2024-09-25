@@ -1,33 +1,43 @@
-use futures::Stream;
-use std::{convert::Infallible, pin::Pin, sync::Arc};
+#[cfg(test)]
+#[path = "./stream_thread_run_service_test.rs"]
+mod stream_thread_run_service_test;
+
+use std::sync::Arc;
 
 use super::{
     dto::{CreateRunDto, CreateThreadAndRunDto, ThreadEvent},
+    message_delta_update_service::MessageDeltaUpdateService,
     run_factory::RunFactory,
+    stream_types::AssistantStream,
     thread_chat_completions_inference::ThreadChatCompletionInference,
+    thread_message_factory::ThreadMessageFactory,
     thread_repository::ThreadRepository,
 };
 use crate::assistant::domain::dto::ThreadEventDto;
 use futures::StreamExt;
 
-pub struct StreamInferenceService {
+pub struct StreamThreadRunService {
     run_factory: Arc<RunFactory>,
     inference_service: Arc<ThreadChatCompletionInference>,
     thread_repository: Arc<dyn ThreadRepository>,
+    thread_message_factory: Arc<ThreadMessageFactory>,
+    message_delta_update_service: Arc<MessageDeltaUpdateService>,
 }
 
-pub type AssistantStream = Pin<Box<dyn Stream<Item = Result<ThreadEvent, Infallible>> + Send>>;
-
-impl StreamInferenceService {
+impl StreamThreadRunService {
     pub fn new(
         run_factory: Arc<RunFactory>,
         inference_service: Arc<ThreadChatCompletionInference>,
         thread_repository: Arc<dyn ThreadRepository>,
+        thread_message_factory: Arc<ThreadMessageFactory>,
+        message_delta_update_service: Arc<MessageDeltaUpdateService>,
     ) -> Self {
         Self {
             run_factory,
             inference_service,
             thread_repository,
+            thread_message_factory,
+            message_delta_update_service,
         }
     }
 
@@ -65,6 +75,8 @@ impl StreamInferenceService {
         let run_factory = self.run_factory.clone();
         let thread_repository = self.thread_repository.clone();
         let inference_service = self.inference_service.clone();
+        let thread_message_factory = self.thread_message_factory.clone();
+        let message_delta_update_service = self.message_delta_update_service.clone();
 
         let s = async_stream::try_stream! {
             let run = match run_factory.create_run(&thread_id, &dto).await {
@@ -85,11 +97,44 @@ impl StreamInferenceService {
                 }
             };
 
+            // Step
+
             let mut stream = inference_service.stream(&run.model, &messages);
 
+            let mut message = match thread_message_factory.create_assistant(&thread_id, &run.id).await {
+                Ok(message) => message,
+                Err(e) => {
+                    yield ThreadEvent::Error(ThreadEventDto::std_error(e));
+                    return;
+                }
+            };
+
+            yield ThreadEvent::ThreadMessageCreated(ThreadEventDto::thread_message_created(&message));
+
             while let Some(chunk) = stream.next().await {
-                // yield run_chunk.unwrap();
+                let chunk = match chunk {
+                    Ok(chunk) => chunk,
+                    Err(e) => {
+                        yield ThreadEvent::Error(ThreadEventDto::std_error(e));
+                        return;
+                    }
+                };
+
+                let (message_delta, updated_message) = match message_delta_update_service.from_chunk(&chunk, &message).await {
+                    Ok(res) => res,
+                    Err(e) => {
+                        yield ThreadEvent::Error(ThreadEventDto::std_error(e));
+                        return;
+                    }
+                };
+                message = updated_message;
+
+                yield ThreadEvent::ThreadMessageDelta(ThreadEventDto::thread_message_delta(&message_delta));
             }
+
+            yield ThreadEvent::ThreadMessageCreated(ThreadEventDto::thread_message_completed(&message));
+
+            // Step - End
 
             yield ThreadEvent::ThreadRunCompleted(ThreadEventDto::completed(&run));
         };
@@ -98,12 +143,14 @@ impl StreamInferenceService {
     }
 }
 
-impl Clone for StreamInferenceService {
+impl Clone for StreamThreadRunService {
     fn clone(&self) -> Self {
-        StreamInferenceService {
+        StreamThreadRunService {
             run_factory: self.run_factory.clone(),
             inference_service: self.inference_service.clone(),
             thread_repository: self.thread_repository.clone(),
+            thread_message_factory: self.thread_message_factory.clone(),
+            message_delta_update_service: self.message_delta_update_service.clone(),
         }
     }
 }

@@ -1,7 +1,9 @@
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 
-use crate::entities::message;
+use mockall::*;
+
+use super::dto::{ThreadMessageDto, UpdateThreadMessageDto};
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct CreateMessageParams {
@@ -14,18 +16,23 @@ pub struct CreateMessageParams {
 }
 
 #[async_trait::async_trait]
+#[automock]
 pub trait MessageRepository: Sync + Send {
     async fn create(
         &self,
         message: CreateMessageParams,
-    ) -> Result<message::Model, Box<dyn Error + Send>>;
+    ) -> Result<ThreadMessageDto, Box<dyn Error + Send>>;
     async fn create_many(
         &self,
         messages: Vec<CreateMessageParams>,
     ) -> Result<(), Box<dyn Error + Send>>;
 
-    async fn find(&self, id: String) -> Result<Option<message::Model>, Box<dyn Error>>;
-    async fn find_by_thread_id(&self, id: String) -> Result<Vec<message::Model>, Box<dyn Error>>;
+    async fn find(&self, id: String) -> Result<Option<ThreadMessageDto>, Box<dyn Error>>;
+    async fn update(
+        &self,
+        message: UpdateThreadMessageDto,
+    ) -> Result<ThreadMessageDto, Box<dyn Error + Send>>;
+    async fn find_by_thread_id(&self, id: String) -> Result<Vec<ThreadMessageDto>, Box<dyn Error>>;
 
     async fn delete(&self, id: String) -> Result<(), Box<dyn Error>>;
 }

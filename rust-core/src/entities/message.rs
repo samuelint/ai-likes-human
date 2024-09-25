@@ -20,6 +20,10 @@ pub struct Model {
     pub metadata: Option<String>,
     pub thread_id: Option<i32>,
     pub run_id: Option<i32>,
+    #[sea_orm(column_type = "Text")]
+    pub status: String,
+    #[sea_orm(column_type = "Text", nullable)]
+    pub assistant_id: Option<String>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

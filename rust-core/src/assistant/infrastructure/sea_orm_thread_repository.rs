@@ -14,6 +14,7 @@ use sea_orm::{
 use std::error::Error;
 use std::sync::Arc;
 
+use super::metadata::to_concrete_metadata;
 use super::{SeaOrmMessageRepository, SeaOrmRunRepository};
 
 pub struct SeaOrmThreadRepository {
@@ -33,13 +34,6 @@ impl SeaOrmThreadRepository {
             message_repository,
             run_repository,
         }
-    }
-
-    fn to_concrete_metadata(&self, metadata: Option<String>) -> String {
-        metadata
-            .as_ref()
-            .map(|s| s.clone())
-            .unwrap_or("{}".to_string())
     }
 }
 
@@ -84,7 +78,7 @@ impl ThreadRepository for SeaOrmThreadRepository {
         let txn = conn.begin().await.map_err(|e| anyhow!(e))?;
 
         let model = thread::ActiveModel {
-            metadata: ActiveValue::Set(self.to_concrete_metadata(new_thread.metadata)),
+            metadata: ActiveValue::Set(to_concrete_metadata(new_thread.metadata)),
             created_at: ActiveValue::Set(current_time_with_timezone()),
             ..Default::default()
         };
@@ -131,7 +125,7 @@ impl ThreadRepository for SeaOrmThreadRepository {
         }
 
         let mut model: thread::ActiveModel = existing.unwrap().into();
-        model.metadata = ActiveValue::Set(self.to_concrete_metadata(thread.metadata));
+        model.metadata = ActiveValue::Set(to_concrete_metadata(thread.metadata));
 
         let updated_model = model.update(conn.as_ref()).await?;
 

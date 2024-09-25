@@ -135,6 +135,16 @@ pub struct ChatCompletionChunkObject {
     pub usage: ChatCompletionUsage,
 }
 
+impl ChatCompletionChunkObject {
+    pub fn to_content_string(&self) -> String {
+        self.choices
+            .iter()
+            .map(|x| x.delta.as_ref().unwrap().content.clone())
+            .collect::<Vec<String>>()
+            .join("")
+    }
+}
+
 impl Default for ChatCompletionChunkObject {
     fn default() -> Self {
         ChatCompletionChunkObject {

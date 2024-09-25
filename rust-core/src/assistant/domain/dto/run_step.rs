@@ -2,8 +2,14 @@ use serde::{Deserialize, Serialize};
 
 use crate::utils::time::current_unix_time;
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub enum RunStep {
+    ToolCallRunStep(RunStepDto<ToolCallsStepDetails>),
+    MessageCreationRunStep(RunStepDto<MessageCreationStepDetails>),
+}
+
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
-pub struct RunStepDto<'a, TStepDetails> {
+pub struct RunStepDto<TStepDetails> {
     pub id: i32,
     pub created_at: i64,
     pub assistant_id: String,
@@ -12,17 +18,17 @@ pub struct RunStepDto<'a, TStepDetails> {
     pub status: String,
     pub instructions: Option<String>,
     pub model: String,
-    pub r#type: &'a str,
+    pub r#type: String,
     pub step_details: TStepDetails,
 }
 
-impl<'a> RunStepDto<'a, MessageCreationStepDetails<'a>> {
+impl RunStepDto<MessageCreationStepDetails> {
     pub fn message_creation(
         id: i32,
         assistant_id: String,
         model: String,
         status: String,
-        step_details: MessageCreationStepDetails<'a>,
+        step_details: MessageCreationStepDetails,
         thread_id: Option<i32>,
         run_id: Option<i32>,
         instructions: Option<String>,
@@ -34,7 +40,7 @@ impl<'a> RunStepDto<'a, MessageCreationStepDetails<'a>> {
             thread_id,
             run_id,
             status,
-            r#type: "message_creation",
+            r#type: "message_creation".to_string(),
             model,
             step_details,
             instructions,
@@ -48,27 +54,27 @@ pub struct MessageCreation {
 }
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
-pub struct MessageCreationStepDetails<'a> {
+pub struct MessageCreationStepDetails {
     pub message_creation: MessageCreation,
-    pub r#type: &'a str, // message_creation
+    pub r#type: String, // message_creation
 }
 
-impl<'a> MessageCreationStepDetails<'a> {
+impl MessageCreationStepDetails {
     pub fn new(message_creation: MessageCreation) -> Self {
         Self {
             message_creation,
-            r#type: "message_creation",
+            r#type: "message_creation".to_string(),
         }
     }
 }
 
-impl<'a> RunStepDto<'a, ToolCallsStepDetails<'a>> {
+impl RunStepDto<ToolCallsStepDetails> {
     pub fn tool_calls(
         id: i32,
         assistant_id: String,
         model: String,
         status: String,
-        step_details: ToolCallsStepDetails<'a>,
+        step_details: ToolCallsStepDetails,
         thread_id: Option<i32>,
         run_id: Option<i32>,
         instructions: Option<String>,
@@ -80,7 +86,7 @@ impl<'a> RunStepDto<'a, ToolCallsStepDetails<'a>> {
             thread_id,
             run_id,
             status,
-            r#type: "tool_calls",
+            r#type: "tool_calls".to_string(),
             model,
             step_details,
             instructions,
@@ -89,40 +95,40 @@ impl<'a> RunStepDto<'a, ToolCallsStepDetails<'a>> {
 }
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
-pub struct Function<'a> {
-    arguments: &'a str,
-    name: &'a str,
-    output: Option<&'a str>,
+pub struct Function {
+    arguments: String,
+    name: String,
+    output: Option<String>,
 }
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
-pub struct FunctionToolCall<'a> {
+pub struct FunctionToolCall {
     pub id: i32,
-    pub function: Function<'a>,
-    pub r#type: &'a str, // function
+    pub function: Function,
+    pub r#type: String, // function
 }
 
-impl<'a> FunctionToolCall<'a> {
-    pub fn new(id: i32, function: Function<'a>) -> Self {
+impl FunctionToolCall {
+    pub fn new(id: i32, function: Function) -> Self {
         Self {
             id,
             function,
-            r#type: "function",
+            r#type: "function".to_string(),
         }
     }
 }
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
-pub struct ToolCallsStepDetails<'a> {
-    pub tool_calls: Vec<FunctionToolCall<'a>>,
-    pub r#type: &'a str, // tool_calls
+pub struct ToolCallsStepDetails {
+    pub tool_calls: Vec<FunctionToolCall>,
+    pub r#type: String, // tool_calls
 }
 
-impl<'a> ToolCallsStepDetails<'a> {
-    pub fn new(tool_calls: Vec<FunctionToolCall<'a>>) -> Self {
+impl ToolCallsStepDetails {
+    pub fn new(tool_calls: Vec<FunctionToolCall>) -> Self {
         Self {
             tool_calls,
-            r#type: "tool_calls",
+            r#type: "tool_calls".to_string(),
         }
     }
 }

@@ -1,0 +1,166 @@
+#[cfg(test)]
+mod tests {
+    use std::sync::Arc;
+
+    use crate::{
+        assistant::domain::{
+            dto::{message_delta::MessageContentDelta, ThreadMessageDto, UpdateThreadMessageDto},
+            message_delta_update_service::MessageDeltaUpdateService,
+            message_repository::MockMessageRepository,
+        },
+        chat_completion::{
+            ChatCompletionChunkChoice, ChatCompletionChunkObject, ChatCompletionMessageDto,
+        },
+    };
+
+    #[tokio::test]
+    async fn test_updated_message_from_chunk_contains_full_message() {
+        let thread_id = "some_thread_id";
+        let message_id = "some_message_id";
+        let expected_update_message = UpdateThreadMessageDto {
+            id: message_id.to_string(),
+            content: Some("Hello World!".to_string()),
+            ..UpdateThreadMessageDto::default()
+        };
+        let existing_message = ThreadMessageDto {
+            id: message_id.to_string(),
+            thread_id: Some(thread_id.to_string()),
+            content: "Hello ".to_string(),
+            ..ThreadMessageDto::default()
+        };
+        let chunk = ChatCompletionChunkObject {
+            choices: vec![ChatCompletionChunkChoice {
+                delta: Some(ChatCompletionMessageDto {
+                    role: "assistant".to_string(),
+                    content: "World!".to_string(),
+                }),
+                ..ChatCompletionChunkChoice::default()
+            }],
+            ..ChatCompletionChunkObject::default()
+        };
+
+        let repository = message_repository_mocking_update(&thread_id, &expected_update_message);
+        let instance = MessageDeltaUpdateService::new(Arc::new(repository));
+
+        let (_delta, message) = instance
+            .from_chunk(&chunk, &existing_message)
+            .await
+            .unwrap();
+
+        assert_eq!(message.content, "Hello World!");
+    }
+
+    #[tokio::test]
+    async fn test_updated_message_from_chunk_delta_contains_chunk_text() {
+        let thread_id = "some_thread_id";
+        let message_id = "some_message_id";
+        let expected_update_message = UpdateThreadMessageDto {
+            id: message_id.to_string(),
+            content: Some("Hello World!".to_string()),
+            ..UpdateThreadMessageDto::default()
+        };
+        let existing_message = ThreadMessageDto {
+            id: message_id.to_string(),
+            thread_id: Some(thread_id.to_string()),
+            content: "Hello ".to_string(),
+            ..ThreadMessageDto::default()
+        };
+        let chunk = ChatCompletionChunkObject {
+            choices: vec![ChatCompletionChunkChoice {
+                delta: Some(ChatCompletionMessageDto {
+                    role: "assistant".to_string(),
+                    content: "World!".to_string(),
+                }),
+                ..ChatCompletionChunkChoice::default()
+            }],
+            ..ChatCompletionChunkObject::default()
+        };
+
+        let repository = message_repository_mocking_update(&thread_id, &expected_update_message);
+        let instance = MessageDeltaUpdateService::new(Arc::new(repository));
+
+        let (delta, _message) = instance
+            .from_chunk(&chunk, &existing_message)
+            .await
+            .unwrap();
+
+        assert!(delta.delta.content.len() > 0);
+        let message_content = &delta.delta.content[0];
+
+        let text_delta = match message_content {
+            MessageContentDelta::Text(event) => event,
+            _ => panic!("Expected Text MessageContentDelta"),
+        };
+
+        assert_eq!(text_delta.value.clone().unwrap(), "Hello World!");
+    }
+
+    #[tokio::test]
+    async fn test_updated_message_chunk_role_is_same_as_message() {
+        let thread_id = "some_thread_id";
+        let message_id = "some_message_id";
+        let expected_update_message = UpdateThreadMessageDto {
+            id: message_id.to_string(),
+            content: Some("Hello World!".to_string()),
+            ..UpdateThreadMessageDto::default()
+        };
+        let existing_message = ThreadMessageDto {
+            id: message_id.to_string(),
+            thread_id: Some(thread_id.to_string()),
+            content: "Hello ".to_string(),
+            role: "assistant".to_string(),
+            ..ThreadMessageDto::default()
+        };
+        let chunk = ChatCompletionChunkObject {
+            choices: vec![ChatCompletionChunkChoice {
+                delta: Some(ChatCompletionMessageDto {
+                    role: "assistant".to_string(),
+                    content: "World!".to_string(),
+                }),
+                ..ChatCompletionChunkChoice::default()
+            }],
+            ..ChatCompletionChunkObject::default()
+        };
+
+        let repository = message_repository_mocking_update(&thread_id, &expected_update_message);
+        let instance = MessageDeltaUpdateService::new(Arc::new(repository));
+
+        let (delta, _message) = instance
+            .from_chunk(&chunk, &existing_message)
+            .await
+            .unwrap();
+
+        assert_eq!(delta.delta.role, "assistant");
+    }
+
+    fn message_repository_mocking_update(
+        thread_id: &str,
+        update_message_dto: &UpdateThreadMessageDto,
+    ) -> MockMessageRepository {
+        let mut message_repository = MockMessageRepository::new();
+        let thread_id = thread_id.to_string();
+        let update_message_dto = update_message_dto.clone();
+        let update_message_dto_with = update_message_dto.clone();
+
+        message_repository
+            .expect_update()
+            .withf_st(move |x| *x == update_message_dto_with)
+            .returning(move |_| {
+                let update_message_dto = update_message_dto.clone();
+                let thread_id = thread_id.clone();
+
+                Box::pin(async {
+                    Ok(ThreadMessageDto {
+                        id: update_message_dto.id,
+                        thread_id: Some(thread_id),
+                        status: update_message_dto.status.unwrap_or("".to_string()),
+                        role: "assistant".to_string(),
+                        content: update_message_dto.content.unwrap_or("".to_string()),
+                        ..ThreadMessageDto::default()
+                    })
+                })
+            });
+
+        message_repository
+    }
+}

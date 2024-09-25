@@ -31,6 +31,8 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Message::Metadata).json())
                     .col(ColumnDef::new(Message::ThreadId).integer())
                     .col(ColumnDef::new(Message::RunId).integer())
+                    .col(ColumnDef::new(Message::Status).string().not_null())
+                    .col(ColumnDef::new(Message::AssistantId).string())
                     .foreign_key(
                         ForeignKey::create()
                             .name("fk_thread")
@@ -70,4 +72,6 @@ pub enum Message {
     Role,
     ThreadId,
     RunId,
+    Status,
+    AssistantId,
 }

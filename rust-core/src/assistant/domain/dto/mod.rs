@@ -1,4 +1,6 @@
+pub mod annotation;
 pub mod message;
+pub mod message_delta;
 pub mod run;
 pub mod run_step;
 pub mod run_stream;

@@ -1,16 +1,16 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{assistant::domain::{thread_repository::CreateThreadMessageParams, CreateMessageParams}, chat_completion::ChatCompletionMessageDto};
+use crate::{
+    assistant::domain::{thread_repository::CreateThreadMessageParams, CreateMessageParams},
+    chat_completion::ChatCompletionMessageDto,
+};
 
-#[derive(Default, Serialize, Deserialize, Clone)]
-pub struct AnnotationDto {
-    pub value: String,
-}
+use super::annotation::MessageAnnotation;
 
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct TextContentDto {
     pub value: String,
-    pub annotations: Option<AnnotationDto>,
+    pub annotations: Vec<MessageAnnotation>,
 }
 
 #[derive(Default, Serialize, Deserialize, Clone)]
@@ -19,7 +19,7 @@ pub struct TextMessageContentDto {
     pub text: TextContentDto,
 }
 
-#[derive(Default, Serialize, Deserialize, Clone)]
+#[derive(Default, Serialize, Deserialize, Clone, Debug)]
 pub struct ThreadMessageDto {
     pub id: String,
     pub object: String,
@@ -32,6 +32,16 @@ pub struct ThreadMessageDto {
     pub assistant_id: Option<String>,
     pub run_id: Option<String>,
     pub metadata: Option<String>,
+}
+
+#[derive(Default, Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct UpdateThreadMessageDto {
+    pub id: String,
+    pub status: Option<String>,
+    // pub content: Vec<TextMessageContentDto>,
+    pub content: Option<String>,
+    pub assistant_id: Option<Option<String>>,
+    pub metadata: Option<Option<String>>,
 }
 
 impl From<ThreadMessageDto> for ChatCompletionMessageDto {

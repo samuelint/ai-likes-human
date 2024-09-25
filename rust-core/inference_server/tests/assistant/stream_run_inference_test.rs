@@ -1,6 +1,6 @@
 use crate::test_utils;
 use app_core::assistant::domain::dto::{
-    CreateMessageDto, CreateThreadAndRunDto, CreateThreadDto, ThreadEvent,
+    CreateThreadAndRunDto, CreateThreadDto, CreateThreadMessageDto, ThreadEvent,
 };
 use futures::{Stream, StreamExt};
 use test_utils::router_client::RouterClient;
@@ -13,9 +13,9 @@ async fn create_run_stream(prompt: &str) -> impl Stream<Item = Result<ThreadEven
     let create_thread_run_dto = CreateThreadAndRunDto {
         model: LLM_MODEL.to_string(),
         thread: CreateThreadDto {
-            messages: vec![CreateMessageDto {
+            messages: vec![CreateThreadMessageDto {
                 content: prompt.to_string(),
-                ..CreateMessageDto::user()
+                ..CreateThreadMessageDto::user()
             }],
             ..CreateThreadDto::default()
         },
@@ -43,6 +43,78 @@ async fn stream_as_chunks_array(prompt: &str) -> Vec<ThreadEvent> {
     responses
 }
 
+// Single Step Sequence
+
+#[tokio::test]
+async fn test_stream_run_single_step_is_sequenced_by_events() {
+    let chunks = stream_as_chunks_array("Tell me a joke.").await;
+
+    assert!(
+        matches!(&chunks[0], ThreadEvent::ThreadCreated(_)),
+        "Events does not have ThreadCreated"
+    );
+    assert!(
+        matches!(&chunks[1], ThreadEvent::ThreadRunCreated(_)),
+        "Events does not have ThreadRunCreated"
+    );
+    assert!(
+        matches!(&chunks[2], ThreadEvent::ThreadRunQueued(_)),
+        "Events does not have ThreadRunQueued"
+    );
+    assert!(
+        matches!(&chunks[3], ThreadEvent::ThreadRunInProgress(_)),
+        "Events does not have ThreadRunInProgress"
+    );
+    assert!(
+        matches!(&chunks[4], ThreadEvent::ThreadRunStepCreated(_)),
+        "Events does not have ThreadRunStepCreated"
+    );
+    assert!(
+        matches!(&chunks[4], ThreadEvent::ThreadRunStepCreated(_)),
+        "Events does not have ThreadRunStepCreated"
+    );
+    assert!(
+        matches!(&chunks[5], ThreadEvent::ThreadRunStepInProgress(_)),
+        "Events does not have ThreadRunStepInProgress"
+    );
+    assert!(
+        matches!(&chunks[6], ThreadEvent::ThreadMessageCreated(_)),
+        "Events does not have ThreadMessageCreated"
+    );
+    assert!(
+        matches!(&chunks[7], ThreadEvent::ThreadMessageInProgress(_)),
+        "Events does not have ThreadMessageInProgress"
+    );
+    // Deltas
+    for i in 8..(chunks.len() - 4) {
+        let event = &chunks[i];
+        assert!(
+            matches!(event, ThreadEvent::ThreadMessageDelta(_)),
+            "Events[{}] does not have ThreadMessageDelta",
+            i
+        );
+    }
+    // Deltas - END
+
+    let last_item = chunks.get(chunks.len() - 3).unwrap();
+    assert!(
+        matches!(&last_item, ThreadEvent::ThreadMessageCompleted(_)),
+        "Events does not end with ThreadMessageCompleted"
+    );
+
+    let last_item = chunks.get(chunks.len() - 2).unwrap();
+    assert!(
+        matches!(&last_item, ThreadEvent::ThreadRunStepCompleted(_)),
+        "Events does not end with ThreadRunStepCompleted"
+    );
+
+    let last_chunk = chunks.last().unwrap();
+    assert!(
+        matches!(&last_chunk, ThreadEvent::ThreadRunCompleted(_)),
+        "Events does not end with Done"
+    );
+}
+
 // ThreadCreated
 #[tokio::test]
 async fn test_run_stream_starts_with_thread_created() {
@@ -50,7 +122,7 @@ async fn test_run_stream_starts_with_thread_created() {
     let chunk = &chunks[0];
 
     let chunk = match chunk {
-        ThreadEvent::ThreadCreated(event) => event,
+        ThreadEvent::ThreadRunCreated(event) => event,
         _ => panic!("Expected ThreadCreated event"),
     };
 
@@ -63,7 +135,7 @@ async fn test_run_stream_thread_created_contains_new_thread_data() {
     let chunk = &chunks[0];
 
     let chunk = match chunk {
-        ThreadEvent::ThreadCreated(event) => event,
+        ThreadEvent::ThreadRunCreated(event) => event,
         _ => panic!("Expected ThreadCreated event"),
     };
 

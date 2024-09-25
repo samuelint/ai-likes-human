@@ -1,30 +1,19 @@
-use serde::{Deserialize, Serialize};
 use std::error::Error;
 
 use mockall::*;
 
-use super::dto::{ThreadMessageDto, UpdateThreadMessageDto};
-
-#[derive(Default, Serialize, Deserialize)]
-pub struct CreateMessageParams {
-    pub content: String,
-    pub role: String,
-    pub thread_id: Option<String>,
-    pub run_id: Option<String>,
-    pub attachments: Option<String>,
-    pub metadata: Option<String>,
-}
+use super::dto::{CreateThreadMessageDto, ThreadMessageDto, UpdateThreadMessageDto};
 
 #[async_trait::async_trait]
 #[automock]
 pub trait MessageRepository: Sync + Send {
     async fn create(
         &self,
-        message: CreateMessageParams,
+        message: CreateThreadMessageDto,
     ) -> Result<ThreadMessageDto, Box<dyn Error + Send>>;
     async fn create_many(
         &self,
-        messages: Vec<CreateMessageParams>,
+        messages: Vec<CreateThreadMessageDto>,
     ) -> Result<(), Box<dyn Error + Send>>;
 
     async fn find(&self, id: String) -> Result<Option<ThreadMessageDto>, Box<dyn Error>>;

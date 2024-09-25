@@ -4,7 +4,10 @@ mod thread_message_factory_test;
 
 use std::sync::Arc;
 
-use super::{dto::ThreadMessageDto, message_repository::MessageRepository, CreateMessageParams};
+use super::{
+    dto::{CreateThreadMessageDto, ThreadMessageDto},
+    message_repository::MessageRepository,
+};
 
 pub struct ThreadMessageFactory {
     message_repository: Arc<dyn MessageRepository>,
@@ -22,11 +25,11 @@ impl ThreadMessageFactory {
     ) -> Result<ThreadMessageDto, Box<dyn std::error::Error + Send>> {
         let message = self
             .message_repository
-            .create(CreateMessageParams {
+            .create(CreateThreadMessageDto {
                 role: "assistant".to_string(),
                 thread_id: Some(thread_id.to_string()),
                 run_id: Some(run_id.to_string()),
-                ..CreateMessageParams::default()
+                ..CreateThreadMessageDto::default()
             })
             .await?;
 

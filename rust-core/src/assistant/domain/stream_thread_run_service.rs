@@ -5,7 +5,7 @@ mod stream_thread_run_service_test;
 use std::sync::Arc;
 
 use super::{
-    dto::{CreateRunDto, CreateThreadAndRunDto, ThreadEvent},
+    dto::{CreateRunDto, CreateThreadAndRunDto, RunStep, RunStepDto, ThreadEvent},
     message_delta_update_service::MessageDeltaUpdateService,
     run_factory::RunFactory,
     stream_types::AssistantStream,
@@ -69,6 +69,8 @@ impl StreamThreadRunService {
         Box::pin(s)
     }
 
+    // Follow openai Assistant API streaming
+    // https://platform.openai.com/docs/api-reference/runs/createRun
     pub fn stream_new_run(&self, thread_id: &str, dto: &CreateRunDto) -> AssistantStream {
         let dto = dto.clone();
         let thread_id = thread_id.to_string();
@@ -88,6 +90,15 @@ impl StreamThreadRunService {
             };
 
             yield ThreadEvent::ThreadRunCreated(ThreadEventDto::created_run(&run));
+            yield ThreadEvent::ThreadRunQueued(ThreadEventDto::run_queued(&run));
+            yield ThreadEvent::ThreadRunInProgress(ThreadEventDto::run_in_progress(&run));
+
+            // Step
+            let run_step = RunStep::MessageCreationRunStep(RunStepDto {
+                ..RunStepDto::default()
+            });
+            yield ThreadEvent::ThreadRunStepCreated(ThreadEventDto::run_step_created(&run_step));
+            yield ThreadEvent::ThreadRunStepInProgress(ThreadEventDto::run_step_in_progress(&run_step));
 
             let messages = match thread_repository.find_messages(&thread_id).await {
                 Ok(messages) => messages,
@@ -96,9 +107,6 @@ impl StreamThreadRunService {
                     return;
                 }
             };
-
-            // Step
-
             let mut stream = inference_service.stream(&run.model, &messages);
 
             let mut message = match thread_message_factory.create_assistant(&thread_id, &run.id).await {
@@ -110,6 +118,7 @@ impl StreamThreadRunService {
             };
 
             yield ThreadEvent::ThreadMessageCreated(ThreadEventDto::thread_message_created(&message));
+            yield ThreadEvent::ThreadMessageInProgress(ThreadEventDto::thread_message_in_progress(&message));
 
             while let Some(chunk) = stream.next().await {
                 let chunk = match chunk {
@@ -132,11 +141,12 @@ impl StreamThreadRunService {
                 yield ThreadEvent::ThreadMessageDelta(ThreadEventDto::thread_message_delta(&message_delta));
             }
 
-            yield ThreadEvent::ThreadMessageCreated(ThreadEventDto::thread_message_completed(&message));
+            yield ThreadEvent::ThreadMessageCompleted(ThreadEventDto::thread_message_completed(&message));
 
+            yield ThreadEvent::ThreadRunStepCompleted(ThreadEventDto::run_step_completed(&run_step));
             // Step - End
 
-            yield ThreadEvent::ThreadRunCompleted(ThreadEventDto::completed(&run));
+            yield ThreadEvent::ThreadRunCompleted(ThreadEventDto::run_completed(&run));
         };
 
         Box::pin(s)

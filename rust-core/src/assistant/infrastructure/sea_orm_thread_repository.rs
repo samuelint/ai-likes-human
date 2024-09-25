@@ -1,8 +1,7 @@
-use crate::assistant::domain::dto::{ThreadDto, ThreadMessageDto};
+use crate::assistant::domain::dto::{CreateThreadMessageDto, ThreadDto, ThreadMessageDto};
 use crate::assistant::domain::thread_repository::{
     CreateThreadParams, ThreadRepository, UpdateThreadParams,
 };
-use crate::assistant::domain::CreateMessageParams;
 use crate::entities::{message, thread};
 use crate::utils::time::current_time_with_timezone;
 use crate::utils::PageRequest;
@@ -89,21 +88,19 @@ impl ThreadRepository for SeaOrmThreadRepository {
             .map_err(|e| anyhow!(e))?;
 
         if new_thread.messages.len() > 0 {
-            let messages: Vec<CreateMessageParams> = new_thread
+            let messages: Vec<CreateThreadMessageDto> = new_thread
                 .messages
                 .iter()
-                .map(|mesg| CreateMessageParams {
+                .map(|mesg| CreateThreadMessageDto {
                     content: mesg.content.clone(),
                     role: mesg.role.clone(),
                     thread_id: Some(model.id.to_string()),
-                    run_id: None,
-                    attachments: None,
-                    metadata: None,
+                    ..CreateThreadMessageDto::default()
                 })
                 .collect();
 
             self.message_repository
-                .tx_create_many(&txn, messages)
+                .tx_create_many(&txn, &messages)
                 .await?;
         }
 

@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    assistant::domain::{thread_repository::CreateThreadMessageParams, CreateMessageParams},
+    assistant::domain::thread_repository::CreateThreadMessageParams,
     chat_completion::ChatCompletionMessageDto,
 };
 
@@ -53,15 +53,18 @@ impl From<ThreadMessageDto> for ChatCompletionMessageDto {
     }
 }
 
-#[derive(Default, Serialize, Deserialize, Clone)]
-pub struct CreateMessageDto {
+#[derive(Serialize, Deserialize, Clone)]
+pub struct CreateThreadMessageDto {
     pub content: String,
     pub role: String,
-    pub attachments: Option<serde_json::Value>,
-    pub metadata: Option<serde_json::Value>,
+    pub status: String,
+    pub thread_id: Option<String>,
+    pub run_id: Option<String>,
+    pub attachments: Option<String>,
+    pub metadata: Option<String>,
 }
 
-impl CreateMessageDto {
+impl CreateThreadMessageDto {
     pub fn user() -> Self {
         Self {
             role: "user".to_string(),
@@ -70,24 +73,25 @@ impl CreateMessageDto {
     }
 }
 
-impl From<CreateMessageDto> for CreateThreadMessageParams {
-    fn from(dto: CreateMessageDto) -> Self {
-        CreateThreadMessageParams {
-            content: dto.content,
-            role: dto.role,
+impl Default for CreateThreadMessageDto {
+    fn default() -> Self {
+        Self {
+            content: "".to_string(),
+            role: "user".to_string(),
+            thread_id: None,
+            run_id: None,
+            attachments: None,
+            status: "in_progress".to_string(),
+            metadata: None,
         }
     }
 }
 
-impl From<CreateMessageDto> for CreateMessageParams {
-    fn from(dto: CreateMessageDto) -> Self {
-        CreateMessageParams {
+impl From<CreateThreadMessageDto> for CreateThreadMessageParams {
+    fn from(dto: CreateThreadMessageDto) -> Self {
+        CreateThreadMessageParams {
             content: dto.content,
             role: dto.role,
-            thread_id: None,
-            run_id: None,
-            attachments: dto.attachments.as_ref().map(|v| v.to_string()),
-            metadata: dto.metadata.as_ref().map(|v| v.to_string()),
         }
     }
 }

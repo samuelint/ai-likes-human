@@ -1,6 +1,6 @@
 use crate::test_utils;
 use app_core::assistant::domain::dto::{
-    CreateMessageDto, CreateThreadDto, ThreadDto, ThreadMessageDto,
+    CreateThreadDto, CreateThreadMessageDto, ThreadDto, ThreadMessageDto,
 };
 use axum::http::StatusCode;
 use test_utils::router_client::RouterClient;
@@ -98,10 +98,10 @@ async fn test_created_threads_are_listed() {
 #[tokio::test]
 async fn test_created_thread_with_message_is_successful() {
     let client = RouterClient::from_app("/openai/v1").await;
-    let message1 = CreateMessageDto {
+    let message1 = CreateThreadMessageDto {
         content: "Say Hello!".to_string(),
         role: "user".to_string(),
-        ..CreateMessageDto::default()
+        ..CreateThreadMessageDto::default()
     };
     let body = CreateThreadDto {
         messages: vec![message1],
@@ -123,10 +123,10 @@ async fn test_created_thread_with_message_is_successful() {
 #[tokio::test]
 async fn test_created_thread_with_message_have_id() {
     let client = RouterClient::from_app("/openai/v1").await;
-    let message1 = CreateMessageDto {
+    let message1 = CreateThreadMessageDto {
         content: "Say Hello!".to_string(),
         role: "user".to_string(),
-        ..CreateMessageDto::default()
+        ..CreateThreadMessageDto::default()
     };
     let body = CreateThreadDto {
         messages: vec![message1],
@@ -152,10 +152,10 @@ async fn test_created_thread_with_message_have_id() {
 #[tokio::test]
 async fn test_created_thread_with_message_have_same_content() {
     let client = RouterClient::from_app("/openai/v1").await;
-    let message1 = CreateMessageDto {
+    let message1 = CreateThreadMessageDto {
         content: "Say Hello!".to_string(),
         role: "user".to_string(),
-        ..CreateMessageDto::default()
+        ..CreateThreadMessageDto::default()
     };
     let body = CreateThreadDto {
         messages: vec![message1],
@@ -183,10 +183,10 @@ async fn test_created_thread_with_message_can_be_retrieved() {
     let client = RouterClient::from_app("/openai/v1").await;
 
     // Create thread with message
-    let message1 = CreateMessageDto {
+    let message1 = CreateThreadMessageDto {
         content: "Say Hello!".to_string(),
         role: "user".to_string(),
-        ..CreateMessageDto::default()
+        ..CreateThreadMessageDto::default()
     };
     let body = CreateThreadDto {
         messages: vec![message1],

@@ -11,6 +11,7 @@ pub enum ThreadEvent {
     ThreadCreated(ThreadEventDto<ThreadDto>),
 
     ThreadRunCreated(ThreadEventDto<RunDto>),
+    ThreadRunQueued(ThreadEventDto<RunDto>),
     ThreadRunInProgress(ThreadEventDto<RunDto>),
     ThreadRunCompleted(ThreadEventDto<RunDto>),
 
@@ -51,14 +52,21 @@ impl ThreadEventDto<RunDto> {
         }
     }
 
-    pub fn in_progress(data: &RunDto) -> Self {
+    pub fn run_queued(data: &RunDto) -> Self {
+        Self {
+            data: data.clone(),
+            event: "thread.run.queued".to_string(),
+        }
+    }
+
+    pub fn run_in_progress(data: &RunDto) -> Self {
         Self {
             data: data.clone(),
             event: "thread.run.in_progress".to_string(),
         }
     }
 
-    pub fn completed(data: &RunDto) -> Self {
+    pub fn run_completed(data: &RunDto) -> Self {
         Self {
             data: data.clone(),
             event: "thread.run.completed".to_string(),

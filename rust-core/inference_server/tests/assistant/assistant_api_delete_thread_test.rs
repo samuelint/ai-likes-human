@@ -1,6 +1,7 @@
 use crate::test_utils;
 use app_core::assistant::domain::dto::{
-    CreateMessageDto, CreateThreadAndRunDto, CreateThreadDto, RunDto, ThreadDto, ThreadMessageDto,
+    CreateThreadAndRunDto, CreateThreadDto, CreateThreadMessageDto, RunDto, ThreadDto,
+    ThreadMessageDto,
 };
 use axum::http::StatusCode;
 use test_utils::router_client::RouterClient;
@@ -52,10 +53,10 @@ async fn test_deleted_thread_also_deletes_associated_messages() {
     let client = RouterClient::from_app("/openai/v1").await;
 
     // Create thread with message
-    let message1 = CreateMessageDto {
+    let message1 = CreateThreadMessageDto {
         content: "Say Hello!".to_string(),
         role: "user".to_string(),
-        ..CreateMessageDto::default()
+        ..CreateThreadMessageDto::default()
     };
     let body = CreateThreadDto {
         messages: vec![message1],

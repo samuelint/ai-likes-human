@@ -1,9 +1,9 @@
 use app_core::assistant::domain::{
     dto::{
-        CreateMessageDto, CreateRunDto, CreateThreadAndRunDto, CreateThreadDto, RunDto, ThreadDto,
-        ThreadMessageDto, UpdateThreadDto,
+        CreateRunDto, CreateThreadAndRunDto, CreateThreadDto, CreateThreadMessageDto, RunDto,
+        ThreadDto, ThreadMessageDto, UpdateThreadDto,
     },
-    CreateMessageParams, UpdateThreadParams,
+    UpdateThreadParams,
 };
 pub use app_core::PageRequest;
 use axum::{
@@ -196,12 +196,12 @@ pub async fn delete_thread_message(
 pub async fn create_thread_message(
     axum::extract::Path(thread_id): axum::extract::Path<String>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
-    extract::Json(payload): extract::Json<CreateMessageDto>,
+    extract::Json(payload): extract::Json<CreateThreadMessageDto>,
 ) -> impl IntoResponse {
     let service = state.core_container.agent_module.get_message_repository();
 
     match service
-        .create(CreateMessageParams {
+        .create(CreateThreadMessageDto {
             thread_id: Some(thread_id),
             ..payload.into()
         })

@@ -5,6 +5,7 @@ mod m20220101_000001_create_configuration_table;
 mod m20220101_000002_create_thread_table;
 mod m20220101_000003_create_run_table;
 mod m20220101_000004_create_message_table;
+mod m20220101_000005_seed_default_llm_configuration;
 
 pub struct Migrator;
 
@@ -16,6 +17,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20220101_000002_create_thread_table::Migration),
             Box::new(m20220101_000003_create_run_table::Migration),
             Box::new(m20220101_000004_create_message_table::Migration),
+            Box::new(m20220101_000005_seed_default_llm_configuration::Migration),
         ]
     }
 }

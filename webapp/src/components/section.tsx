@@ -1,22 +1,24 @@
 import { ReactNode } from 'react';
-import { H2 } from './h2';
-import { cn } from '@/lib/utils';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
 
 interface Props {
   id?: string
   title: ReactNode
+  description?: ReactNode
   children?: ReactNode
-  className?: string
 }
 
-export function Section({ id, title, className, children }: Props) {
+export function Section({ id, title, description, children }: Props) {
   return (
-    <section id={id} className='py-4'>
-      <H2 className='text-xl'>{title}</H2>
-      <div className={cn('w-full flex flex-col gap-4 px-4', className)}>
+    <Card id={id}>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+        { description && <CardDescription>{description}</CardDescription> }
+      </CardHeader>
+      <CardContent>
         { children }
-      </div>
-    </section>
+      </CardContent>
+    </Card>
   );
 }

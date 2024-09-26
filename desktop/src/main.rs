@@ -9,7 +9,8 @@ pub mod system_tray;
 use app::configuration::AppConfigurationBuilder;
 use app_state::app_state::AppState;
 use core::tauri_command::{
-    find_configuration, get_inference_server_url, is_server_up, upsert_configuration,
+    find_configuration, get_app_directory_path, get_inference_server_url, is_server_up,
+    upsert_configuration,
 };
 use log::info;
 use screencapture::tauri_command::{assert_screen_capture_permissions, capture_screen};
@@ -41,6 +42,7 @@ async fn main() {
             upsert_configuration,
             find_configuration,
             get_inference_server_url,
+            get_app_directory_path,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")

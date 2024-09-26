@@ -6,6 +6,7 @@ const appConfig = {
   app_description: 'The ultimate AI client',
   api_url,
   openai_api_url,
+  available_llm_models: ['openai:gpt-4o', 'openai:gpt-4o-mini', 'local:llama3'],
 };
 
 export { api_url, openai_api_url };

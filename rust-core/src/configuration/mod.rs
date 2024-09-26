@@ -7,6 +7,7 @@ use infrastructure::SeaOrmConfigurationRepository;
 pub mod app;
 pub mod domain;
 pub mod infrastructure;
+pub use domain::dto::*;
 
 pub struct ConfigurationDIModule {
     connection: Arc<::sea_orm::DatabaseConnection>,

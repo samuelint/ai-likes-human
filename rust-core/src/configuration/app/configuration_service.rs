@@ -1,17 +1,13 @@
 use std::error::Error;
 use std::sync::Arc;
 
-use crate::configuration::domain::{ConfigurationRepository, NewConfigurationModel};
-use crate::entities::configuration;
+use crate::configuration::domain::dto::ConfigurationDto;
+use crate::configuration::domain::ConfigurationRepository;
 
 #[async_trait::async_trait]
 pub trait ConfigurationService: Send + Sync {
-    async fn find(&self, key: String) -> Result<Option<configuration::Model>, Box<dyn Error>>;
-    async fn upsert(
-        &self,
-        key: String,
-        value: String,
-    ) -> Result<configuration::Model, Box<dyn Error>>;
+    async fn find(&self, key: &str) -> Result<Option<ConfigurationDto>, Box<dyn Error>>;
+    async fn upsert(&self, key: &str, value: &str) -> Result<ConfigurationDto, Box<dyn Error>>;
 }
 
 pub struct ConfigurationServiceImpl {
@@ -26,20 +22,16 @@ impl ConfigurationServiceImpl {
 
 #[async_trait::async_trait]
 impl ConfigurationService for ConfigurationServiceImpl {
-    async fn find(&self, key: String) -> Result<Option<configuration::Model>, Box<dyn Error>> {
-        let r = self.repository.find_by_key(key.as_str()).await?;
+    async fn find(&self, key: &str) -> Result<Option<ConfigurationDto>, Box<dyn Error>> {
+        let r = self.repository.find_by_key(key).await?;
 
         Ok(r)
     }
 
-    async fn upsert(
-        &self,
-        key: String,
-        value: String,
-    ) -> Result<configuration::Model, Box<dyn Error>> {
+    async fn upsert(&self, key: &str, value: &str) -> Result<ConfigurationDto, Box<dyn Error>> {
         let r = self
             .repository
-            .upsert(NewConfigurationModel { key, value })
+            .upsert(ConfigurationDto::new(key, value))
             .await?;
 
         Ok(r)

@@ -1,16 +1,28 @@
 import useSWR from 'swr';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { findConfiguration, upsertConfiguration } from './tauri-command';
+import { useErrorNotification } from '@/app/_components/use-error-notification';
 
 
 
 export function useConfigurationKV(key: string) {
-  const { data, error, isLoading, mutate: mutateCache } = useSWR(`/configuration/kv/${key}`, async () => await findConfiguration(key));
+  const { data, error: fetchError, isLoading, mutate: mutateCache } = useSWR(`/configuration/kv/${key}`, async () => await findConfiguration(key));
+
+  const [error, setError] = useState<unknown | undefined>(undefined);
+
+  useEffect(() => setError(fetchError), [fetchError]);
+
   const mutate = useCallback<(newValue: string) => Promise<void>>(async (newValue) => {
-    const config = await upsertConfiguration({ key, value: newValue });
-    mutateCache(config, { revalidate: false });
+    try {
+      const config = await upsertConfiguration({ key, value: newValue });
+      mutateCache(config, { revalidate: false });
+    } catch (e) {
+      setError(e);
+    }
 
   }, [key, mutateCache]);
+
+  useErrorNotification(error);
 
   return {
     data,

@@ -3,7 +3,7 @@ mod app_configuration;
 mod app_container;
 pub mod assistant;
 pub mod chat_completion;
-mod configuration;
+pub mod configuration;
 mod infrastructure;
 mod llm;
 pub mod utils;

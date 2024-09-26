@@ -1,5 +1,5 @@
 use crate::app_state::app_state::AppState;
-use app_core::entities::configuration;
+use app_core::configuration::ConfigurationDto;
 use tauri::State;
 
 #[tauri::command]
@@ -16,36 +16,31 @@ pub fn get_inference_server_url(app_state: State<'_, AppState>) -> String {
 }
 
 #[tauri::command]
+pub fn get_app_directory_path(app_state: State<'_, AppState>) -> String {
+    app_state.configuration.app_data_directory_path.clone()
+}
+
+#[tauri::command]
 pub async fn find_configuration(
     app_state: State<'_, AppState>,
-    key: String,
-) -> Result<Option<configuration::Model>, String> {
-    let configuration_service = app_state
-        .core_container
-        .configuration_module
-        .get_configuration_service();
-
-    let r = configuration_service
-        .find(key)
+    key: &str,
+) -> Result<Option<ConfigurationDto>, String> {
+    app_state
+        .api
+        .find_configuration(key)
         .await
-        .map_err(|err| err.to_string());
-
-    r
+        .map_err(|err| err.to_string())
 }
 
 #[tauri::command]
 pub async fn upsert_configuration(
     app_state: State<'_, AppState>,
-    key: String,
-    value: String,
-) -> Result<configuration::Model, String> {
-    let configuration_service = app_state
-        .core_container
-        .configuration_module
-        .get_configuration_service();
-
-    configuration_service
-        .upsert(key, value)
+    key: &str,
+    value: &str,
+) -> Result<ConfigurationDto, String> {
+    app_state
+        .api
+        .upsert_configuration(key, value)
         .await
         .map_err(|err| err.to_string())
 }

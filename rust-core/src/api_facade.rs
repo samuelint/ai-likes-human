@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use crate::{
     chat_completion::{ChatCompletionMessageDto, ChatCompletionResult, ChatCompletionStream},
+    configuration::ConfigurationDto,
     AppContainer,
 };
 
@@ -38,5 +39,29 @@ impl ApiFacade {
             .get_inference_factory();
 
         factory.stream(model, messages)
+    }
+
+    pub async fn find_configuration(
+        &self,
+        key: &str,
+    ) -> Result<Option<ConfigurationDto>, Box<dyn std::error::Error>> {
+        self.container
+            .configuration_module
+            .get_configuration_service()
+            .find(key)
+            .await
+    }
+
+    pub async fn upsert_configuration(
+        &self,
+        key: &str,
+        value: &str,
+    ) -> Result<ConfigurationDto, Box<dyn std::error::Error>> {
+        let configuration_service = self
+            .container
+            .configuration_module
+            .get_configuration_service();
+
+        configuration_service.upsert(key, value).await
     }
 }

@@ -9,19 +9,16 @@ async fn test_configuration_create_read() {
     let app = create_app_container().await;
     let service = app.configuration_module.get_configuration_service();
 
-    let find_result = service.find("aa".to_string()).await.unwrap();
+    let find_result = service.find("aa").await.unwrap();
     assert!(find_result.is_none());
 
-    let upsert_result = service
-        .upsert("aa".to_string(), "AAA".to_string())
-        .await
-        .unwrap();
+    let upsert_result = service.upsert("aa", "AAA").await.unwrap();
 
     assert_eq!(upsert_result.value, "AAA");
     assert_eq!(upsert_result.key, "aa");
 
     let find_result = service
-        .find("aa".to_string())
+        .find("aa")
         .await
         .unwrap()
         .expect("Configuration item is supposed to exist");
@@ -38,19 +35,13 @@ async fn test_configuration_upsert() {
     let app = create_app_container().await;
     let service = app.configuration_module.get_configuration_service();
 
-    service
-        .upsert("bb".to_string(), "BB".to_string())
-        .await
-        .unwrap();
+    service.upsert("bb", "BB").await.unwrap();
 
-    let upsert_result = service
-        .upsert("bb".to_string(), "Hello".to_string())
-        .await
-        .unwrap();
+    let upsert_result = service.upsert("bb", "Hello").await.unwrap();
     assert_eq!(upsert_result.value, "Hello", "Value should be updated");
 
     let find_result = service
-        .find("bb".to_string())
+        .find("bb")
         .await
         .unwrap()
         .expect("Configuration item is supposed to exist");

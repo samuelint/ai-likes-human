@@ -1,7 +1,7 @@
-use crate::assistant::domain::dto::{CreateThreadMessageDto, ThreadDto, ThreadMessageDto};
-use crate::assistant::domain::thread_repository::{
-    CreateThreadParams, ThreadRepository, UpdateThreadParams,
+use crate::assistant::domain::dto::{
+    DbCreateThreadDto, DbCreateThreadMessageDto, DbUpdateThreadDto, ThreadDto, ThreadMessageDto,
 };
+use crate::assistant::domain::thread_repository::ThreadRepository;
 use crate::entities::{message, thread};
 use crate::utils::time::TimeBuilder;
 use crate::utils::PageRequest;
@@ -70,7 +70,7 @@ impl ThreadRepository for SeaOrmThreadRepository {
 
     async fn create(
         &self,
-        new_thread: CreateThreadParams,
+        new_thread: DbCreateThreadDto,
     ) -> Result<ThreadDto, Box<dyn Error + Send>> {
         let conn = Arc::clone(&self.connection);
 
@@ -88,14 +88,14 @@ impl ThreadRepository for SeaOrmThreadRepository {
             .map_err(|e| anyhow!(e))?;
 
         if new_thread.messages.len() > 0 {
-            let messages: Vec<CreateThreadMessageDto> = new_thread
+            let messages: Vec<DbCreateThreadMessageDto> = new_thread
                 .messages
                 .iter()
-                .map(|mesg| CreateThreadMessageDto {
+                .map(|mesg| DbCreateThreadMessageDto {
                     content: mesg.content.clone(),
                     role: mesg.role.clone(),
                     thread_id: Some(model.id.to_string()),
-                    ..CreateThreadMessageDto::default()
+                    ..DbCreateThreadMessageDto::default()
                 })
                 .collect();
 
@@ -109,7 +109,7 @@ impl ThreadRepository for SeaOrmThreadRepository {
         Ok(model.into())
     }
 
-    async fn update(&self, thread: UpdateThreadParams) -> Result<ThreadDto, Box<dyn Error>> {
+    async fn update(&self, thread: DbUpdateThreadDto) -> Result<ThreadDto, Box<dyn Error>> {
         let conn = Arc::clone(&self.connection);
         let thread_id: i32 = thread.id.parse()?;
 

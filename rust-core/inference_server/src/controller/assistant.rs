@@ -1,9 +1,6 @@
-use app_core::assistant::domain::{
-    dto::{
-        CreateRunDto, CreateThreadAndRunDto, CreateThreadDto, CreateThreadMessageDto, RunDto,
-        ThreadDto, ThreadMessageDto, UpdateThreadDto,
-    },
-    UpdateThreadParams,
+use app_core::assistant::domain::dto::{
+    ApiCreateThreadAndRunDto, ApiCreateThreadDto, ApiCreateThreadMessageDto, ApiUpdateThreadDto,
+    CreateRunDto, DbCreateThreadMessageDto, DbUpdateThreadDto, RunDto, ThreadDto, ThreadMessageDto,
 };
 pub use app_core::PageRequest;
 use axum::{
@@ -18,7 +15,7 @@ use crate::{app_state::ServerState, service::stream_create_thread_and_run};
 
 pub async fn create_thread(
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
-    extract::Json(payload): extract::Json<CreateThreadDto>,
+    extract::Json(payload): extract::Json<ApiCreateThreadDto>,
 ) -> impl IntoResponse {
     let service = state.core_container.agent_module.get_thread_repository();
 
@@ -30,7 +27,7 @@ pub async fn create_thread(
 
 pub async fn create_thread_and_run(
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
-    extract::Json(payload): extract::Json<CreateThreadAndRunDto>,
+    extract::Json(payload): extract::Json<ApiCreateThreadAndRunDto>,
 ) -> impl IntoResponse {
     let does_return_stream = match payload.stream {
         Some(stream) => stream,
@@ -115,12 +112,12 @@ pub async fn find_thread(
 pub async fn update_thread(
     axum::extract::Path(thread_id): axum::extract::Path<String>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
-    extract::Json(payload): extract::Json<UpdateThreadDto>,
+    extract::Json(payload): extract::Json<ApiUpdateThreadDto>,
 ) -> impl IntoResponse {
     let service = state.core_container.agent_module.get_thread_repository();
 
     match service
-        .update(UpdateThreadParams {
+        .update(DbUpdateThreadDto {
             id: thread_id,
             metadata: payload.metadata,
         })
@@ -196,14 +193,14 @@ pub async fn delete_thread_message(
 pub async fn create_thread_message(
     axum::extract::Path(thread_id): axum::extract::Path<String>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
-    extract::Json(payload): extract::Json<CreateThreadMessageDto>,
+    extract::Json(payload): extract::Json<ApiCreateThreadMessageDto>,
 ) -> impl IntoResponse {
     let service = state.core_container.agent_module.get_message_repository();
 
     match service
-        .create(CreateThreadMessageDto {
+        .create(DbCreateThreadMessageDto {
             thread_id: Some(thread_id),
-            ..payload.into()
+            ..(&payload).into()
         })
         .await
     {

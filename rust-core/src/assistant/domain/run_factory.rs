@@ -1,10 +1,9 @@
 use std::{error::Error, sync::Arc};
 
 use super::{
-    dto::{CreateRunDto, CreateThreadAndRunDto, RunDto, ThreadDto},
+    dto::{ApiCreateThreadAndRunDto, CreateRunDto, DbCreateRunDto, RunDto, ThreadDto},
     run_repository::RunRepository,
     thread_repository::ThreadRepository,
-    CreateRunParams,
 };
 
 pub struct RunFactory {
@@ -25,7 +24,7 @@ impl RunFactory {
 
     pub async fn create_thread_and_run(
         &self,
-        dto: &CreateThreadAndRunDto,
+        dto: &ApiCreateThreadAndRunDto,
     ) -> Result<(ThreadDto, RunDto), Box<dyn std::error::Error + Send>> {
         let create_run_dto: CreateRunDto = dto.into();
         let thread = self.thread_repository.create(dto.into()).await?;
@@ -43,7 +42,7 @@ impl RunFactory {
         let assistant_id = new_run.assistant_id.unwrap_or("default".to_string());
         let run = self
             .run_repository
-            .create(CreateRunParams {
+            .create(DbCreateRunDto {
                 assistant_id,
                 thread_id: thread_id.to_string(),
                 model: new_run.model,

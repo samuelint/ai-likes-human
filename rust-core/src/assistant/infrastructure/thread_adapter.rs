@@ -1,19 +1,16 @@
 use crate::{
-    assistant::domain::{
-        dto::{CreateThreadDto, ThreadDto},
-        CreateThreadParams,
-    },
+    assistant::domain::dto::{ApiCreateThreadDto, DbCreateThreadDto, ThreadDto},
     entities::thread,
     utils::time::TimeBuilder,
 };
 
 use super::metadata::{deserialize_metadata, serialize_metadata};
 
-impl From<CreateThreadDto> for CreateThreadParams {
-    fn from(dto: CreateThreadDto) -> Self {
-        CreateThreadParams {
+impl From<ApiCreateThreadDto> for DbCreateThreadDto {
+    fn from(dto: ApiCreateThreadDto) -> Self {
+        DbCreateThreadDto {
             metadata: dto.metadata,
-            messages: dto.messages.into_iter().map(|m| m.into()).collect(),
+            messages: dto.messages.into_iter().map(|m| (&m).into()).collect(),
         }
     }
 }

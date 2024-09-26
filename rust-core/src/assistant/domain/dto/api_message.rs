@@ -1,12 +1,12 @@
 #[cfg(test)]
-#[path = "./message_test.rs"]
-mod message_test;
+#[path = "./api_message_test.rs"]
+mod api_message_test;
 
 use crate::chat_completion::ChatCompletionMessageDto;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
-use super::{annotation::MessageAnnotation, Metadata};
+use super::{annotation::MessageAnnotation, DbCreateThreadMessageDto, Metadata};
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
 pub struct TextContentDto {
@@ -39,7 +39,7 @@ impl ThreadMessageDto {
         self.content
             .iter()
             .filter_map(|c| match c {
-                MessageContent::Text(block) => Some(block),
+                MessageContent::TextContentBlock(block) => Some(block),
                 _ => None,
             })
             .map(|block| block.text.value.clone())
@@ -50,7 +50,6 @@ impl ThreadMessageDto {
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
 pub struct TextContentBlock {
     pub text: TextDto,
-    pub r#type: String, // text
 }
 
 impl TextContentBlock {
@@ -69,7 +68,6 @@ impl Default for TextContentBlock {
     fn default() -> Self {
         Self {
             text: TextDto::default(),
-            r#type: "text".to_string(),
         }
     }
 }
@@ -83,14 +81,13 @@ pub struct ImageURL {
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
 pub struct ImageURLContentBlock {
     pub image_url: ImageURL,
-    pub r#type: String, // image_url
 }
 
 impl Default for ImageURLContentBlock {
     fn default() -> Self {
         Self {
             image_url: ImageURL::default(),
-            r#type: "image_url".to_string(),
+            // r#type: "image_url".to_string(),
         }
     }
 }
@@ -102,14 +99,17 @@ pub struct TextDto {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
+#[serde(tag = "type")]
 pub enum MessageContent {
-    Text(TextContentBlock),
-    ImageUrl(ImageURLContentBlock),
+    #[serde(rename = "text")]
+    TextContentBlock(TextContentBlock),
+    #[serde(rename = "image_url")]
+    ImageUrlContentBlock(ImageURLContentBlock),
 }
 
 impl MessageContent {
     pub fn new_text_content(value: &str) -> Self {
-        MessageContent::Text(TextContentBlock {
+        MessageContent::TextContentBlock(TextContentBlock {
             text: TextDto {
                 value: value.to_string(),
                 ..TextDto::default()
@@ -119,7 +119,7 @@ impl MessageContent {
     }
 
     pub fn new_image_url(url: &str) -> Self {
-        MessageContent::ImageUrl(ImageURLContentBlock {
+        MessageContent::ImageUrlContentBlock(ImageURLContentBlock {
             image_url: ImageURL {
                 url: url.to_string(),
                 ..ImageURL::default()
@@ -148,17 +148,14 @@ impl From<ThreadMessageDto> for ChatCompletionMessageDto {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct CreateThreadMessageDto {
+pub struct ApiCreateThreadMessageDto {
     pub content: Vec<MessageContent>,
     pub role: String,
-    pub status: String,
-    pub thread_id: Option<String>,
-    pub run_id: Option<String>,
     pub attachments: Option<String>,
     pub metadata: Option<Metadata>,
 }
 
-impl CreateThreadMessageDto {
+impl ApiCreateThreadMessageDto {
     pub fn user() -> Self {
         Self {
             role: "user".to_string(),
@@ -167,15 +164,24 @@ impl CreateThreadMessageDto {
     }
 }
 
-impl Default for CreateThreadMessageDto {
+impl From<&ApiCreateThreadMessageDto> for DbCreateThreadMessageDto {
+    fn from(dto: &ApiCreateThreadMessageDto) -> Self {
+        DbCreateThreadMessageDto {
+            content: dto.content.clone(),
+            role: dto.role.clone(),
+            attachments: dto.attachments.clone(),
+            metadata: dto.metadata.clone(),
+            ..DbCreateThreadMessageDto::default()
+        }
+    }
+}
+
+impl Default for ApiCreateThreadMessageDto {
     fn default() -> Self {
         Self {
             content: vec![],
             role: "user".to_string(),
-            thread_id: None,
-            run_id: None,
             attachments: None,
-            status: "in_progress".to_string(),
             metadata: None,
         }
     }

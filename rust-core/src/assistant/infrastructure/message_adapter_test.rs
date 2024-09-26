@@ -3,13 +3,14 @@ mod test_from_messate_entity_model_to_thread_message_dto {
     use crate::{
         assistant::domain::dto::{MessageContent, ThreadMessageDto},
         entities::message,
+        utils::time::TimeBuilder,
     };
 
     #[test]
     fn test_object_is_thead_message() {
         let model = message::Model {
             id: 0,
-            created_at: "".to_string(),
+            created_at: TimeBuilder::now().into(),
             content: "".to_string(),
             role: "".to_string(),
             attachments: None,
@@ -29,7 +30,7 @@ mod test_from_messate_entity_model_to_thread_message_dto {
     fn test_status_is_the_same() {
         let model = message::Model {
             id: 0,
-            created_at: "".to_string(),
+            created_at: TimeBuilder::now().into(),
             content: "".to_string(),
             role: "".to_string(),
             attachments: None,
@@ -49,7 +50,7 @@ mod test_from_messate_entity_model_to_thread_message_dto {
     fn test_thread_id_is_the_same() {
         let model = message::Model {
             id: 0,
-            created_at: "".to_string(),
+            created_at: TimeBuilder::now().into(),
             content: "".to_string(),
             role: "".to_string(),
             attachments: None,
@@ -69,7 +70,7 @@ mod test_from_messate_entity_model_to_thread_message_dto {
     fn test_empty_json_content_is_empty_vec() {
         let model = message::Model {
             id: 0,
-            created_at: "".to_string(),
+            created_at: TimeBuilder::now().into(),
             content: "".to_string(),
             role: "".to_string(),
             attachments: None,
@@ -89,7 +90,7 @@ mod test_from_messate_entity_model_to_thread_message_dto {
     fn test_json_content_with_empty_array_is_empty_vec() {
         let model = message::Model {
             id: 0,
-            created_at: "".to_string(),
+            created_at: TimeBuilder::now().into(),
             content: "[]".to_string(),
             role: "".to_string(),
             attachments: None,
@@ -111,7 +112,7 @@ mod test_from_messate_entity_model_to_thread_message_dto {
         let json_content = serde_json::to_string(&content).unwrap();
         let model = message::Model {
             id: 0,
-            created_at: "".to_string(),
+            created_at: TimeBuilder::now().into(),
             content: json_content,
             role: "".to_string(),
             attachments: None,

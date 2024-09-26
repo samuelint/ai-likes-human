@@ -56,7 +56,7 @@ mod tests {
             .content
             .iter()
             .filter_map(|c| match c {
-                MessageContent::Text(block) => Some(block),
+                MessageContent::TextContentBlock(block) => Some(block),
                 _ => None,
             })
             .collect::<Vec<_>>();

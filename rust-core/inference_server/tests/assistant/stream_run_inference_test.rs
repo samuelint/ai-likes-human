@@ -1,6 +1,7 @@
 use crate::test_utils;
 use app_core::assistant::domain::dto::{
-    CreateThreadAndRunDto, CreateThreadDto, CreateThreadMessageDto, MessageContent, ThreadEvent,
+    ApiCreateThreadAndRunDto, ApiCreateThreadDto, ApiCreateThreadMessageDto, MessageContent,
+    ThreadEvent,
 };
 use futures::{Stream, StreamExt};
 use test_utils::router_client::RouterClient;
@@ -10,20 +11,20 @@ static LLM_MODEL: &str = "openai:gpt-4o-mini";
 async fn create_run_stream(prompt: &str) -> impl Stream<Item = Result<ThreadEvent, axum::Error>> {
     let client = RouterClient::from_app("/openai/v1").await;
 
-    let create_thread_run_dto = CreateThreadAndRunDto {
+    let create_thread_run_dto = ApiCreateThreadAndRunDto {
         model: LLM_MODEL.to_string(),
-        thread: CreateThreadDto {
-            messages: vec![CreateThreadMessageDto {
+        thread: ApiCreateThreadDto {
+            messages: vec![ApiCreateThreadMessageDto {
                 content: vec![MessageContent::new_text_content(prompt)],
-                ..CreateThreadMessageDto::user()
+                ..ApiCreateThreadMessageDto::user()
             }],
-            ..CreateThreadDto::default()
+            ..ApiCreateThreadDto::default()
         },
         stream: Some(true),
-        ..CreateThreadAndRunDto::default()
+        ..ApiCreateThreadAndRunDto::default()
     };
 
-    let stream = client.post_json_stream::<CreateThreadAndRunDto, ThreadEvent>(
+    let stream = client.post_json_stream::<ApiCreateThreadAndRunDto, ThreadEvent>(
         "/threads/runs",
         &create_thread_run_dto,
     );

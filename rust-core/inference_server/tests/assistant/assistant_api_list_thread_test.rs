@@ -1,5 +1,5 @@
 use crate::test_utils;
-use app_core::assistant::domain::dto::{CreateThreadDto, ThreadDto};
+use app_core::assistant::domain::dto::{ApiCreateThreadDto, ThreadDto};
 use axum::http::StatusCode;
 use test_utils::router_client::RouterClient;
 
@@ -18,19 +18,19 @@ async fn test_when_no_threads_exist_empty_array_is_returned() {
 async fn test_listing_threads_limit_is_respected() {
     let client = RouterClient::from_app("/openai/v1").await;
     let _ = client
-        .post::<CreateThreadDto, ThreadDto>("/threads", &CreateThreadDto::default())
+        .post::<ApiCreateThreadDto, ThreadDto>("/threads", &ApiCreateThreadDto::default())
         .await;
     let _ = client
-        .post::<CreateThreadDto, ThreadDto>("/threads", &CreateThreadDto::default())
+        .post::<ApiCreateThreadDto, ThreadDto>("/threads", &ApiCreateThreadDto::default())
         .await;
     let _ = client
-        .post::<CreateThreadDto, ThreadDto>("/threads", &CreateThreadDto::default())
+        .post::<ApiCreateThreadDto, ThreadDto>("/threads", &ApiCreateThreadDto::default())
         .await;
     let _ = client
-        .post::<CreateThreadDto, ThreadDto>("/threads", &CreateThreadDto::default())
+        .post::<ApiCreateThreadDto, ThreadDto>("/threads", &ApiCreateThreadDto::default())
         .await;
     let _ = client
-        .post::<CreateThreadDto, ThreadDto>("/threads", &CreateThreadDto::default())
+        .post::<ApiCreateThreadDto, ThreadDto>("/threads", &ApiCreateThreadDto::default())
         .await;
 
     let (response, _status) = client

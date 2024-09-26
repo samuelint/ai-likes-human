@@ -1,5 +1,5 @@
-use crate::assistant::domain::dto::RunDto;
-use crate::assistant::domain::run_repository::{CreateRunParams, RunRepository};
+use crate::assistant::domain::dto::{DbCreateRunDto, RunDto};
+use crate::assistant::domain::run_repository::RunRepository;
 use crate::entities::run;
 use crate::utils::time::TimeBuilder;
 use crate::utils::PageRequest;
@@ -11,6 +11,8 @@ use sea_orm::{
 use std::error::Error;
 use std::num::ParseIntError;
 use std::sync::Arc;
+
+use super::metadata::serialize_metadata_opt;
 
 pub struct SeaOrmRunRepository {
     connection: Arc<DatabaseConnection>,
@@ -32,7 +34,7 @@ impl RunRepository for SeaOrmRunRepository {
         Ok(Some(r))
     }
 
-    async fn create(&self, item: CreateRunParams) -> Result<RunDto, Box<dyn Error + Send>> {
+    async fn create(&self, item: DbCreateRunDto) -> Result<RunDto, Box<dyn Error + Send>> {
         let conn: Arc<DatabaseConnection> = Arc::clone(&self.connection);
         let thread_id: i32 = item
             .thread_id
@@ -47,7 +49,7 @@ impl RunRepository for SeaOrmRunRepository {
             status: ActiveValue::Set(item.status.to_owned()),
             instructions: ActiveValue::Set(item.instructions),
             temperature: ActiveValue::Set(item.temperature),
-            metadata: ActiveValue::Set(item.metadata.to_owned()),
+            metadata: ActiveValue::Set(Some(serialize_metadata_opt(item.metadata))),
             ..Default::default()
         };
 

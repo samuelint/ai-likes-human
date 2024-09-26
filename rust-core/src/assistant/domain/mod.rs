@@ -8,6 +8,3 @@ pub mod stream_types;
 pub mod thread_chat_completions_inference;
 pub mod thread_message_factory;
 pub mod thread_repository;
-
-pub use run_repository::CreateRunParams;
-pub use thread_repository::{CreateThreadParams, UpdateThreadParams};

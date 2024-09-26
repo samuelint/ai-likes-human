@@ -1,7 +1,7 @@
 use crate::test_utils;
 use app_core::assistant::domain::dto::{
-    CreateThreadAndRunDto, CreateThreadDto, CreateThreadMessageDto, MessageContent, RunDto,
-    ThreadDto, ThreadMessageDto,
+    ApiCreateThreadAndRunDto, ApiCreateThreadDto, ApiCreateThreadMessageDto, MessageContent,
+    RunDto, ThreadDto, ThreadMessageDto,
 };
 use axum::http::StatusCode;
 use test_utils::router_client::RouterClient;
@@ -9,10 +9,10 @@ use test_utils::router_client::RouterClient;
 #[tokio::test]
 async fn test_deleted_thread() {
     let client = RouterClient::from_app("/openai/v1").await;
-    let create_body = CreateThreadDto::default();
+    let create_body = ApiCreateThreadDto::default();
 
     let (response, _) = client
-        .post::<CreateThreadDto, ThreadDto>("/threads", &create_body)
+        .post::<ApiCreateThreadDto, ThreadDto>("/threads", &create_body)
         .await
         .unwrap();
     let response = response.unwrap();
@@ -27,10 +27,10 @@ async fn test_deleted_thread() {
 #[tokio::test]
 async fn test_deleted_thread_cannot_be_fetched_again() {
     let client = RouterClient::from_app("/openai/v1").await;
-    let create_body = CreateThreadDto::default();
+    let create_body = ApiCreateThreadDto::default();
 
     let (response, _) = client
-        .post::<CreateThreadDto, ThreadDto>("/threads", &create_body)
+        .post::<ApiCreateThreadDto, ThreadDto>("/threads", &create_body)
         .await
         .unwrap();
     let response = response.unwrap();
@@ -53,17 +53,17 @@ async fn test_deleted_thread_also_deletes_associated_messages() {
     let client = RouterClient::from_app("/openai/v1").await;
 
     // Create thread with message
-    let message1 = CreateThreadMessageDto {
+    let message1 = ApiCreateThreadMessageDto {
         content: vec![MessageContent::new_text_content("Say Hello!")],
         role: "user".to_string(),
-        ..CreateThreadMessageDto::default()
+        ..ApiCreateThreadMessageDto::default()
     };
-    let body = CreateThreadDto {
+    let body = ApiCreateThreadDto {
         messages: vec![message1],
-        ..CreateThreadDto::default()
+        ..ApiCreateThreadDto::default()
     };
     let (response, _status) = client
-        .post::<CreateThreadDto, ThreadDto>("/threads", &body)
+        .post::<ApiCreateThreadDto, ThreadDto>("/threads", &body)
         .await
         .unwrap();
     let created_thread = response.unwrap();
@@ -102,13 +102,13 @@ async fn test_deleted_thread_also_deletes_associated_messages() {
 #[tokio::test]
 async fn test_deleted_thread_also_deletes_associated_runs() {
     let client = RouterClient::from_app("/openai/v1").await;
-    let create_thread_run_dto = CreateThreadAndRunDto {
+    let create_thread_run_dto = ApiCreateThreadAndRunDto {
         model: "openai:gpt-4o-mini".to_string(),
-        ..CreateThreadAndRunDto::default()
+        ..ApiCreateThreadAndRunDto::default()
     };
 
     let run = client
-        .post::<CreateThreadAndRunDto, RunDto>("/threads/runs", &create_thread_run_dto)
+        .post::<ApiCreateThreadAndRunDto, RunDto>("/threads/runs", &create_thread_run_dto)
         .await
         .unwrap()
         .0

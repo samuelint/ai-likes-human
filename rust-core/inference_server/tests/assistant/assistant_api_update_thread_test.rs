@@ -1,6 +1,6 @@
 use crate::test_utils;
 use app_core::assistant::domain::dto::{
-    CreateThreadDto, MetadataBuilder, ThreadDto, UpdateThreadDto,
+    ApiCreateThreadDto, ApiUpdateThreadDto, MetadataBuilder, ThreadDto,
 };
 use axum::http::StatusCode;
 use serde_json::Value;
@@ -9,9 +9,9 @@ use test_utils::router_client::RouterClient;
 #[tokio::test]
 async fn test_update_thread_metadata() {
     let client = RouterClient::from_app("/openai/v1").await;
-    let create_body = CreateThreadDto::default();
+    let create_body = ApiCreateThreadDto::default();
     let (response, _) = client
-        .post::<CreateThreadDto, ThreadDto>("/threads", &create_body)
+        .post::<ApiCreateThreadDto, ThreadDto>("/threads", &create_body)
         .await
         .unwrap();
 
@@ -19,12 +19,12 @@ async fn test_update_thread_metadata() {
     let mut metadata = MetadataBuilder::create_empty();
     metadata.insert("key".to_string(), Value::String("value".to_string()));
 
-    let update_body = UpdateThreadDto {
+    let update_body = ApiUpdateThreadDto {
         metadata: Some(metadata),
-        ..UpdateThreadDto::default()
+        ..ApiUpdateThreadDto::default()
     };
     let (response, status) = client
-        .post::<UpdateThreadDto, ThreadDto>(
+        .post::<ApiUpdateThreadDto, ThreadDto>(
             format!("/threads/{}", response.unwrap().id).as_str(),
             &update_body,
         )

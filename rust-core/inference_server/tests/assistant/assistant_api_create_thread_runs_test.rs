@@ -1,5 +1,5 @@
 use crate::test_utils;
-use app_core::assistant::domain::dto::{CreateRunDto, CreateThreadDto, RunDto, ThreadDto};
+use app_core::assistant::domain::dto::{ApiCreateThreadDto, CreateRunDto, RunDto, ThreadDto};
 use axum::http::StatusCode;
 use test_utils::router_client::RouterClient;
 
@@ -7,7 +7,7 @@ use test_utils::router_client::RouterClient;
 async fn test_created_thread_run_is_successful() {
     let client = RouterClient::from_app("/openai/v1").await;
     let thread = client
-        .post::<CreateThreadDto, ThreadDto>("/threads", &CreateThreadDto::default())
+        .post::<ApiCreateThreadDto, ThreadDto>("/threads", &ApiCreateThreadDto::default())
         .await
         .unwrap()
         .0
@@ -32,7 +32,7 @@ async fn test_created_thread_run_is_successful() {
 async fn test_created_thread_run_has_created_at() {
     let client = RouterClient::from_app("/openai/v1").await;
     let thread = client
-        .post::<CreateThreadDto, ThreadDto>("/threads", &CreateThreadDto::default())
+        .post::<ApiCreateThreadDto, ThreadDto>("/threads", &ApiCreateThreadDto::default())
         .await
         .unwrap()
         .0
@@ -67,7 +67,7 @@ async fn test_created_thread_run_has_created_at() {
 async fn test_created_thread_run_has_model() {
     let client = RouterClient::from_app("/openai/v1").await;
     let thread = client
-        .post::<CreateThreadDto, ThreadDto>("/threads", &CreateThreadDto::default())
+        .post::<ApiCreateThreadDto, ThreadDto>("/threads", &ApiCreateThreadDto::default())
         .await
         .unwrap()
         .0
@@ -103,7 +103,7 @@ async fn test_created_thread_run_has_model() {
 async fn test_created_thread_run_status_is_queued() {
     let client = RouterClient::from_app("/openai/v1").await;
     let thread = client
-        .post::<CreateThreadDto, ThreadDto>("/threads", &CreateThreadDto::default())
+        .post::<ApiCreateThreadDto, ThreadDto>("/threads", &ApiCreateThreadDto::default())
         .await
         .unwrap()
         .0

@@ -2,18 +2,20 @@ use std::error::Error;
 
 use mockall::*;
 
-use super::dto::{CreateThreadMessageDto, ThreadMessageDto, UpdateThreadMessageDto};
+use super::dto::{DbCreateThreadMessageDto, ThreadMessageDto, UpdateThreadMessageDto};
+
+
 
 #[async_trait::async_trait]
 #[automock]
 pub trait MessageRepository: Sync + Send {
     async fn create(
         &self,
-        message: CreateThreadMessageDto,
+        message: DbCreateThreadMessageDto,
     ) -> Result<ThreadMessageDto, Box<dyn Error + Send>>;
     async fn create_many(
         &self,
-        messages: Vec<CreateThreadMessageDto>,
+        messages: Vec<DbCreateThreadMessageDto>,
     ) -> Result<(), Box<dyn Error + Send>>;
 
     async fn find(&self, id: String) -> Result<Option<ThreadMessageDto>, Box<dyn Error>>;

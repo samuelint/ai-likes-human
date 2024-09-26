@@ -1,29 +1,15 @@
 use std::error::Error;
 
 use mockall::automock;
-use serde::{Deserialize, Serialize};
-use serde_json::{Map, Value};
 
-use super::dto::{CreateThreadMessageDto, ThreadDto, ThreadMessageDto};
+use super::dto::{DbCreateThreadDto, DbUpdateThreadDto, ThreadDto, ThreadMessageDto};
 use crate::utils::PageRequest;
-
-#[derive(Default, Serialize, Deserialize, Clone)]
-pub struct CreateThreadParams {
-    pub metadata: Option<Map<String, Value>>,
-    pub messages: Vec<CreateThreadMessageDto>,
-}
-
-#[derive(Default, Serialize, Deserialize)]
-pub struct UpdateThreadParams {
-    pub id: String,
-    pub metadata: Option<Map<String, Value>>,
-}
 
 #[async_trait::async_trait]
 #[automock]
 pub trait ThreadRepository: Sync + Send {
-    async fn create(&self, thread: CreateThreadParams) -> Result<ThreadDto, Box<dyn Error + Send>>;
-    async fn update(&self, thread: UpdateThreadParams) -> Result<ThreadDto, Box<dyn Error>>;
+    async fn create(&self, thread: DbCreateThreadDto) -> Result<ThreadDto, Box<dyn Error + Send>>;
+    async fn update(&self, thread: DbUpdateThreadDto) -> Result<ThreadDto, Box<dyn Error>>;
     async fn list_by_page(&self, args: PageRequest) -> Result<Vec<ThreadDto>, Box<dyn Error>>;
     async fn find(&self, id: &str) -> Result<Option<ThreadDto>, Box<dyn Error>>;
     async fn find_messages(&self, id: &str)

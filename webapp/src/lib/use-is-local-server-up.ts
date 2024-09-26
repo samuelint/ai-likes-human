@@ -7,7 +7,7 @@ interface Props {
   refreshInterval?: number;
 }
 
-export function useIsLocalServerUp ({ refreshInterval = 2000 }: Props = {}) {
+export function useIsLocalServerUp ({ refreshInterval = 10000 }: Props = {}) {
   const isDesktopAppFn = useIsInDesktopAppFn();
   const [isUp, setIsUp] = useState(false);
   const [hasAlreadyBeenUp, setHasAlreadyBeenUp] = useState(false);

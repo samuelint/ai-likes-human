@@ -1,25 +1,12 @@
 use std::error::Error;
 
-use serde::{Deserialize, Serialize};
-
 use crate::utils::PageRequest;
 
-use super::dto::RunDto;
-
-#[derive(Default, Serialize, Deserialize)]
-pub struct CreateRunParams {
-    pub assistant_id: String,
-    pub thread_id: String,
-    pub model: String,
-    pub status: String,
-    pub instructions: Option<String>,
-    pub temperature: Option<i32>,
-    pub metadata: Option<String>,
-}
+use super::dto::{DbCreateRunDto, RunDto};
 
 #[async_trait::async_trait]
 pub trait RunRepository: Sync + Send {
-    async fn create(&self, message: CreateRunParams) -> Result<RunDto, Box<dyn Error + Send>>;
+    async fn create(&self, new_run: DbCreateRunDto) -> Result<RunDto, Box<dyn Error + Send>>;
     async fn list_by_thread_paginated(
         &self,
         thread_id: String,

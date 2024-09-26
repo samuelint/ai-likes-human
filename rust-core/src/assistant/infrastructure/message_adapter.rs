@@ -5,15 +5,15 @@ mod message_adapter_test;
 use sea_orm::ActiveValue;
 
 use crate::{
-    assistant::domain::dto::{CreateThreadMessageDto, MessageContent, ThreadMessageDto},
+    assistant::domain::dto::{DbCreateThreadMessageDto, MessageContent, ThreadMessageDto},
     entities::message,
     utils::time::TimeBuilder,
 };
 
 use super::metadata::{deserialize_metadata, serialize_metadata};
 
-impl From<&CreateThreadMessageDto> for message::ActiveModel {
-    fn from(item: &CreateThreadMessageDto) -> Self {
+impl From<&DbCreateThreadMessageDto> for message::ActiveModel {
+    fn from(item: &DbCreateThreadMessageDto) -> Self {
         let thread_id: Option<i32> = item.thread_id.clone().map(|id| id.parse().unwrap());
         let run_id: Option<i32> = item.run_id.clone().map(|id| id.parse().unwrap());
         let json_content: String = serde_json::to_string(&item.content).unwrap();

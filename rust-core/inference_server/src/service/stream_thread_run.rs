@@ -1,4 +1,4 @@
-use app_core::assistant::domain::dto::CreateThreadAndRunDto;
+use app_core::assistant::domain::dto::ApiCreateThreadAndRunDto;
 use async_stream::try_stream;
 use axum::response::{
     sse::{Event, KeepAlive},
@@ -11,7 +11,7 @@ use crate::app_state::ServerState;
 
 pub fn stream_create_thread_and_run(
     state: &ServerState,
-    dto: &CreateThreadAndRunDto,
+    dto: &ApiCreateThreadAndRunDto,
 ) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
     let service = state.core_container.agent_module.get_stream_run_service();
     let dto = dto.clone();

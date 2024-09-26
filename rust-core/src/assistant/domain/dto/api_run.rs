@@ -1,8 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::assistant::domain::CreateThreadParams;
-
-use super::{CreateThreadDto, Metadata};
+use super::{ApiCreateThreadDto, DbCreateThreadDto, Metadata};
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
 pub struct RunDto {
@@ -28,9 +26,9 @@ pub struct CreateRunDto {
 }
 
 #[derive(Default, Serialize, Deserialize, Clone)]
-pub struct CreateThreadAndRunDto {
+pub struct ApiCreateThreadAndRunDto {
     pub assistant_id: Option<String>,
-    pub thread: CreateThreadDto,
+    pub thread: ApiCreateThreadDto,
     pub model: String,
     pub instructions: Option<String>,
     pub metadata: Option<Metadata>,
@@ -38,28 +36,23 @@ pub struct CreateThreadAndRunDto {
     pub stream: Option<bool>,
 }
 
-impl From<&CreateThreadAndRunDto> for CreateThreadParams {
-    fn from(dto: &CreateThreadAndRunDto) -> Self {
-        CreateThreadParams {
+impl From<&ApiCreateThreadAndRunDto> for DbCreateThreadDto {
+    fn from(dto: &ApiCreateThreadAndRunDto) -> Self {
+        DbCreateThreadDto {
             metadata: dto.thread.metadata.clone(),
-            messages: dto
-                .thread
-                .messages
-                .iter()
-                .map(|m| m.clone().into())
-                .collect(),
+            messages: dto.thread.messages.iter().map(|m| m.into()).collect(),
         }
     }
 }
 
-impl From<&CreateThreadAndRunDto> for CreateThreadDto {
-    fn from(dto: &CreateThreadAndRunDto) -> Self {
+impl From<&ApiCreateThreadAndRunDto> for ApiCreateThreadDto {
+    fn from(dto: &ApiCreateThreadAndRunDto) -> Self {
         dto.thread.clone()
     }
 }
 
-impl From<&CreateThreadAndRunDto> for CreateRunDto {
-    fn from(dto: &CreateThreadAndRunDto) -> Self {
+impl From<&ApiCreateThreadAndRunDto> for CreateRunDto {
+    fn from(dto: &ApiCreateThreadAndRunDto) -> Self {
         CreateRunDto {
             assistant_id: dto.assistant_id.clone(),
             model: dto.model.clone(),

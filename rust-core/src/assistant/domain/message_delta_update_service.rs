@@ -80,12 +80,12 @@ impl MessageDeltaUpdateService {
         let mut content: Vec<MessageContent> = existing_content
             .iter()
             .filter_map(|c| match c {
-                MessageContent::Text(_) => None,
+                MessageContent::TextContentBlock(_) => None,
                 c => Some(c.clone()),
             })
             .collect();
 
-        content.push(MessageContent::Text(new_text_block));
+        content.push(MessageContent::TextContentBlock(new_text_block));
 
         content
     }

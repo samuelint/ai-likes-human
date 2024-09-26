@@ -5,7 +5,7 @@ mod stream_thread_run_service_test;
 use std::sync::Arc;
 
 use super::{
-    dto::{CreateRunDto, CreateThreadAndRunDto, RunStep, RunStepDto, ThreadEvent},
+    dto::{CreateRunDto, ApiCreateThreadAndRunDto, RunStep, RunStepDto, ThreadEvent},
     message_delta_update_service::MessageDeltaUpdateService,
     run_factory::RunFactory,
     stream_types::AssistantStream,
@@ -41,7 +41,7 @@ impl StreamThreadRunService {
         }
     }
 
-    pub fn stream_new_thread(&self, dto: &CreateThreadAndRunDto) -> AssistantStream {
+    pub fn stream_new_thread(&self, dto: &ApiCreateThreadAndRunDto) -> AssistantStream {
         let dto = dto.clone();
         let thread_repository = self.thread_repository.clone();
         let self_clone = self.clone();

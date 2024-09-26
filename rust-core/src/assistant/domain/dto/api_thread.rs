@@ -1,11 +1,11 @@
 use serde::{Deserialize, Serialize};
 
-use super::{message::CreateThreadMessageDto, Metadata};
+use super::{api_message::ApiCreateThreadMessageDto, Metadata};
 
 #[derive(Default, Serialize, Deserialize, Clone)]
-pub struct CreateThreadDto {
+pub struct ApiCreateThreadDto {
     pub metadata: Option<Metadata>,
-    pub messages: Vec<CreateThreadMessageDto>,
+    pub messages: Vec<ApiCreateThreadMessageDto>,
 }
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
@@ -16,6 +16,6 @@ pub struct ThreadDto {
 }
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
-pub struct UpdateThreadDto {
+pub struct ApiUpdateThreadDto {
     pub metadata: Option<Metadata>,
 }

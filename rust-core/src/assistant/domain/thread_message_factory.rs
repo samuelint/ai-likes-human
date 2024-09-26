@@ -5,7 +5,7 @@ mod thread_message_factory_test;
 use std::sync::Arc;
 
 use super::{
-    dto::{CreateThreadMessageDto, ThreadMessageDto},
+    dto::{DbCreateThreadMessageDto, ThreadMessageDto},
     message_repository::MessageRepository,
 };
 
@@ -25,11 +25,11 @@ impl ThreadMessageFactory {
     ) -> Result<ThreadMessageDto, Box<dyn std::error::Error + Send>> {
         let message = self
             .message_repository
-            .create(CreateThreadMessageDto {
+            .create(DbCreateThreadMessageDto {
                 role: "assistant".to_string(),
                 thread_id: Some(thread_id.to_string()),
                 run_id: Some(run_id.to_string()),
-                ..CreateThreadMessageDto::default()
+                ..DbCreateThreadMessageDto::default()
             })
             .await?;
 

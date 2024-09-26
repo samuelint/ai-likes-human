@@ -8,7 +8,7 @@ use std::num::ParseIntError;
 use std::sync::Arc;
 
 use crate::assistant::domain::dto::{
-    CreateThreadMessageDto, ThreadMessageDto, UpdateThreadMessageDto,
+    DbCreateThreadMessageDto, ThreadMessageDto, UpdateThreadMessageDto,
 };
 use crate::assistant::domain::message_repository::MessageRepository;
 use crate::entities::message;
@@ -118,7 +118,7 @@ impl MessageRepository for SeaOrmMessageRepository {
 
     async fn create(
         &self,
-        item: CreateThreadMessageDto,
+        item: DbCreateThreadMessageDto,
     ) -> Result<ThreadMessageDto, Box<dyn Error + Send>> {
         let conn = Arc::clone(&self.connection);
         let model: message::ActiveModel = (&item).into();
@@ -133,7 +133,7 @@ impl MessageRepository for SeaOrmMessageRepository {
 
     async fn create_many(
         &self,
-        messages: Vec<CreateThreadMessageDto>,
+        messages: Vec<DbCreateThreadMessageDto>,
     ) -> Result<(), Box<dyn Error + Send>> {
         let conn = Arc::clone(&self.connection);
         self.tx_create_many(conn.as_ref(), &messages).await?;
@@ -160,7 +160,7 @@ impl SeaOrmMessageRepository {
     pub async fn tx_create_many<'a, C>(
         &self,
         conn: &'a C,
-        messages: &Vec<CreateThreadMessageDto>,
+        messages: &Vec<DbCreateThreadMessageDto>,
     ) -> Result<InsertResult<message::ActiveModel>, Box<dyn Error + Send>>
     where
         C: ConnectionTrait,

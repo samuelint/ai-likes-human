@@ -108,7 +108,7 @@ mod test_from_messate_entity_model_to_thread_message_dto {
 
     #[test]
     fn test_content_is_deserialized_from_json() {
-        let content: Vec<MessageContent> = vec![MessageContent::new_text_content("hello")];
+        let content: Vec<MessageContent> = vec![MessageContent::text("hello")];
         let json_content = serde_json::to_string(&content).unwrap();
         let model = message::Model {
             id: 0,

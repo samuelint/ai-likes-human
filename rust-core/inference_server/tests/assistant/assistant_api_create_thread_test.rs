@@ -1,7 +1,7 @@
 use crate::test_utils;
 use app_core::{
     assistant::domain::dto::{
-        ApiCreateThreadMessageDto, ApiCreateThreadDto, MessageContent, MetadataBuilder, ThreadDto,
+        ApiCreateThreadDto, ApiCreateThreadMessageDto, MessageContent, MetadataBuilder, ThreadDto,
         ThreadMessageDto,
     },
     utils::time::TimeBuilder,
@@ -107,7 +107,7 @@ async fn test_created_threads_are_listed() {
 async fn test_created_thread_with_message_is_successful() {
     let client = RouterClient::from_app("/openai/v1").await;
     let message1 = ApiCreateThreadMessageDto {
-        content: vec![MessageContent::new_text_content("Say Hello!")],
+        content: vec![MessageContent::text("Say Hello!")],
         role: "user".to_string(),
         ..ApiCreateThreadMessageDto::default()
     };
@@ -132,7 +132,7 @@ async fn test_created_thread_with_message_is_successful() {
 async fn test_created_thread_with_message_have_id() {
     let client = RouterClient::from_app("/openai/v1").await;
     let message1 = ApiCreateThreadMessageDto {
-        content: vec![MessageContent::new_text_content("Say Hello!")],
+        content: vec![MessageContent::text("Say Hello!")],
         role: "user".to_string(),
         ..ApiCreateThreadMessageDto::default()
     };
@@ -161,7 +161,7 @@ async fn test_created_thread_with_message_have_id() {
 async fn test_created_thread_with_message_have_same_content() {
     let client = RouterClient::from_app("/openai/v1").await;
     let message1 = ApiCreateThreadMessageDto {
-        content: vec![MessageContent::new_text_content("Say Hello!")],
+        content: vec![MessageContent::text("Say Hello!")],
         role: "user".to_string(),
         ..ApiCreateThreadMessageDto::default()
     };
@@ -192,7 +192,7 @@ async fn test_created_thread_with_message_can_be_retrieved() {
 
     // Create thread with message
     let message1 = ApiCreateThreadMessageDto {
-        content: vec![MessageContent::new_text_content("Say Hello!")],
+        content: vec![MessageContent::text("Say Hello!")],
         role: "user".to_string(),
         ..ApiCreateThreadMessageDto::default()
     };

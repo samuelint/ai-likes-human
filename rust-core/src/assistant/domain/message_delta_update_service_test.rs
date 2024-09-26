@@ -23,13 +23,13 @@ mod tests {
         let message_id = "some_message_id";
         let expected_update_message = UpdateThreadMessageDto {
             id: message_id.to_string(),
-            content: Some(vec![MessageContent::new_text_content("Hello World!")]),
+            content: Some(vec![MessageContent::text("Hello World!")]),
             ..UpdateThreadMessageDto::default()
         };
         let existing_message = ThreadMessageDto {
             id: message_id.to_string(),
             thread_id: Some(thread_id.to_string()),
-            content: vec![MessageContent::new_text_content("Hello ")],
+            content: vec![MessageContent::text("Hello ")],
             ..ThreadMessageDto::default()
         };
         let chunk = ChatCompletionChunkObject {
@@ -56,7 +56,7 @@ mod tests {
             .content
             .iter()
             .filter_map(|c| match c {
-                MessageContent::TextContentBlock(block) => Some(block),
+                MessageContent::Text { text } => Some(text),
                 _ => None,
             })
             .collect::<Vec<_>>();
@@ -65,7 +65,7 @@ mod tests {
         // Then message Text Block Content should contain "Hello World!"
         let text_block = text_blocks[0];
 
-        assert_eq!(text_block.text.value, "Hello World!");
+        assert_eq!(text_block.to_string(), "Hello World!");
     }
 
     #[tokio::test]
@@ -74,13 +74,13 @@ mod tests {
         let message_id = "some_message_id";
         let expected_update_message = UpdateThreadMessageDto {
             id: message_id.to_string(),
-            content: Some(vec![MessageContent::new_text_content("Hello World!")]),
+            content: Some(vec![MessageContent::text("Hello World!")]),
             ..UpdateThreadMessageDto::default()
         };
         let existing_message = ThreadMessageDto {
             id: message_id.to_string(),
             thread_id: Some(thread_id.to_string()),
-            content: vec![MessageContent::new_text_content("Hello ")],
+            content: vec![MessageContent::text("Hello ")],
             ..ThreadMessageDto::default()
         };
         let chunk = ChatCompletionChunkObject {
@@ -119,13 +119,13 @@ mod tests {
         let message_id = "some_message_id";
         let expected_update_message = UpdateThreadMessageDto {
             id: message_id.to_string(),
-            content: Some(vec![MessageContent::new_text_content("Hello World!")]),
+            content: Some(vec![MessageContent::text("Hello World!")]),
             ..UpdateThreadMessageDto::default()
         };
         let existing_message = ThreadMessageDto {
             id: message_id.to_string(),
             thread_id: Some(thread_id.to_string()),
-            content: vec![MessageContent::new_text_content("Hello ")],
+            content: vec![MessageContent::text("Hello ")],
             role: "assistant".to_string(),
             ..ThreadMessageDto::default()
         };
@@ -173,7 +173,7 @@ mod tests {
                         thread_id: Some(thread_id),
                         status: update_message_dto.status.unwrap_or("".to_string()),
                         role: "assistant".to_string(),
-                        content: vec![MessageContent::new_text_content("Hello World!")],
+                        content: vec![MessageContent::text("Hello World!")],
                         ..ThreadMessageDto::default()
                     })
                 })

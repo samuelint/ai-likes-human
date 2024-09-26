@@ -39,93 +39,106 @@ impl ThreadMessageDto {
         self.content
             .iter()
             .filter_map(|c| match c {
-                MessageContent::TextContentBlock(block) => Some(block),
+                MessageContent::Text { text } => Some(text.to_string()),
                 _ => None,
             })
-            .map(|block| block.text.value.clone())
             .join("")
     }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
-pub struct TextContentBlock {
-    pub text: TextDto,
+#[serde(untagged)]
+pub enum TextContent {
+    String(String),
+    Annotated {
+        value: String,
+        annotations: Vec<MessageAnnotation>,
+    },
 }
 
-impl TextContentBlock {
-    pub fn new(text: &str) -> Self {
-        Self {
-            text: TextDto {
-                value: text.to_string(),
-                ..TextDto::default()
-            },
-            ..TextContentBlock::default()
+impl TextContent {
+    pub fn annotated(text: &str) -> Self {
+        Self::Annotated {
+            value: text.to_string(),
+            annotations: vec![],
+        }
+    }
+
+    pub fn string(text: &str) -> Self {
+        Self::String(text.to_string())
+    }
+
+    pub fn to_string(&self) -> String {
+        match self {
+            TextContent::String(text) => text.to_string(),
+            TextContent::Annotated { value, .. } => value.to_string(),
         }
     }
 }
 
-impl Default for TextContentBlock {
+impl Default for TextContent {
     fn default() -> Self {
-        Self {
-            text: TextDto::default(),
+        Self::Annotated {
+            value: "".to_string(),
+            annotations: vec![],
         }
     }
 }
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
-pub struct ImageURL {
+pub struct AnnotatedTextDto {
+    pub value: String,
+    pub annotations: Vec<MessageAnnotation>,
+}
+
+#[derive(Default, Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
+pub struct ImageUrl {
     pub url: String,
     pub details: Option<String>, // auto, low, high
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
-pub struct ImageURLContentBlock {
-    pub image_url: ImageURL,
+pub struct ImageUrlContent {
+    pub image_url: ImageUrl,
 }
 
-impl Default for ImageURLContentBlock {
-    fn default() -> Self {
-        Self {
-            image_url: ImageURL::default(),
-            // r#type: "image_url".to_string(),
+impl ImageUrlContent {
+    pub fn url(url: &str) -> Self {
+        ImageUrlContent {
+            image_url: ImageUrl {
+                url: url.to_string(),
+                ..ImageUrl::default()
+            },
         }
     }
 }
 
-#[derive(Default, Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
-pub struct TextDto {
-    pub value: String,
-    pub annotations: Vec<MessageAnnotation>,
+impl Default for ImageUrlContent {
+    fn default() -> Self {
+        Self {
+            image_url: ImageUrl::default(),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
-#[serde(tag = "type")]
+#[serde(tag = "type", rename_all = "snake_case")]
 pub enum MessageContent {
-    #[serde(rename = "text")]
-    TextContentBlock(TextContentBlock),
-    #[serde(rename = "image_url")]
-    ImageUrlContentBlock(ImageURLContentBlock),
+    Text { text: TextContent },
+    ImageUrl { image_url: ImageUrlContent },
 }
 
 impl MessageContent {
-    pub fn new_text_content(value: &str) -> Self {
-        MessageContent::TextContentBlock(TextContentBlock {
-            text: TextDto {
-                value: value.to_string(),
-                ..TextDto::default()
-            },
-            ..TextContentBlock::default()
-        })
+    pub fn text(value: &str) -> Self {
+        Self::Text {
+            text: TextContent::annotated(value),
+        }
     }
 
-    pub fn new_image_url(url: &str) -> Self {
-        MessageContent::ImageUrlContentBlock(ImageURLContentBlock {
-            image_url: ImageURL {
-                url: url.to_string(),
-                ..ImageURL::default()
-            },
-            ..ImageURLContentBlock::default()
-        })
+    pub fn image_url(url: &str) -> Self {
+        Self::ImageUrl {
+            image_url: ImageUrlContent::url(url),
+        }
     }
 }
 

@@ -54,7 +54,7 @@ async fn test_deleted_thread_also_deletes_associated_messages() {
 
     // Create thread with message
     let message1 = ApiCreateThreadMessageDto {
-        content: vec![MessageContent::new_text_content("Say Hello!")],
+        content: vec![MessageContent::text("Say Hello!")],
         role: "user".to_string(),
         ..ApiCreateThreadMessageDto::default()
     };

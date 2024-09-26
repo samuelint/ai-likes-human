@@ -13,7 +13,7 @@ use super::{
         message_delta::{
             MessageContentDelta, MessageDeltaDto, TextDeltaDto, ThreadMessageDeltaDto,
         },
-        MessageContent, TextContentBlock, ThreadMessageDto,
+        MessageContent, ThreadMessageDto,
     },
     message_repository::MessageRepository,
 };
@@ -75,17 +75,15 @@ impl MessageDeltaUpdateService {
         existing_content: &Vec<MessageContent>,
         new_content: &str,
     ) -> Vec<MessageContent> {
-        let new_text_block = TextContentBlock::new(&new_content);
-
         let mut content: Vec<MessageContent> = existing_content
             .iter()
             .filter_map(|c| match c {
-                MessageContent::TextContentBlock(_) => None,
+                MessageContent::Text { .. } => None,
                 c => Some(c.clone()),
             })
             .collect();
 
-        content.push(MessageContent::TextContentBlock(new_text_block));
+        content.push(MessageContent::text(new_content));
 
         content
     }

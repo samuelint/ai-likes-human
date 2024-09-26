@@ -15,7 +15,7 @@ async fn create_run_stream(prompt: &str) -> impl Stream<Item = Result<ThreadEven
         model: LLM_MODEL.to_string(),
         thread: ApiCreateThreadDto {
             messages: vec![ApiCreateThreadMessageDto {
-                content: vec![MessageContent::new_text_content(prompt)],
+                content: vec![MessageContent::text(prompt)],
                 ..ApiCreateThreadMessageDto::user()
             }],
             ..ApiCreateThreadDto::default()

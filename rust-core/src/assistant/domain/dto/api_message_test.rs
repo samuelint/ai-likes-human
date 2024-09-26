@@ -6,9 +6,9 @@ mod tests_thread_message_dto {
     fn test_text_content_are_all_join_in_a_string() {
         let message = ThreadMessageDto {
             content: vec![
-                MessageContent::new_text_content("Hello"),
-                MessageContent::new_text_content(" World"),
-                MessageContent::new_text_content("!"),
+                MessageContent::text("Hello"),
+                MessageContent::text(" World"),
+                MessageContent::text("!"),
             ],
             ..ThreadMessageDto::default()
         };
@@ -24,33 +24,33 @@ mod test_create_thread_message_dto {
 
     use crate::assistant::domain::dto::{ApiCreateThreadMessageDto, MessageContent};
 
-    // #[test]
-    // fn test_message_deserialization_with_string_text_content() {
-    //     let json = r#"{
-    //         "role": "user",
-    //         "content": [
-    //             {
-    //             "type": "text",
-    //             "text": "Salut"
-    //             }
-    //         ]
-    //         }"#;
+    #[test]
+    fn test_message_deserialization_with_string_text_content() {
+        let json = r#"{
+            "role": "user",
+            "content": [
+                {
+                "type": "text",
+                "text": "Salut"
+                }
+            ]
+            }"#;
 
-    //     let dto = serde_json::from_str::<ApiCreateThreadMessageDto>(json);
+        let dto = serde_json::from_str::<ApiCreateThreadMessageDto>(json);
 
-    //     assert_ok!(&dto);
+        assert_ok!(&dto);
 
-    //     let dto = dto.unwrap();
+        let dto = dto.unwrap();
 
-    //     assert_eq!(dto.role, "user");
+        assert_eq!(dto.role, "user");
 
-    //     let content1: &crate::assistant::domain::dto::TextContentBlock = match &dto.content[0] {
-    //         MessageContent::TextContentBlock(content) => content,
-    //         _ => unreachable!(),
-    //     };
+        let content1 = match &dto.content[0] {
+            MessageContent::Text { text } => text.to_string(),
+            _ => unreachable!(),
+        };
 
-    //     assert_eq!(content1.text.value, "Salut");
-    // }
+        assert_eq!(content1, "Salut");
+    }
 
     #[test]
     fn test_message_deserialization_with_array_text_content() {
@@ -70,16 +70,13 @@ mod test_create_thread_message_dto {
         let dto = serde_json::from_str::<ApiCreateThreadMessageDto>(json);
 
         assert_ok!(&dto);
-
         let dto = dto.unwrap();
-
         assert_eq!(dto.role, "user");
-
         let content1 = match &dto.content[0] {
-            MessageContent::TextContentBlock(content) => content,
+            MessageContent::Text { text } => text.to_string(),
             _ => unreachable!(),
         };
 
-        assert_eq!(content1.text.value, "Hi");
+        assert_eq!(content1, "Hi");
     }
 }

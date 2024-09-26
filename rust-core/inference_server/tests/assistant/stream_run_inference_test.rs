@@ -140,10 +140,7 @@ async fn test_run_stream_thread_created_contains_new_thread_data() {
     };
 
     assert!(chunk.data.id.len() > 0, "Should have a thread id");
-    assert!(
-        chunk.data.created_at.len() > 0,
-        "Should have a created at date"
-    );
+    assert!(chunk.data.created_at > 0, "Should have a created at date");
 }
 
 #[tokio::test]
@@ -171,10 +168,7 @@ async fn test_run_stream_thread_run_created_chunk_contains_run_data() {
     };
 
     assert!(chunk.data.id.len() > 0, "Should have a thread id");
-    assert!(
-        chunk.data.created_at.len() > 0,
-        "Should have a created at date"
-    );
+    assert!(chunk.data.created_at > 0, "Should have a created at date");
 }
 
 #[tokio::test]

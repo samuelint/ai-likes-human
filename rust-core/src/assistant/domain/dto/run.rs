@@ -7,7 +7,7 @@ use super::{CreateThreadDto, Metadata};
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
 pub struct RunDto {
     pub id: String,
-    pub created_at: String,
+    pub created_at: i64,
     pub assistant_id: String,
     pub thread_id: Option<String>,
     pub instructions: Option<String>,

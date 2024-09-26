@@ -6,7 +6,7 @@ pub mod chat_completion;
 mod configuration;
 mod infrastructure;
 mod llm;
-mod utils;
+pub mod utils;
 
 pub mod entities;
 

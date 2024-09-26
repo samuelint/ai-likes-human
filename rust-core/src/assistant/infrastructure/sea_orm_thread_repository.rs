@@ -3,7 +3,7 @@ use crate::assistant::domain::thread_repository::{
     CreateThreadParams, ThreadRepository, UpdateThreadParams,
 };
 use crate::entities::{message, thread};
-use crate::utils::time::current_time_with_timezone;
+use crate::utils::time::TimeBuilder;
 use crate::utils::PageRequest;
 use anyhow::anyhow;
 use sea_orm::{
@@ -78,7 +78,7 @@ impl ThreadRepository for SeaOrmThreadRepository {
 
         let model = thread::ActiveModel {
             metadata: ActiveValue::Set(serialize_metadata_opt(new_thread.metadata)),
-            created_at: ActiveValue::Set(current_time_with_timezone()),
+            created_at: ActiveValue::Set(TimeBuilder::now().into()),
             ..Default::default()
         };
 

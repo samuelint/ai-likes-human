@@ -1,7 +1,10 @@
 use crate::test_utils;
-use app_core::assistant::domain::dto::{
-    CreateThreadDto, CreateThreadMessageDto, MessageContent, MetadataBuilder, ThreadDto,
-    ThreadMessageDto,
+use app_core::{
+    assistant::domain::dto::{
+        CreateThreadDto, CreateThreadMessageDto, MessageContent, MetadataBuilder, ThreadDto,
+        ThreadMessageDto,
+    },
+    utils::time::TimeBuilder,
 };
 use axum::http::StatusCode;
 use serde_json::Value;
@@ -49,10 +52,9 @@ async fn test_created_thread_have_created_at_date() {
         .await
         .unwrap();
 
-    assert!(
-        response.unwrap().created_at.len() > 0,
-        "should have a created date"
-    );
+    let created_at = response.unwrap().created_at;
+    assert!(created_at > 0, "should have a created date");
+    assert!(TimeBuilder::from_i64(created_at).is_near_now());
 }
 
 #[tokio::test]

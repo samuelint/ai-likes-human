@@ -1,7 +1,7 @@
 use crate::assistant::domain::dto::RunDto;
 use crate::assistant::domain::run_repository::{CreateRunParams, RunRepository};
 use crate::entities::run;
-use crate::utils::time::current_time_with_timezone;
+use crate::utils::time::TimeBuilder;
 use crate::utils::PageRequest;
 use anyhow::anyhow;
 use sea_orm::{
@@ -34,10 +34,13 @@ impl RunRepository for SeaOrmRunRepository {
 
     async fn create(&self, item: CreateRunParams) -> Result<RunDto, Box<dyn Error + Send>> {
         let conn: Arc<DatabaseConnection> = Arc::clone(&self.connection);
-        let thread_id: i32 = item.thread_id.parse().map_err(|e: ParseIntError| anyhow!(e))?;
+        let thread_id: i32 = item
+            .thread_id
+            .parse()
+            .map_err(|e: ParseIntError| anyhow!(e))?;
 
         let model = run::ActiveModel {
-            created_at: ActiveValue::Set(current_time_with_timezone()),
+            created_at: ActiveValue::Set(TimeBuilder::now().into()),
             assistant_id: ActiveValue::Set(item.assistant_id),
             thread_id: ActiveValue::Set(Some(thread_id)),
             model: ActiveValue::Set(item.model.to_owned()),

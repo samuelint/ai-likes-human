@@ -51,7 +51,7 @@ async fn test_created_thread_run_has_created_at() {
         .unwrap()
         .0
         .unwrap();
-    assert!(run.created_at.len() > 0);
+    assert!(run.created_at > 0);
 
     let retrieved_run = client
         .get::<RunDto>(format!("/threads/{}/runs/{}", thread.id, run.id).as_str())

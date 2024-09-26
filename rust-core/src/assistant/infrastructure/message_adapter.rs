@@ -7,7 +7,7 @@ use sea_orm::ActiveValue;
 use crate::{
     assistant::domain::dto::{CreateThreadMessageDto, MessageContent, ThreadMessageDto},
     entities::message,
-    utils::time::current_time_with_timezone,
+    utils::time::TimeBuilder,
 };
 
 use super::metadata::{deserialize_metadata, serialize_metadata};
@@ -20,7 +20,7 @@ impl From<&CreateThreadMessageDto> for message::ActiveModel {
         let json_metadata = item.metadata.clone().map(|m| serialize_metadata(&m));
 
         message::ActiveModel {
-            created_at: ActiveValue::Set(current_time_with_timezone()),
+            created_at: ActiveValue::Set(TimeBuilder::now().into()),
             content: ActiveValue::Set(json_content),
             role: ActiveValue::Set(item.role.to_owned()),
             thread_id: ActiveValue::Set(thread_id),
@@ -45,7 +45,7 @@ impl From<message::Model> for ThreadMessageDto {
         ThreadMessageDto {
             id: model.id.to_string(),
             object: "thread.message".to_string(),
-            created_at: model.created_at,
+            created_at: TimeBuilder::from_string(&model.created_at).into(),
             thread_id: model.thread_id.map(|id| id.to_string()),
             status: model.status,
             role: model.role,

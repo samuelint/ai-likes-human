@@ -11,7 +11,7 @@ pub struct CreateThreadDto {
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
 pub struct ThreadDto {
     pub id: String,
-    pub created_at: String,
+    pub created_at: i64,
     pub metadata: Metadata,
 }
 

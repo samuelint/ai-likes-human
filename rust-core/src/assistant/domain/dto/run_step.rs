@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::utils::time::current_unix_time;
+use crate::utils::time::TimeBuilder;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub enum RunStep {
@@ -35,7 +35,7 @@ impl RunStepDto<MessageCreationStepDetails> {
     ) -> Self {
         Self {
             id,
-            created_at: current_unix_time(),
+            created_at: TimeBuilder::now().into(),
             assistant_id,
             thread_id,
             run_id,
@@ -81,7 +81,7 @@ impl RunStepDto<ToolCallsStepDetails> {
     ) -> Self {
         Self {
             id,
-            created_at: current_unix_time(),
+            created_at: TimeBuilder::now().into(),
             assistant_id,
             thread_id,
             run_id,

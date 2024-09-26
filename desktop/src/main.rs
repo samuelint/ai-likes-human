@@ -6,6 +6,7 @@ pub mod core;
 pub mod screencapture;
 pub mod system_tray;
 
+use app::configuration::AppConfigurationBuilder;
 use app_state::app_state::AppState;
 use core::tauri_command::{
     find_configuration, get_inference_server_url, is_server_up, upsert_configuration,
@@ -13,18 +14,12 @@ use core::tauri_command::{
 use log::info;
 use screencapture::tauri_command::{assert_screen_capture_permissions, capture_screen};
 use system_tray::{build_menu, on_system_tray_event};
-use tauri::{Manager, State, SystemTray, WindowEvent};
+use tauri::{AppHandle, Manager, RunEvent, State, SystemTray, WindowEvent};
 use tauri_plugin_log::LogTarget;
 use tauri_plugin_window_state::{AppHandleExt, StateFlags};
 
-static CORE_SERVER_PORT_NUMBER: u16 = 1234;
-
 #[tokio::main]
 async fn main() {
-    let tray_menu = build_menu();
-
-    let state = AppState::new(CORE_SERVER_PORT_NUMBER).await;
-
     let log_builder = tauri_plugin_log::Builder::default().targets([
         LogTarget::LogDir,
         LogTarget::Stdout,
@@ -33,38 +28,12 @@ async fn main() {
     ]);
 
     tauri::Builder::default()
-        .manage(state)
-        .system_tray(SystemTray::new().with_menu(tray_menu))
+        .system_tray(SystemTray::new().with_menu(build_menu()))
         .on_system_tray_event(on_system_tray_event)
         .plugin(log_builder.build())
         .plugin(tauri_plugin_window_state::Builder::default().build())
-        .setup(|app| {
-            let app_state: State<AppState> = app.state();
-
-            app_state.start_inference_server()
-        })
-        .on_window_event(move |event| match event.event() {
-            WindowEvent::CloseRequested { api, .. } => {
-                info!("Window CloseRequested");
-                #[cfg(not(target_os = "macos"))]
-                {
-                    event.window().hide().unwrap();
-                }
-
-                #[cfg(target_os = "macos")]
-                {
-                    tauri::AppHandle::hide(&event.window().app_handle()).unwrap();
-                }
-                api.prevent_close();
-            }
-            WindowEvent::Destroyed => {
-                info!("Window destroyed");
-
-                let app_handle: tauri::AppHandle = event.window().app_handle();
-                app_handle.save_window_state(StateFlags::all()).ok();
-            }
-            _ => {}
-        })
+        .setup(setup)
+        .on_window_event(on_window_event)
         .invoke_handler(tauri::generate_handler![
             is_server_up,
             capture_screen,
@@ -75,10 +44,61 @@ async fn main() {
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
-        .run(|_app_handle, event| match event {
-            tauri::RunEvent::ExitRequested { api, .. } => {
-                api.prevent_exit();
+        .run(run);
+}
+
+fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error + 'static>> {
+    let data_path = app.handle().path_resolver().app_data_dir().unwrap();
+
+    let app_configuration = AppConfigurationBuilder::new()
+        .with_app_data_directory_path(&data_path)
+        .with_local_database()
+        .with_local_server_port(1234)
+        .create();
+
+    let app_handle = app.handle();
+    tauri::async_runtime::spawn(async move {
+        let state = AppState::new(app_configuration).await;
+
+        app_handle.manage(state);
+        let state: State<'_, AppState> = app_handle.state();
+
+        state.inference_server.serve().await;
+    });
+
+    Ok(())
+}
+
+fn run(_app_handle: &AppHandle, event: RunEvent) -> () {
+    match event {
+        tauri::RunEvent::ExitRequested { api, .. } => {
+            api.prevent_exit();
+        }
+        _ => {}
+    }
+}
+
+fn on_window_event(event: tauri::GlobalWindowEvent) -> () {
+    match event.event() {
+        WindowEvent::CloseRequested { api, .. } => {
+            info!("Window CloseRequested");
+            #[cfg(not(target_os = "macos"))]
+            {
+                event.window().hide().unwrap();
             }
-            _ => {}
-        });
+
+            #[cfg(target_os = "macos")]
+            {
+                tauri::AppHandle::hide(&event.window().app_handle()).unwrap();
+            }
+            api.prevent_close();
+        }
+        WindowEvent::Destroyed => {
+            info!("Window destroyed");
+
+            let app_handle: tauri::AppHandle = event.window().app_handle();
+            app_handle.save_window_state(StateFlags::all()).ok();
+        }
+        _ => {}
+    };
 }

@@ -1,7 +1,7 @@
 use std::net::SocketAddr;
 use std::sync::Arc;
 
-use app_core::{AppConfiguration, AppContainer};
+use app_core::{CoreConfiguration, AppContainer};
 use tokio::net::TcpListener;
 
 use crate::router::{create_router, CreateRouterParameters};
@@ -10,6 +10,7 @@ use crate::trace::configure_tracing;
 pub struct ServeParameters {
     pub port: u16,
     pub use_trace: bool, // Traces must be disabled for integration tests. https://github.com/tokio-rs/console/issues/505#issuecomment-1935805256
+    pub database_url: String,
 }
 
 impl Default for ServeParameters {
@@ -17,6 +18,7 @@ impl Default for ServeParameters {
         ServeParameters {
             port: 1234,
             use_trace: false,
+            database_url: String::from("sqlite::memory:"),
         }
     }
 }
@@ -25,9 +27,9 @@ pub async fn serve(parameters: ServeParameters) {
     if parameters.use_trace {
         configure_tracing();
     }
-    let config = AppConfiguration {
-        database_url: String::from("sqlite::memory:"),
-        ..AppConfiguration::default()
+    let config = CoreConfiguration {
+        database_url: parameters.database_url,
+        ..CoreConfiguration::default()
     };
     let container = AppContainer::new(config).await.unwrap();
 

@@ -11,7 +11,7 @@ pub mod utils;
 pub mod entities;
 
 pub use api_facade::ApiFacade;
-pub use app_configuration::AppConfiguration;
+pub use app_configuration::CoreConfiguration;
 pub use app_container::AppContainer;
 pub use configuration::app::*;
 pub use entities::configuration::*;

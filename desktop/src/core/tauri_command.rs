@@ -5,13 +5,14 @@ use tauri::State;
 #[tauri::command]
 pub fn is_server_up(app_state: State<'_, AppState>) -> Result<bool, String> {
     app_state
-        .is_inference_server_up()
+        .inference_server
+        .is_up()
         .map_err(|err| err.to_string())
 }
 
 #[tauri::command]
 pub fn get_inference_server_url(app_state: State<'_, AppState>) -> String {
-    app_state.get_inference_server_url()
+    app_state.inference_server.get_url()
 }
 
 #[tauri::command]

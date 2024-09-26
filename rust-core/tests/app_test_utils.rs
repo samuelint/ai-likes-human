@@ -1,4 +1,4 @@
-use app_core::{AppConfiguration, AppContainer};
+use app_core::{AppContainer, CoreConfiguration};
 
 pub fn get_test_db_url() -> String {
     format!("sqlite::memory:")
@@ -7,7 +7,7 @@ pub fn get_test_db_url() -> String {
 pub async fn create_app_container() -> AppContainer {
     let database_url = get_test_db_url();
 
-    AppContainer::new(AppConfiguration { database_url })
+    AppContainer::new(CoreConfiguration { database_url })
         .await
         .unwrap()
 }

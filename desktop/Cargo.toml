@@ -19,7 +19,6 @@ app-core = { path = "../rust-core" }
 inference-server = { path = "../rust-core/inference_server" }
 command-group = "2.1.0"
 serde_json = "1.0"
-dirs = "5.0"
 log = "^0.4"
 tracing = "0.1"
 tauri-plugin-log = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }

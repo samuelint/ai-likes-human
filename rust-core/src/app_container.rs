@@ -1,13 +1,13 @@
 use std::{error::Error, sync::Arc};
 
 use crate::{
-    app_configuration::AppConfiguration, assistant::AgentDIModule,
+    app_configuration::CoreConfiguration, assistant::AgentDIModule,
     chat_completion::ChatCompletionDIModule, configuration::ConfigurationDIModule,
     infrastructure::sea_orm::ConnectionFactory, llm::LLMDIModule,
 };
 
 pub struct AppContainer {
-    pub config: AppConfiguration,
+    pub config: CoreConfiguration,
     pub sea_orm_connection: Arc<::sea_orm::DatabaseConnection>,
     pub configuration_module: ConfigurationDIModule,
     pub llm_module: Arc<LLMDIModule>,
@@ -16,7 +16,7 @@ pub struct AppContainer {
 }
 
 impl AppContainer {
-    pub async fn new(config: AppConfiguration) -> Result<Self, Box<dyn Error>> {
+    pub async fn new(config: CoreConfiguration) -> Result<Self, Box<dyn Error>> {
         let connection_factory = ConnectionFactory::new(config.database_url.clone());
         let connection: Arc<::sea_orm::DatabaseConnection> = connection_factory.create().await?;
 
@@ -37,9 +37,9 @@ impl AppContainer {
     }
 
     pub async fn new_in_memory() -> Result<Self, Box<dyn Error>> {
-        let config = AppConfiguration {
+        let config = CoreConfiguration {
             database_url: "sqlite::memory:".to_string(),
-            ..AppConfiguration::default()
+            ..CoreConfiguration::default()
         };
         Self::new(config).await
     }

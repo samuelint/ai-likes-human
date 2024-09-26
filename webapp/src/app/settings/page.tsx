@@ -5,7 +5,7 @@ import LocalModelsSection from './_components/local-models.section';
 import AdvancedSection from './_components/advanced.section';
 import { PageSection } from '@/components/page-section';
 import { useScrollToSectionUsingRouteHash } from '@/lib/use-scroll-to-id';
-import InferenceServerSection from './_components/inference-server';
+import InferenceServerSection from './_components/inference-server.section';
 
 
 export default function Settings() {

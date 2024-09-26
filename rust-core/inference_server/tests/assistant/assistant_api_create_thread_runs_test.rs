@@ -1,29 +1,14 @@
-use crate::test_utils;
-use app_core::assistant::domain::dto::{ApiCreateThreadDto, CreateRunDto, RunDto, ThreadDto};
+use crate::test_utils::{self, assistant_api::AssistantApiClient};
+use app_core::assistant::domain::dto::{ApiCreateRunDto, ApiCreateThreadDto, RunDto, ThreadDto};
 use axum::http::StatusCode;
 use test_utils::router_client::RouterClient;
 
 #[tokio::test]
 async fn test_created_thread_run_is_successful() {
-    let client = RouterClient::from_app("/openai/v1").await;
-    let thread = client
-        .post::<ApiCreateThreadDto, ThreadDto>("/threads", &ApiCreateThreadDto::default())
-        .await
-        .unwrap()
-        .0
-        .unwrap();
+    let client = AssistantApiClient::new().await;
 
-    let create_thread_run_dto = CreateRunDto {
-        ..CreateRunDto::default()
-    };
-
-    let (_, status) = client
-        .post::<CreateRunDto, RunDto>(
-            format!("/threads/{}/runs", thread.id).as_str(),
-            &create_thread_run_dto,
-        )
-        .await
-        .unwrap();
+    let (thread, _) = client.create_thread(&ApiCreateThreadDto::default()).await;
+    let (_, status) = client.create_run(&thread.id, &ApiCreateRunDto::default()).await;
 
     assert_eq!(status, StatusCode::OK, "status should be 200 OK");
 }
@@ -38,12 +23,12 @@ async fn test_created_thread_run_has_created_at() {
         .0
         .unwrap();
 
-    let create_thread_run_dto = CreateRunDto {
-        ..CreateRunDto::default()
+    let create_thread_run_dto = ApiCreateRunDto {
+        ..ApiCreateRunDto::default()
     };
 
     let run = client
-        .post::<CreateRunDto, RunDto>(
+        .post::<ApiCreateRunDto, RunDto>(
             format!("/threads/{}/runs", thread.id).as_str(),
             &create_thread_run_dto,
         )
@@ -73,13 +58,13 @@ async fn test_created_thread_run_has_model() {
         .0
         .unwrap();
 
-    let create_thread_run_dto = CreateRunDto {
+    let create_thread_run_dto = ApiCreateRunDto {
         model: "openai:gpt-4o-mini".to_string(),
-        ..CreateRunDto::default()
+        ..ApiCreateRunDto::default()
     };
 
     let run = client
-        .post::<CreateRunDto, RunDto>(
+        .post::<ApiCreateRunDto, RunDto>(
             format!("/threads/{}/runs", thread.id).as_str(),
             &create_thread_run_dto,
         )
@@ -109,13 +94,13 @@ async fn test_created_thread_run_status_is_queued() {
         .0
         .unwrap();
 
-    let create_thread_run_dto = CreateRunDto {
+    let create_thread_run_dto = ApiCreateRunDto {
         model: "openai:gpt-4o-mini".to_string(),
-        ..CreateRunDto::default()
+        ..ApiCreateRunDto::default()
     };
 
     let run = client
-        .post::<CreateRunDto, RunDto>(
+        .post::<ApiCreateRunDto, RunDto>(
             format!("/threads/{}/runs", thread.id).as_str(),
             &create_thread_run_dto,
         )

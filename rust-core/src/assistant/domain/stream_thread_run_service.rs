@@ -5,7 +5,7 @@ mod stream_thread_run_service_test;
 use std::sync::Arc;
 
 use super::{
-    dto::{CreateRunDto, ApiCreateThreadAndRunDto, RunStep, RunStepDto, ThreadEvent},
+    dto::{ApiCreateRunDto, ApiCreateThreadAndRunDto, RunStep, RunStepDto, ThreadEvent},
     message_delta_update_service::MessageDeltaUpdateService,
     run_factory::RunFactory,
     stream_types::AssistantStream,
@@ -58,7 +58,7 @@ impl StreamThreadRunService {
                 }
             };
 
-            let new_run_dto: CreateRunDto = (&dto.clone()).into();
+            let new_run_dto: ApiCreateRunDto = (&dto.clone()).into();
             let mut stream_run = self_clone.stream_new_run(&thread.id, &new_run_dto);
 
             while let Some(run_chunk) = stream_run.next().await {
@@ -71,7 +71,7 @@ impl StreamThreadRunService {
 
     // Follow openai Assistant API streaming
     // https://platform.openai.com/docs/api-reference/runs/createRun
-    pub fn stream_new_run(&self, thread_id: &str, dto: &CreateRunDto) -> AssistantStream {
+    pub fn stream_new_run(&self, thread_id: &str, dto: &ApiCreateRunDto) -> AssistantStream {
         let dto = dto.clone();
         let thread_id = thread_id.to_string();
         let run_factory = self.run_factory.clone();

@@ -1,7 +1,7 @@
 use std::{error::Error, sync::Arc};
 
 use super::{
-    dto::{ApiCreateThreadAndRunDto, CreateRunDto, DbCreateRunDto, RunDto, ThreadDto},
+    dto::{ApiCreateThreadAndRunDto, ApiCreateRunDto, DbCreateRunDto, RunDto, ThreadDto},
     run_repository::RunRepository,
     thread_repository::ThreadRepository,
 };
@@ -26,7 +26,7 @@ impl RunFactory {
         &self,
         dto: &ApiCreateThreadAndRunDto,
     ) -> Result<(ThreadDto, RunDto), Box<dyn std::error::Error + Send>> {
-        let create_run_dto: CreateRunDto = dto.into();
+        let create_run_dto: ApiCreateRunDto = dto.into();
         let thread = self.thread_repository.create(dto.into()).await?;
         let run = self.create_run(&thread.id, &create_run_dto).await?;
 
@@ -36,7 +36,7 @@ impl RunFactory {
     pub async fn create_run<'a>(
         &self,
         thread_id: &'a str,
-        new_run: &CreateRunDto,
+        new_run: &ApiCreateRunDto,
     ) -> Result<RunDto, Box<dyn Error + Send>> {
         let new_run = new_run.clone();
         let assistant_id = new_run.assistant_id.unwrap_or("default".to_string());

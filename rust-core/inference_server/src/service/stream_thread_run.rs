@@ -1,4 +1,4 @@
-use app_core::assistant::domain::dto::ApiCreateThreadAndRunDto;
+use app_core::assistant::domain::dto::{ApiCreateRunDto, ApiCreateThreadAndRunDto};
 use async_stream::try_stream;
 use axum::response::{
     sse::{Event, KeepAlive},
@@ -18,6 +18,27 @@ pub fn stream_create_thread_and_run(
 
     Sse::new(try_stream! {
         let mut stream = service.stream_new_thread(&dto);
+        while let Some(item) = stream.next().await {
+            let data = item.unwrap();
+            let json_data = serde_json::to_string(&data).unwrap();
+
+            yield Event::default().data(json_data)
+        }
+    })
+    .keep_alive(KeepAlive::default())
+}
+
+pub fn stream_create_thread_run(
+    state: &ServerState,
+    thread_id: &str,
+    dto: &ApiCreateRunDto,
+) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
+    let service = state.core_container.agent_module.get_stream_run_service();
+    let dto = dto.clone();
+    let thread_id = thread_id.to_string();
+
+    Sse::new(try_stream! {
+        let mut stream = service.stream_new_run(&thread_id, &dto);
         while let Some(item) = stream.next().await {
             let data = item.unwrap();
             let json_data = serde_json::to_string(&data).unwrap();

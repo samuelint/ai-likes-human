@@ -1,6 +1,7 @@
 use app_core::assistant::domain::dto::{
-    ApiCreateThreadAndRunDto, ApiCreateThreadDto, ApiCreateThreadMessageDto, ApiUpdateThreadDto,
-    CreateRunDto, DbCreateThreadMessageDto, DbUpdateThreadDto, RunDto, ThreadDto, ThreadMessageDto,
+    ApiCreateRunDto, ApiCreateThreadAndRunDto, ApiCreateThreadDto, ApiCreateThreadMessageDto,
+    ApiUpdateThreadDto, DbCreateThreadMessageDto, DbUpdateThreadDto, RunDto, ThreadDto,
+    ThreadMessageDto,
 };
 pub use app_core::PageRequest;
 use axum::{
@@ -11,7 +12,10 @@ use axum::{
 use hyper::StatusCode;
 use std::sync::Arc;
 
-use crate::{app_state::ServerState, service::stream_create_thread_and_run};
+use crate::{
+    app_state::ServerState,
+    service::{stream_create_thread_and_run, stream_thread_run::stream_create_thread_run},
+};
 
 pub async fn create_thread(
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
@@ -25,7 +29,7 @@ pub async fn create_thread(
     }
 }
 
-pub async fn create_thread_and_run(
+pub async fn create_thread_create_run_and_execute(
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
     extract::Json(payload): extract::Json<ApiCreateThreadAndRunDto>,
 ) -> impl IntoResponse {
@@ -45,10 +49,10 @@ pub async fn create_thread_and_run(
     }
 }
 
-pub async fn create_thread_run(
+pub async fn create_run_and_execute(
     axum::extract::Path(thread_id): axum::extract::Path<String>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
-    extract::Json(payload): extract::Json<CreateRunDto>,
+    extract::Json(payload): extract::Json<ApiCreateRunDto>,
 ) -> impl IntoResponse {
     let service = state.core_container.agent_module.get_run_factory();
 
@@ -58,16 +62,12 @@ pub async fn create_thread_run(
     };
 
     if does_return_stream {
-        return (
-            StatusCode::BAD_REQUEST,
-            "Stream is only supported with Create Thread And Run.",
-        )
-            .into_response();
-    }
-
-    match service.create_run(&thread_id, &payload).await {
-        Ok(run) => return Json::<RunDto>(run.into()).into_response(),
-        Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+        stream_create_thread_run(&state, &thread_id, &payload).into_response()
+    } else {
+        match service.create_run(&thread_id, &payload).await {
+            Ok(run) => return Json::<RunDto>(run.into()).into_response(),
+            Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+        }
     }
 }
 

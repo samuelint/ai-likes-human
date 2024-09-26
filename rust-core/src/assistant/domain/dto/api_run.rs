@@ -16,7 +16,7 @@ pub struct RunDto {
 }
 
 #[derive(Default, Serialize, Deserialize, Clone)]
-pub struct CreateRunDto {
+pub struct ApiCreateRunDto {
     pub assistant_id: Option<String>,
     pub model: String,
     pub instructions: Option<String>,
@@ -51,9 +51,9 @@ impl From<&ApiCreateThreadAndRunDto> for ApiCreateThreadDto {
     }
 }
 
-impl From<&ApiCreateThreadAndRunDto> for CreateRunDto {
+impl From<&ApiCreateThreadAndRunDto> for ApiCreateRunDto {
     fn from(dto: &ApiCreateThreadAndRunDto) -> Self {
-        CreateRunDto {
+        ApiCreateRunDto {
             assistant_id: dto.assistant_id.clone(),
             model: dto.model.clone(),
             instructions: dto.instructions.clone(),

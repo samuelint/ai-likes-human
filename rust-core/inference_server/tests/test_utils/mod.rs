@@ -1,3 +1,4 @@
+pub mod assistant_api;
 pub mod client;
 pub mod prompt_validator;
 pub mod router;

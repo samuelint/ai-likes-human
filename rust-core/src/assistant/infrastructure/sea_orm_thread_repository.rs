@@ -8,9 +8,10 @@ use crate::utils::PageRequest;
 use anyhow::anyhow;
 use sea_orm::{
     ActiveModelTrait, ActiveValue, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter,
-    QuerySelect, TransactionTrait,
+    QueryOrder, QuerySelect, TransactionTrait,
 };
 use std::error::Error;
+use std::num::ParseIntError;
 use std::sync::Arc;
 
 use super::metadata::serialize_metadata_opt;
@@ -55,9 +56,11 @@ impl ThreadRepository for SeaOrmThreadRepository {
         &self,
         id: &str,
     ) -> Result<Vec<ThreadMessageDto>, Box<dyn Error + Send>> {
+        let id: i32 = id.parse().map_err(|e: ParseIntError| anyhow!(e))?;
         let conn = Arc::clone(&self.connection);
         let models: Vec<message::Model> = message::Entity::find()
             .filter(message::Column::ThreadId.eq(id))
+            .order_by_desc(message::Column::CreatedAt)
             .all(conn.as_ref())
             .await
             .map_err(|e| anyhow!(e))?;
@@ -129,18 +132,18 @@ impl ThreadRepository for SeaOrmThreadRepository {
         Ok(updated_model.into())
     }
 
-    async fn list_by_page(&self, args: PageRequest) -> Result<Vec<ThreadDto>, Box<dyn Error>> {
+    async fn list_by_page(&self, page: PageRequest) -> Result<Vec<ThreadDto>, Box<dyn Error>> {
         let conn = Arc::clone(&self.connection);
         let mut cursor = thread::Entity::find().cursor_by(thread::Column::Id);
 
-        if args.after.is_some() {
-            cursor.after(args.after);
+        if page.after.is_some() {
+            cursor.after(page.after);
         }
-        if args.before.is_some() {
-            cursor.after(args.after);
+        if page.before.is_some() {
+            cursor.after(page.after);
         }
 
-        let mut cursor = if let Some(limit) = args.limit {
+        let mut cursor = if let Some(limit) = page.limit {
             cursor.limit(limit)
         } else {
             cursor

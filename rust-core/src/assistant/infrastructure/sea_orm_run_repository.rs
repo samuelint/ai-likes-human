@@ -105,12 +105,17 @@ impl RunRepository for SeaOrmRunRepository {
         thread_id: &str,
         page: PageRequest,
     ) -> Result<Vec<RunDto>, Box<dyn Error>> {
-        let thread_id: i32 = thread_id.parse()?;
         let conn = Arc::clone(&self.connection);
         let mut cursor = run::Entity::find()
             .filter(run::Column::ThreadId.eq(thread_id))
             .cursor_by(run::Column::Id);
-        cursor.after(page.after).before(page.before);
+
+        if page.after.is_some() {
+            cursor.after(page.after);
+        }
+        if page.before.is_some() {
+            cursor.after(page.after);
+        }
 
         let mut cursor = if let Some(limit) = page.limit {
             cursor.limit(limit)
@@ -121,6 +126,22 @@ impl RunRepository for SeaOrmRunRepository {
         let result = cursor.all(conn.as_ref()).await?;
 
         Ok(result.iter().map(|r| r.clone().into()).collect())
+
+        // let thread_id: i32 = thread_id.parse()?;
+        // let conn = Arc::clone(&self.connection);
+        // let cursor = run::Entity::find().filter(run::Column::ThreadId.eq(thread_id));
+        // // .cursor_by(run::Column::Id);
+        // // cursor.after(page.after).before(page.before);
+
+        // // let mut cursor = if let Some(limit) = page.limit {
+        // //     cursor.limit(limit)
+        // // } else {
+        // //     cursor
+        // // };
+
+        // let result = cursor.all(conn.as_ref()).await?;
+
+        // Ok(result.iter().map(|r| r.clone().into()).collect())
     }
 
     async fn delete(&self, id: &str) -> Result<(), Box<dyn Error>> {

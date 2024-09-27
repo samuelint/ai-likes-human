@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use sea_orm::{
     ActiveModelTrait, ActiveValue, ColumnTrait, ConnectionTrait, DatabaseConnection, DeleteResult,
-    EntityTrait, InsertResult, QueryFilter,
+    EntityTrait, InsertResult, QueryFilter, QueryOrder,
 };
 use std::error::Error;
 use std::num::ParseIntError;
@@ -35,9 +35,11 @@ impl MessageRepository for SeaOrmMessageRepository {
     }
 
     async fn find_by_thread_id(&self, id: String) -> Result<Vec<ThreadMessageDto>, Box<dyn Error>> {
+        let id: i32 = id.parse()?;
         let conn = Arc::clone(&self.connection);
         let models: Vec<message::Model> = message::Entity::find()
             .filter(message::Column::ThreadId.eq(id))
+            .order_by_desc(message::Column::CreatedAt)
             .all(conn.as_ref())
             .await?;
 

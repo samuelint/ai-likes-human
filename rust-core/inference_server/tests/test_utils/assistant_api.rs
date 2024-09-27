@@ -201,6 +201,31 @@ impl AssistantApiClient {
         (dto.unwrap(), status)
     }
 
+    #[allow(dead_code)]
+    pub async fn list_thread_messages(
+        &self,
+        thread_id: &str,
+    ) -> (Vec<ThreadMessageDto>, StatusCode) {
+        let (dto, status) = self
+            .client
+            .get::<Vec<ThreadMessageDto>>(&format!("/threads/{}/messages", thread_id))
+            .await
+            .unwrap();
+
+        (dto.unwrap(), status)
+    }
+
+    #[allow(dead_code)]
+    pub async fn list_thread_runs(&self, thread_id: &str) -> (Vec<RunDto>, StatusCode) {
+        let (dto, status) = self
+            .client
+            .get::<Vec<RunDto>>(&format!("/threads/{}/runs", thread_id))
+            .await
+            .unwrap();
+
+        (dto.unwrap(), status)
+    }
+
     pub async fn stream_to_events_array(
         mut stream: Pin<Box<dyn Stream<Item = Result<(String, ThreadEventData), axum::Error>>>>,
     ) -> Vec<(String, ThreadEventData)> {

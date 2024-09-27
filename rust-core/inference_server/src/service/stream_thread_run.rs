@@ -9,7 +9,7 @@ use std::convert::Infallible;
 
 use crate::app_state::ServerState;
 
-use super::thread_event_adapter::result_to_sse_event;
+use super::thread_event_adapter::{create_done_event, result_to_sse_event};
 
 pub fn stream_create_thread_and_run(
     state: &ServerState,
@@ -23,6 +23,8 @@ pub fn stream_create_thread_and_run(
         while let Some(item) = stream.next().await {
             yield result_to_sse_event(&item)
         }
+
+        yield create_done_event();
     })
     .keep_alive(KeepAlive::default())
 }
@@ -42,9 +44,7 @@ pub fn stream_create_thread_run(
             yield result_to_sse_event(&item)
         }
 
-        yield Event::default()
-        .data("[DONE]")
-        .event("done");
+        yield create_done_event();
     })
     .keep_alive(KeepAlive::default())
 }

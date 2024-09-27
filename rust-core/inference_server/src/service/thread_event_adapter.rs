@@ -22,3 +22,7 @@ pub fn to_sse_event(event: &ThreadEventDto) -> Event {
         }
     }
 }
+
+pub fn create_done_event() -> Event {
+    Event::default().data("[DONE]").event("done")
+}

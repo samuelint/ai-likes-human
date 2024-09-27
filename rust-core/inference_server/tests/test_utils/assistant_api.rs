@@ -2,7 +2,7 @@ use std::pin::Pin;
 
 use app_core::assistant::domain::dto::{
     ApiCreateRunDto, ApiCreateThreadAndRunDto, ApiCreateThreadDto, ApiCreateThreadMessageDto,
-    MessageContent, RunDto, ThreadDto, ThreadEventData,
+    MessageContent, RunDto, ThreadDto, ThreadEventData, ThreadMessageDto,
 };
 use futures::{Stream, StreamExt};
 use hyper::StatusCode;
@@ -35,6 +35,11 @@ impl AssistantApiClient {
     }
 
     #[allow(dead_code)]
+    pub async fn create_empty_thread(&self) -> (ThreadDto, StatusCode) {
+        self.create_thread(&ApiCreateThreadDto::default()).await
+    }
+
+    #[allow(dead_code)]
     pub async fn create_thread_with_prompt(&self, prompt: &str) -> ThreadDto {
         let r = self
             .create_thread(&ApiCreateThreadDto {
@@ -49,6 +54,40 @@ impl AssistantApiClient {
             .0;
 
         r
+    }
+
+    #[allow(dead_code)]
+    pub async fn create_message(
+        &self,
+        thread_id: &str,
+        request: &ApiCreateThreadMessageDto,
+    ) -> (ThreadMessageDto, StatusCode) {
+        let (dto, status) = self
+            .client
+            .post::<ApiCreateThreadMessageDto, ThreadMessageDto>(
+                &format!("/threads/{}/messages", thread_id),
+                request,
+            )
+            .await
+            .unwrap();
+
+        (dto.unwrap(), status)
+    }
+
+    #[allow(dead_code)]
+    pub async fn create_user_message_from_prompt(
+        &self,
+        thread_id: &str,
+        prompt: &str,
+    ) -> (ThreadMessageDto, StatusCode) {
+        self.create_message(
+            thread_id,
+            &ApiCreateThreadMessageDto {
+                content: vec![MessageContent::text(prompt)],
+                ..ApiCreateThreadMessageDto::user()
+            },
+        )
+        .await
     }
 
     #[allow(dead_code)]

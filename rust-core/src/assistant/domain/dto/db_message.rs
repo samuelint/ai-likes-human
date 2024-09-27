@@ -18,6 +18,7 @@ impl DbCreateThreadMessageDto {
     pub fn user() -> Self {
         Self {
             role: "user".to_string(),
+            status: "completed".to_string(),
             ..Self::default()
         }
     }

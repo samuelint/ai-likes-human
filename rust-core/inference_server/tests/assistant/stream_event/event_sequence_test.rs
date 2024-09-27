@@ -36,9 +36,10 @@ async fn test_stream_new_thread_run_simple_sequence() {
 }
 
 #[tokio::test]
-async fn test_stream_new_run_on_existign_thread_simple_sequence() {
+async fn test_stream_new_run_on_existing_thread_simple_sequence() {
     let client: AssistantApiClient = AssistantApiClient::new().await;
     let thread = client.create_thread_with_prompt("Tell me a joke.").await;
+
     let chunks = client
         .stream_run_as_chunks_array(&thread.id, &ApiCreateRunDto::default())
         .await;
@@ -63,6 +64,22 @@ async fn test_stream_new_run_on_existign_thread_simple_sequence() {
 
     let before_last_chunk = chunks.get(chunks.len() - 2).unwrap();
     assert_eq!(&before_last_chunk.0, "thread.run.step.completed");
+
+    let last_chunk = chunks.get(chunks.len() - 1).unwrap();
+    assert_eq!(&last_chunk.0, "thread.run.completed");
+}
+
+#[tokio::test]
+async fn test_stream_on_thread_with_message_created_after_thread_creation() {
+    let client: AssistantApiClient = AssistantApiClient::new().await;
+    let (thread, _) = client.create_empty_thread().await;
+    let _ = client
+        .create_user_message_from_prompt(&thread.id, "Tell me a joke.")
+        .await;
+
+    let chunks = client
+        .stream_run_as_chunks_array(&thread.id, &ApiCreateRunDto::default())
+        .await;
 
     let last_chunk = chunks.get(chunks.len() - 1).unwrap();
     assert_eq!(&last_chunk.0, "thread.run.completed");

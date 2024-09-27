@@ -181,6 +181,7 @@ impl From<&ApiCreateThreadMessageDto> for DbCreateThreadMessageDto {
             role: dto.role.clone(),
             attachments: dto.attachments.clone(),
             metadata: dto.metadata.clone(),
+            status: "completed".to_string(),
             ..DbCreateThreadMessageDto::default()
         }
     }

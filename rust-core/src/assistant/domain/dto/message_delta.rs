@@ -11,15 +11,9 @@ pub enum MessageContentDelta {
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
 pub struct TextDeltaDto {
+    pub index: i32,
     pub value: Option<String>,
     pub annotations: Vec<MessageAnnotation>,
-}
-
-#[derive(Default, Serialize, Deserialize, Clone, Debug)]
-pub struct TextDeltaBlockDto {
-    pub index: i32,
-    pub r#type: String,
-    pub text: TextDeltaDto,
 }
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
@@ -37,11 +31,8 @@ pub struct ImageURLDelta {
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
 pub struct ImageFileDeltaBlock {
-    /// The index of the content part in the message.
     pub index: i32,
-    /// Always `image_file`.
     pub r#type: String,
-    /// The image file detail.
     pub image_file: Option<ImageFileDelta>,
 }
 

@@ -1,6 +1,4 @@
-use app_core::assistant::domain::dto::{
-    message_delta::ThreadMessageDeltaDto, ApiCreateRunDto, ThreadEventData,
-};
+use app_core::assistant::domain::dto::{ApiCreateRunDto, ThreadEventData};
 
 use crate::test_utils::assistant_api::AssistantApiClient;
 

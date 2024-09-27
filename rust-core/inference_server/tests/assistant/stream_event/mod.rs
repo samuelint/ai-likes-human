@@ -4,3 +4,4 @@ mod thread_message_completed_test;
 mod thread_run_completed_test;
 mod thread_run_created_test;
 mod thread_run_message_delta_test;
+mod thread_run_step_completed_test;

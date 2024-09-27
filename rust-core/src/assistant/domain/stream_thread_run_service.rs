@@ -5,7 +5,7 @@ mod stream_thread_run_service_test;
 use std::sync::Arc;
 
 use super::{
-    dto::{ApiCreateRunDto, ApiCreateThreadAndRunDto, RunStep, RunStepDto, ThreadEvent},
+    dto::{ApiCreateRunDto, ApiCreateThreadAndRunDto, RunStepDto, ThreadEvent},
     message::{message_status_mutator::MessageStatusMutator, MessageDeltaUpdateService},
     run::{run_status_mutator::RunStatusMutator, RunFactory},
     stream_types::AssistantStream,
@@ -109,12 +109,6 @@ impl StreamThreadRunService {
             };
             yield ThreadEvent::ThreadRunInProgress(ThreadEventDto::run_in_progress(&run));
 
-            // Step
-            let run_step = RunStep::MessageCreationRunStep(RunStepDto {
-                ..RunStepDto::default()
-            });
-            yield ThreadEvent::ThreadRunStepCreated(ThreadEventDto::run_step_created(&run_step));
-            yield ThreadEvent::ThreadRunStepInProgress(ThreadEventDto::run_step_in_progress(&run_step));
 
             let messages = match thread_repository.find_messages(&thread_id).await {
                 Ok(messages) => messages,
@@ -123,6 +117,30 @@ impl StreamThreadRunService {
                     return;
                 }
             };
+
+            let last_message = match messages.last() {
+                Some(message) => message,
+                None => {
+                    let run = match run_status_mutator.mutate_to_completed(&run).await {
+                        Ok(run) => run,
+                        Err(e) => {
+                            yield ThreadEvent::Error(ThreadEventDto::std_error(e));
+                            return;
+                        }
+                    };
+                    yield ThreadEvent::ThreadRunCompleted(ThreadEventDto::run_completed(&run));
+                    yield ThreadEvent::Done(ThreadEventDto::done());
+                    return;
+                }
+            };
+
+            // Step
+            let mut run_step = RunStepDto::message_creation_from_run("step-1", &last_message.id, "in_progress", &run);
+            yield ThreadEvent::ThreadRunStepCreated(ThreadEventDto::run_step_created(&run_step));
+            run_step.status = "in_progress".to_string();
+            yield ThreadEvent::ThreadRunStepInProgress(ThreadEventDto::run_step_in_progress(&run_step));
+
+
             let mut stream = inference_service.stream(&run.model, &messages);
 
             let mut message = match thread_message_factory.create_assistant(&thread_id, &run.id).await {
@@ -167,6 +185,7 @@ impl StreamThreadRunService {
             };
             yield ThreadEvent::ThreadMessageCompleted(ThreadEventDto::thread_message_completed(&message));
 
+            run_step.status = "completed".to_string();
             yield ThreadEvent::ThreadRunStepCompleted(ThreadEventDto::run_step_completed(&run_step));
             // Step - End
 

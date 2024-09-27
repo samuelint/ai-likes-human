@@ -44,4 +44,5 @@ langchain-rust = { git = "https://github.com/samuelint/langchain-rust", branch =
 [dev-dependencies]
 mockall = "0.13.0"
 openai-api-rs = "5.0.8"
+pretty_assertions = "1.4.1"
 serial_test = "3.1.1"

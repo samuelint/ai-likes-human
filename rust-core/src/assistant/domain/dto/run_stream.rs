@@ -1,8 +1,8 @@
 use std::error::Error;
 
 use super::{
-    message_delta::ThreadMessageDeltaDto, stream_error::StreamErrorDto, RunDto, RunStep, ThreadDto,
-    ThreadMessageDto,
+    message_delta::ThreadMessageDeltaDto, stream_error::StreamErrorDto, RunDto, RunStepDto,
+    ThreadDto, ThreadMessageDto,
 };
 use serde::{Deserialize, Serialize};
 
@@ -16,9 +16,9 @@ pub enum ThreadEvent {
     ThreadRunInProgress(ThreadEventDto<RunDto>),
     ThreadRunCompleted(ThreadEventDto<RunDto>),
 
-    ThreadRunStepCreated(ThreadEventDto<RunStep>),
-    ThreadRunStepInProgress(ThreadEventDto<RunStep>),
-    ThreadRunStepCompleted(ThreadEventDto<RunStep>),
+    ThreadRunStepCreated(ThreadEventDto<RunStepDto>),
+    ThreadRunStepInProgress(ThreadEventDto<RunStepDto>),
+    ThreadRunStepCompleted(ThreadEventDto<RunStepDto>),
 
     ThreadMessageCreated(ThreadEventDto<ThreadMessageDto>),
     ThreadMessageInProgress(ThreadEventDto<ThreadMessageDto>),
@@ -75,22 +75,22 @@ impl ThreadEventDto<RunDto> {
     }
 }
 
-impl ThreadEventDto<RunStep> {
-    pub fn run_step_created(data: &RunStep) -> Self {
+impl ThreadEventDto<RunStepDto> {
+    pub fn run_step_created(data: &RunStepDto) -> Self {
         Self {
             data: data.clone(),
             event: "thread.run.step.created".to_string(),
         }
     }
 
-    pub fn run_step_in_progress(data: &RunStep) -> Self {
+    pub fn run_step_in_progress(data: &RunStepDto) -> Self {
         Self {
             data: data.clone(),
             event: "thread.run.step.in_progress".to_string(),
         }
     }
 
-    pub fn run_step_completed(data: &RunStep) -> Self {
+    pub fn run_step_completed(data: &RunStepDto) -> Self {
         Self {
             data: data.clone(),
             event: "thread.run.step.completed".to_string(),

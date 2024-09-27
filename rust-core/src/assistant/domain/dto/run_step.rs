@@ -2,55 +2,107 @@ use serde::{Deserialize, Serialize};
 
 use crate::utils::time::TimeBuilder;
 
+use super::RunDto;
+
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub enum RunStep {
-    ToolCallRunStep(RunStepDto<ToolCallsStepDetails>),
-    MessageCreationRunStep(RunStepDto<MessageCreationStepDetails>),
+pub enum RunStepDetails {
+    ToolCallRunStep(ToolCallsStepDetails),
+    MessageCreationRunStep(MessageCreationStepDetails),
+}
+
+impl Default for RunStepDetails {
+    fn default() -> Self {
+        RunStepDetails::MessageCreationRunStep(MessageCreationStepDetails::default())
+    }
 }
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
-pub struct RunStepDto<TStepDetails> {
-    pub id: i32,
+pub struct RunStepDto {
+    pub id: String,
     pub created_at: i64,
     pub assistant_id: String,
-    pub thread_id: Option<i32>,
-    pub run_id: Option<i32>,
+    pub thread_id: Option<String>,
+    pub run_id: Option<String>,
     pub status: String,
     pub instructions: Option<String>,
     pub model: String,
     pub r#type: String,
-    pub step_details: TStepDetails,
+    pub step_details: RunStepDetails,
 }
 
-impl RunStepDto<MessageCreationStepDetails> {
+impl RunStepDto {
+    pub fn message_creation_from_run(
+        step_id: &str,
+        message_id: &str,
+        status: &str,
+        run: &RunDto,
+    ) -> Self {
+        let thread_id = run.thread_id.as_deref();
+
+        Self::message_creation(
+            step_id,
+            &run.assistant_id,
+            &run.model,
+            status,
+            MessageCreationStepDetails::for_message_id(message_id),
+            thread_id,
+            Some(&run.id),
+            None,
+        )
+    }
+
     pub fn message_creation(
-        id: i32,
-        assistant_id: String,
-        model: String,
-        status: String,
+        id: &str,
+        assistant_id: &str,
+        model: &str,
+        status: &str,
         step_details: MessageCreationStepDetails,
-        thread_id: Option<i32>,
-        run_id: Option<i32>,
-        instructions: Option<String>,
+        thread_id: Option<&str>,
+        run_id: Option<&str>,
+        instructions: Option<&str>,
     ) -> Self {
         Self {
-            id,
+            id: id.to_string(),
             created_at: TimeBuilder::now().into(),
-            assistant_id,
-            thread_id,
-            run_id,
-            status,
+            assistant_id: assistant_id.to_string(),
+            thread_id: thread_id.map(|t| t.to_string()),
+            run_id: run_id.map(|r| r.to_string()),
+            status: status.to_string(),
             r#type: "message_creation".to_string(),
-            model,
-            step_details,
-            instructions,
+            model: model.to_string(),
+            step_details: RunStepDetails::MessageCreationRunStep(step_details),
+            instructions: instructions.map(|i| i.to_string()),
+        }
+    }
+
+    pub fn tool_calls(
+        id: &str,
+        assistant_id: &str,
+        model: &str,
+        status: &str,
+        step_details: ToolCallsStepDetails,
+        thread_id: Option<&str>,
+        run_id: Option<&str>,
+        instructions: Option<&str>,
+    ) -> Self {
+        Self {
+            id: id.to_string(),
+            created_at: TimeBuilder::now().into(),
+            assistant_id: assistant_id.to_string(),
+            thread_id: thread_id.map(|t| t.to_string()),
+            run_id: run_id.map(|r| r.to_string()),
+            status: status.to_string(),
+            r#type: "tool_calls".to_string(),
+            model: model.to_string(),
+            step_details: RunStepDetails::ToolCallRunStep(step_details),
+            instructions: instructions.map(|i| i.to_string()),
         }
     }
 }
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
 pub struct MessageCreation {
-    pub message_id: i32,
+    pub message_id: String,
 }
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
@@ -60,36 +112,12 @@ pub struct MessageCreationStepDetails {
 }
 
 impl MessageCreationStepDetails {
-    pub fn new(message_creation: MessageCreation) -> Self {
+    pub fn for_message_id(message_id: &str) -> Self {
         Self {
-            message_creation,
+            message_creation: MessageCreation {
+                message_id: message_id.to_string(),
+            },
             r#type: "message_creation".to_string(),
-        }
-    }
-}
-
-impl RunStepDto<ToolCallsStepDetails> {
-    pub fn tool_calls(
-        id: i32,
-        assistant_id: String,
-        model: String,
-        status: String,
-        step_details: ToolCallsStepDetails,
-        thread_id: Option<i32>,
-        run_id: Option<i32>,
-        instructions: Option<String>,
-    ) -> Self {
-        Self {
-            id,
-            created_at: TimeBuilder::now().into(),
-            assistant_id,
-            thread_id,
-            run_id,
-            status,
-            r#type: "tool_calls".to_string(),
-            model,
-            step_details,
-            instructions,
         }
     }
 }

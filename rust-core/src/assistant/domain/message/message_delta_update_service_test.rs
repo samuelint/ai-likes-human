@@ -147,6 +147,43 @@ mod tests {
         assert_eq!(delta.delta.role, "assistant");
     }
 
+    #[tokio::test]
+    async fn test_delta_message_id_is_same_as_message() {
+        let thread_id = "some_thread_id";
+        let message_id = "some_message_id";
+        let expected_update_message = DbUpdateThreadMessageDto {
+            content: Some(vec![MessageContent::text("Hello World!")]),
+            ..DbUpdateThreadMessageDto::default()
+        };
+        let existing_message = ThreadMessageDto {
+            id: message_id.to_string(),
+            thread_id: Some(thread_id.to_string()),
+            content: vec![MessageContent::text("Hello ")],
+            role: "assistant".to_string(),
+            ..ThreadMessageDto::default()
+        };
+        let chunk = ChatCompletionChunkObject {
+            choices: vec![ChatCompletionChunkChoice {
+                delta: Some(ChatCompletionMessageDto {
+                    role: "assistant".to_string(),
+                    content: "World!".to_string(),
+                }),
+                ..ChatCompletionChunkChoice::default()
+            }],
+            ..ChatCompletionChunkObject::default()
+        };
+
+        let repository = message_repository_mocking_update(&thread_id, &expected_update_message);
+        let instance = MessageDeltaUpdateService::new(Arc::new(repository));
+
+        let (delta, _message) = instance
+            .from_chunk(&chunk, &existing_message)
+            .await
+            .unwrap();
+
+        assert_eq!(delta.id, message_id);
+    }
+
     fn message_repository_mocking_update(
         thread_id: &str,
         update_message_dto: &DbUpdateThreadMessageDto,

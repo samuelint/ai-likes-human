@@ -47,6 +47,7 @@ impl MessageDeltaUpdateService {
 
         Ok((
             ThreadMessageDeltaDto {
+                id: message.id.clone(),
                 delta: MessageDeltaDto {
                     role: message.role.clone(),
                     content: vec![MessageContentDelta::Text(TextDeltaDto {

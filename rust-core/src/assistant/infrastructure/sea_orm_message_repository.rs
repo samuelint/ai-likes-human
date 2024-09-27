@@ -1,14 +1,14 @@
 use anyhow::anyhow;
 use sea_orm::{
     ActiveModelTrait, ActiveValue, ColumnTrait, ConnectionTrait, DatabaseConnection, DeleteResult,
-    EntityTrait, InsertResult, QueryFilter, QueryOrder,
+    EntityTrait, InsertResult, QueryFilter, QuerySelect,
 };
 use std::error::Error;
 use std::num::ParseIntError;
 use std::sync::Arc;
 
 use crate::assistant::domain::dto::{
-    DbCreateThreadMessageDto, DbUpdateThreadMessageDto, ThreadMessageDto,
+    DbCreateThreadMessageDto, DbUpdateThreadMessageDto, PageRequest, PageResponse, ThreadMessageDto,
 };
 use crate::assistant::domain::message::MessageRepository;
 use crate::entities::message;
@@ -34,17 +34,38 @@ impl MessageRepository for SeaOrmMessageRepository {
         Ok(Some(r))
     }
 
-    async fn find_by_thread_id(&self, id: String) -> Result<Vec<ThreadMessageDto>, Box<dyn Error>> {
-        let id: i32 = id.parse()?;
+    async fn list_by_thread_id_paginated(
+        &self,
+        thread_id: &str,
+        page: &PageRequest,
+    ) -> Result<PageResponse<ThreadMessageDto>, Box<dyn Error + Send>> {
         let conn = Arc::clone(&self.connection);
-        let models: Vec<message::Model> = message::Entity::find()
-            .filter(message::Column::ThreadId.eq(id))
-            .order_by_desc(message::Column::CreatedAt)
-            .all(conn.as_ref())
-            .await?;
+        let mut cursor = message::Entity::find()
+            .filter(message::Column::ThreadId.eq(thread_id))
+            .cursor_by(message::Column::Id);
 
-        let models: Vec<ThreadMessageDto> = models.iter().map(|m| m.clone().into()).collect();
-        Ok(models)
+        if page.after.is_some() {
+            cursor.after(page.after);
+        }
+        if page.before.is_some() {
+            cursor.after(page.after);
+        }
+
+        let mut cursor = if let Some(limit) = page.limit {
+            cursor.limit(limit)
+        } else {
+            cursor
+        };
+
+        let result = cursor.all(conn.as_ref()).await.map_err(|e| anyhow!(e))?;
+        let result: Vec<ThreadMessageDto> = result.iter().map(|r| r.clone().into()).collect();
+
+        Ok(PageResponse {
+            first_id: result.first().map(|r| r.id.to_string()).unwrap_or_default(),
+            last_id: result.last().map(|r| r.id.to_string()).unwrap_or_default(),
+            has_more: result.len() > 0,
+            data: result,
+        })
     }
 
     async fn update(

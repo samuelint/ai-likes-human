@@ -2,9 +2,8 @@ use std::error::Error;
 
 use mockall::automock;
 
-use crate::{
-    assistant::domain::dto::{DbCreateRunDto, DbUpdateRunDto, RunDto},
-    utils::PageRequest,
+use crate::assistant::domain::dto::{
+    DbCreateRunDto, DbUpdateRunDto, PageRequest, PageResponse, RunDto,
 };
 
 #[async_trait::async_trait]
@@ -15,7 +14,7 @@ pub trait RunRepository: Sync + Send {
         &self,
         thread_id: &str,
         page: PageRequest,
-    ) -> Result<Vec<RunDto>, Box<dyn Error>>;
+    ) -> Result<PageResponse<RunDto>, Box<dyn Error>>;
     async fn find(&self, id: &str) -> Result<Option<RunDto>, Box<dyn Error>>;
     async fn update(&self, id: &str, dto: &DbUpdateRunDto)
         -> Result<RunDto, Box<dyn Error + Send>>;

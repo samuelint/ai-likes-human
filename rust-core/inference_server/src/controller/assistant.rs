@@ -1,9 +1,8 @@
 use app_core::assistant::domain::dto::{
     ApiCreateRunDto, ApiCreateThreadAndRunDto, ApiCreateThreadDto, ApiCreateThreadMessageDto,
-    ApiUpdateThreadDto, DbCreateThreadMessageDto, DbUpdateThreadDto, RunDto, ThreadDto,
-    ThreadMessageDto,
+    ApiUpdateThreadDto, DbCreateThreadMessageDto, DbUpdateThreadDto, PageRequest, PageResponse,
+    RunDto, ThreadDto, ThreadMessageDto,
 };
-pub use app_core::PageRequest;
 use axum::{
     extract::{self, Query},
     response::IntoResponse,
@@ -78,15 +77,7 @@ pub async fn list_threads(
     let service = state.core_container.agent_module.get_thread_repository();
 
     match service.list_by_page(page_request).await {
-        Ok(threads) => {
-            return Json::<Vec<ThreadDto>>(
-                threads
-                    .iter()
-                    .map(|thread| thread.clone().into())
-                    .collect::<Vec<ThreadDto>>(),
-            )
-            .into_response()
-        }
+        Ok(page) => return Json::<PageResponse<ThreadDto>>(page).into_response(),
         Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
     }
 }
@@ -143,19 +134,15 @@ pub async fn delete_thread(
 pub async fn list_thread_messages(
     axum::extract::Path(thread_id): axum::extract::Path<String>,
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
+    Query(page_request): Query<PageRequest>,
 ) -> impl IntoResponse {
     let service = state.core_container.agent_module.get_message_repository();
 
-    match service.find_by_thread_id(thread_id).await {
-        Ok(messages) => {
-            return Json::<Vec<ThreadMessageDto>>(
-                messages
-                    .iter()
-                    .map(|message| message.clone().into())
-                    .collect(),
-            )
-            .into_response()
-        }
+    match service
+        .list_by_thread_id_paginated(&thread_id, &page_request)
+        .await
+    {
+        Ok(page) => return Json::<PageResponse<ThreadMessageDto>>(page).into_response(),
         Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
     }
 }
@@ -238,10 +225,7 @@ pub async fn list_thread_runs(
         .list_by_thread_paginated(&thread_id, page_request)
         .await
     {
-        Ok(run) => {
-            return Json::<Vec<RunDto>>(run.iter().map(|r| r.clone().into()).collect())
-                .into_response()
-        }
+        Ok(page) => return Json::<PageResponse<RunDto>>(page).into_response(),
         Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
     }
 }

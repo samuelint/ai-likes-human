@@ -110,6 +110,7 @@ impl AgentDIModule {
             run_factory,
             interence_service,
             thread_repository,
+            Arc::clone(&message_repository),
             thread_message_factory,
             message_delta_update_service,
             run_status_mutator,

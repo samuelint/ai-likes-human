@@ -15,4 +15,3 @@ pub use app_configuration::CoreConfiguration;
 pub use app_container::AppContainer;
 pub use configuration::app::*;
 pub use entities::configuration::*;
-pub use utils::PageRequest;

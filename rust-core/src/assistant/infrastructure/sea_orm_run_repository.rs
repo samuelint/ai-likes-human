@@ -1,8 +1,8 @@
-use crate::assistant::domain::dto::{DbCreateRunDto, DbUpdateRunDto, RunDto};
+use crate::assistant::domain::dto::{DbCreateRunDto, DbUpdateRunDto, PageRequest, PageResponse, RunDto};
 use crate::assistant::domain::run::RunRepository;
 use crate::entities::run;
 use crate::utils::time::TimeBuilder;
-use crate::utils::PageRequest;
+
 use anyhow::anyhow;
 use sea_orm::{
     ActiveModelTrait, ActiveValue, ColumnTrait, ConnectionTrait, DatabaseConnection, DeleteResult,
@@ -104,7 +104,7 @@ impl RunRepository for SeaOrmRunRepository {
         &self,
         thread_id: &str,
         page: PageRequest,
-    ) -> Result<Vec<RunDto>, Box<dyn Error>> {
+    ) -> Result<PageResponse<RunDto>, Box<dyn Error>> {
         let conn = Arc::clone(&self.connection);
         let mut cursor = run::Entity::find()
             .filter(run::Column::ThreadId.eq(thread_id))
@@ -124,24 +124,14 @@ impl RunRepository for SeaOrmRunRepository {
         };
 
         let result = cursor.all(conn.as_ref()).await?;
+        let result: Vec<RunDto> = result.iter().map(|r| r.clone().into()).collect();
 
-        Ok(result.iter().map(|r| r.clone().into()).collect())
-
-        // let thread_id: i32 = thread_id.parse()?;
-        // let conn = Arc::clone(&self.connection);
-        // let cursor = run::Entity::find().filter(run::Column::ThreadId.eq(thread_id));
-        // // .cursor_by(run::Column::Id);
-        // // cursor.after(page.after).before(page.before);
-
-        // // let mut cursor = if let Some(limit) = page.limit {
-        // //     cursor.limit(limit)
-        // // } else {
-        // //     cursor
-        // // };
-
-        // let result = cursor.all(conn.as_ref()).await?;
-
-        // Ok(result.iter().map(|r| r.clone().into()).collect())
+        Ok(PageResponse {
+            first_id: result.first().map(|r| r.id.to_string()).unwrap_or_default(),
+            last_id: result.last().map(|r| r.id.to_string()).unwrap_or_default(),
+            has_more: result.len() > 0,
+            data: result,
+        })
     }
 
     async fn delete(&self, id: &str) -> Result<(), Box<dyn Error>> {

@@ -5,8 +5,10 @@ mod stream_thread_run_service_test;
 use std::sync::Arc;
 
 use super::{
-    dto::{ApiCreateRunDto, ApiCreateThreadAndRunDto, RunStepDto},
-    message::{message_status_mutator::MessageStatusMutator, MessageDeltaUpdateService},
+    dto::{ApiCreateRunDto, ApiCreateThreadAndRunDto, PageRequest, RunStepDto},
+    message::{
+        message_status_mutator::MessageStatusMutator, MessageDeltaUpdateService, MessageRepository,
+    },
     run::{run_status_mutator::RunStatusMutator, RunFactory},
     stream_types::AssistantStream,
     thread::{ThreadMessageFactory, ThreadRepository},
@@ -19,6 +21,7 @@ pub struct StreamThreadRunService {
     run_factory: Arc<RunFactory>,
     inference_service: Arc<ThreadChatCompletionInference>,
     thread_repository: Arc<dyn ThreadRepository>,
+    message_repository: Arc<dyn MessageRepository>,
     thread_message_factory: Arc<ThreadMessageFactory>,
     message_delta_update_service: Arc<MessageDeltaUpdateService>,
     run_status_mutator: Arc<RunStatusMutator>,
@@ -30,6 +33,7 @@ impl StreamThreadRunService {
         run_factory: Arc<RunFactory>,
         inference_service: Arc<ThreadChatCompletionInference>,
         thread_repository: Arc<dyn ThreadRepository>,
+        message_repository: Arc<dyn MessageRepository>,
         thread_message_factory: Arc<ThreadMessageFactory>,
         message_delta_update_service: Arc<MessageDeltaUpdateService>,
         run_status_mutator: Arc<RunStatusMutator>,
@@ -39,6 +43,7 @@ impl StreamThreadRunService {
             run_factory,
             inference_service,
             thread_repository,
+            message_repository,
             thread_message_factory,
             message_delta_update_service,
             run_status_mutator,
@@ -80,7 +85,7 @@ impl StreamThreadRunService {
         let dto = dto.clone();
         let thread_id = thread_id.to_string();
         let run_factory = self.run_factory.clone();
-        let thread_repository = self.thread_repository.clone();
+        let message_repository = self.message_repository.clone();
         let inference_service = self.inference_service.clone();
         let thread_message_factory = self.thread_message_factory.clone();
         let message_delta_update_service = self.message_delta_update_service.clone();
@@ -110,8 +115,8 @@ impl StreamThreadRunService {
             yield ThreadEventDto::thread_run_in_progress(&run);
 
 
-            let messages = match thread_repository.find_messages(&thread_id).await {
-                Ok(messages) => messages,
+            let messages = match message_repository.list_by_thread_id_paginated(&thread_id, &PageRequest::default()).await {
+                Ok(page) => page.data,
                 Err(e) => {
                     yield ThreadEventDto::std_error(e);
                     return;
@@ -208,6 +213,7 @@ impl Clone for StreamThreadRunService {
             run_factory: self.run_factory.clone(),
             inference_service: self.inference_service.clone(),
             thread_repository: self.thread_repository.clone(),
+            message_repository: self.message_repository.clone(),
             thread_message_factory: self.thread_message_factory.clone(),
             message_delta_update_service: self.message_delta_update_service.clone(),
             run_status_mutator: self.run_status_mutator.clone(),

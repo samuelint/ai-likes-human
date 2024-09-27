@@ -1,17 +1,15 @@
 use crate::assistant::domain::dto::{
-    DbCreateThreadDto, DbCreateThreadMessageDto, DbUpdateThreadDto, ThreadDto, ThreadMessageDto,
+    DbCreateThreadDto, DbCreateThreadMessageDto, DbUpdateThreadDto, PageRequest, PageResponse,
+    ThreadDto,
 };
 use crate::assistant::domain::thread::ThreadRepository;
-use crate::entities::{message, thread};
+use crate::entities::thread;
 use crate::utils::time::TimeBuilder;
-use crate::utils::PageRequest;
 use anyhow::anyhow;
 use sea_orm::{
-    ActiveModelTrait, ActiveValue, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter,
-    QueryOrder, QuerySelect, TransactionTrait,
+    ActiveModelTrait, ActiveValue, DatabaseConnection, EntityTrait, QuerySelect, TransactionTrait,
 };
 use std::error::Error;
-use std::num::ParseIntError;
 use std::sync::Arc;
 
 use super::metadata::serialize_metadata_opt;
@@ -50,25 +48,6 @@ impl ThreadRepository for SeaOrmThreadRepository {
         let r: ThreadDto = r.unwrap().into();
 
         Ok(Some(r))
-    }
-
-    async fn find_messages(
-        &self,
-        id: &str,
-    ) -> Result<Vec<ThreadMessageDto>, Box<dyn Error + Send>> {
-        let id: i32 = id.parse().map_err(|e: ParseIntError| anyhow!(e))?;
-        let conn = Arc::clone(&self.connection);
-        let models: Vec<message::Model> = message::Entity::find()
-            .filter(message::Column::ThreadId.eq(id))
-            .order_by_desc(message::Column::CreatedAt)
-            .all(conn.as_ref())
-            .await
-            .map_err(|e| anyhow!(e))?;
-
-        let models: Vec<ThreadMessageDto> =
-            models.iter().map(|model| model.clone().into()).collect();
-
-        Ok(models)
     }
 
     async fn create(
@@ -132,7 +111,10 @@ impl ThreadRepository for SeaOrmThreadRepository {
         Ok(updated_model.into())
     }
 
-    async fn list_by_page(&self, page: PageRequest) -> Result<Vec<ThreadDto>, Box<dyn Error>> {
+    async fn list_by_page(
+        &self,
+        page: PageRequest,
+    ) -> Result<PageResponse<ThreadDto>, Box<dyn Error>> {
         let conn = Arc::clone(&self.connection);
         let mut cursor = thread::Entity::find().cursor_by(thread::Column::Id);
 
@@ -150,8 +132,14 @@ impl ThreadRepository for SeaOrmThreadRepository {
         };
 
         let result = cursor.all(conn.as_ref()).await?;
+        let result: Vec<ThreadDto> = result.iter().map(|r| r.clone().into()).collect();
 
-        Ok(result.iter().map(|r| r.clone().into()).collect())
+        Ok(PageResponse {
+            first_id: result.first().map(|r| r.id.to_string()).unwrap_or_default(),
+            last_id: result.last().map(|r| r.id.to_string()).unwrap_or_default(),
+            has_more: result.len() > 0,
+            data: result,
+        })
     }
 
     async fn delete(&self, id: &str) -> Result<(), Box<dyn Error>> {

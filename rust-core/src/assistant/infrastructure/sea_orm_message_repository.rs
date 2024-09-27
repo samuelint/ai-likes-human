@@ -10,7 +10,7 @@ use std::sync::Arc;
 use crate::assistant::domain::dto::{
     DbCreateThreadMessageDto, ThreadMessageDto, UpdateThreadMessageDto,
 };
-use crate::assistant::domain::message_repository::MessageRepository;
+use crate::assistant::domain::message::MessageRepository;
 use crate::entities::message;
 
 use super::metadata::serialize_metadata_opt;

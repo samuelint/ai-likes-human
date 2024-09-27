@@ -8,8 +8,7 @@ mod tests {
                 message_delta::MessageContentDelta, MessageContent, ThreadMessageDto,
                 UpdateThreadMessageDto,
             },
-            message_delta_update_service::MessageDeltaUpdateService,
-            message_repository::MockMessageRepository,
+            message::{message_repository::MockMessageRepository, MessageDeltaUpdateService},
         },
         chat_completion::{
             ChatCompletionChunkChoice, ChatCompletionChunkObject, ChatCompletionMessageDto,

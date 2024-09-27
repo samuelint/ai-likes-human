@@ -1,13 +1,13 @@
 use std::sync::Arc;
 
 use domain::{
-    message_delta_update_service::MessageDeltaUpdateService,
-    message_repository::MessageRepository,
+    message::MessageDeltaUpdateService,
+    message::MessageRepository,
     run::{run_status_mutator::RunStatusMutator, RunFactory, RunRepository},
     stream_thread_run_service::StreamThreadRunService,
+    thread::ThreadMessageFactory,
+    thread::ThreadRepository,
     thread_chat_completions_inference::ThreadChatCompletionInference,
-    thread_message_factory::ThreadMessageFactory,
-    thread_repository::ThreadRepository,
 };
 use infrastructure::{SeaOrmMessageRepository, SeaOrmRunRepository, SeaOrmThreadRepository};
 

@@ -2,7 +2,7 @@ use std::{error::Error, sync::Arc};
 
 use crate::assistant::domain::{
     dto::{ApiCreateRunDto, ApiCreateThreadAndRunDto, DbCreateRunDto, RunDto, ThreadDto},
-    thread_repository::ThreadRepository,
+    thread::ThreadRepository,
 };
 
 use super::RunRepository;

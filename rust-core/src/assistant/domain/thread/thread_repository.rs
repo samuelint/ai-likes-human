@@ -2,8 +2,10 @@ use std::error::Error;
 
 use mockall::automock;
 
-use super::dto::{DbCreateThreadDto, DbUpdateThreadDto, ThreadDto, ThreadMessageDto};
-use crate::utils::PageRequest;
+use crate::{
+    assistant::domain::dto::{DbCreateThreadDto, DbUpdateThreadDto, ThreadDto, ThreadMessageDto},
+    utils::PageRequest,
+};
 
 #[async_trait::async_trait]
 #[automock]

@@ -1,7 +1,7 @@
 use crate::assistant::domain::dto::{
     DbCreateThreadDto, DbCreateThreadMessageDto, DbUpdateThreadDto, ThreadDto, ThreadMessageDto,
 };
-use crate::assistant::domain::thread_repository::ThreadRepository;
+use crate::assistant::domain::thread::ThreadRepository;
 use crate::entities::{message, thread};
 use crate::utils::time::TimeBuilder;
 use crate::utils::PageRequest;

@@ -2,9 +2,9 @@ use std::error::Error;
 
 use mockall::*;
 
-use super::dto::{DbCreateThreadMessageDto, ThreadMessageDto, UpdateThreadMessageDto};
-
-
+use crate::assistant::domain::dto::{
+    DbCreateThreadMessageDto, ThreadMessageDto, UpdateThreadMessageDto,
+};
 
 #[async_trait::async_trait]
 #[automock]

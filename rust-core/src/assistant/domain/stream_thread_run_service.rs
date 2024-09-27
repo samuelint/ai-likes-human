@@ -6,12 +6,11 @@ use std::sync::Arc;
 
 use super::{
     dto::{ApiCreateRunDto, ApiCreateThreadAndRunDto, RunStep, RunStepDto, ThreadEvent},
-    message_delta_update_service::MessageDeltaUpdateService,
+    message::MessageDeltaUpdateService,
     run::{run_status_mutator::RunStatusMutator, RunFactory},
     stream_types::AssistantStream,
+    thread::{ThreadMessageFactory, ThreadRepository},
     thread_chat_completions_inference::ThreadChatCompletionInference,
-    thread_message_factory::ThreadMessageFactory,
-    thread_repository::ThreadRepository,
 };
 use crate::assistant::domain::dto::ThreadEventDto;
 use futures::StreamExt;

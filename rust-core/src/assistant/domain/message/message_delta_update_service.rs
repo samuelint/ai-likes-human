@@ -5,18 +5,16 @@ mod message_delta_update_service_test;
 use std::{error::Error, sync::Arc};
 
 use crate::{
-    assistant::domain::dto::UpdateThreadMessageDto, chat_completion::ChatCompletionChunkObject,
-};
-
-use super::{
-    dto::{
+    assistant::domain::dto::{
         message_delta::{
             MessageContentDelta, MessageDeltaDto, TextDeltaDto, ThreadMessageDeltaDto,
         },
-        MessageContent, ThreadMessageDto,
+        MessageContent, ThreadMessageDto, UpdateThreadMessageDto,
     },
-    message_repository::MessageRepository,
+    chat_completion::ChatCompletionChunkObject,
 };
+
+use super::message_repository::MessageRepository;
 
 pub struct MessageDeltaUpdateService {
     message_repository: Arc<dyn MessageRepository>,

@@ -3,8 +3,7 @@ mod tests {
     use std::sync::Arc;
 
     use crate::assistant::domain::{
-        dto::ThreadMessageDto, message_repository::MockMessageRepository,
-        thread_message_factory::ThreadMessageFactory,
+        dto::ThreadMessageDto, message::message_repository::MockMessageRepository, thread::ThreadMessageFactory,
     };
 
     #[tokio::test]

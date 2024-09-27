@@ -4,9 +4,9 @@ mod thread_message_factory_test;
 
 use std::sync::Arc;
 
-use super::{
+use crate::assistant::domain::{
     dto::{DbCreateThreadMessageDto, ThreadMessageDto},
-    message_repository::MessageRepository,
+    message::MessageRepository,
 };
 
 pub struct ThreadMessageFactory {

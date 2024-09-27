@@ -8,12 +8,10 @@ use std::num::ParseIntError;
 use std::sync::Arc;
 
 use crate::assistant::domain::dto::{
-    DbCreateThreadMessageDto, ThreadMessageDto, UpdateThreadMessageDto,
+    DbCreateThreadMessageDto, DbUpdateThreadMessageDto, ThreadMessageDto,
 };
 use crate::assistant::domain::message::MessageRepository;
 use crate::entities::message;
-
-use super::metadata::serialize_metadata_opt;
 
 pub struct SeaOrmMessageRepository {
     connection: Arc<DatabaseConnection>,
@@ -49,13 +47,11 @@ impl MessageRepository for SeaOrmMessageRepository {
 
     async fn update(
         &self,
-        update_dto: UpdateThreadMessageDto,
+        id: &str,
+        update_dto: &DbUpdateThreadMessageDto,
     ) -> Result<ThreadMessageDto, Box<dyn Error + Send>> {
         let conn = Arc::clone(&self.connection);
-        let id: i32 = update_dto
-            .id
-            .parse()
-            .map_err(|e: ParseIntError| anyhow!(e))?;
+        let id: i32 = id.parse().map_err(|e: ParseIntError| anyhow!(e))?;
 
         let existing = message::Entity::find_by_id(id)
             .one(conn.as_ref())
@@ -71,45 +67,43 @@ impl MessageRepository for SeaOrmMessageRepository {
             None => return Err(anyhow!("Message not found").into()),
         };
 
-        if update_dto.status.is_some() {
-            let new_status = match update_dto.status {
-                Some(s) => s.to_owned(),
-                None => return Err(anyhow!("Status not found").into()),
-            };
-            model.status = ActiveValue::Set(new_status);
-        }
-
-        if update_dto.content.is_some() {
-            let json_content = match update_dto.content {
-                Some(content) => match serde_json::to_string(&content) {
-                    Ok(content) => content,
-                    Err(_) => return Err(anyhow!("Content cannot be serialized to json").into()),
-                },
-                None => return Err(anyhow!("Content not found").into()),
-            };
-
-            model.content = ActiveValue::Set(json_content);
-        }
-
-        if update_dto.assistant_id.is_some() {
-            let assistant_id = update_dto.assistant_id.unwrap();
-
-            model.assistant_id = if assistant_id.is_some() {
-                let assistant_id = assistant_id
-                    .unwrap()
-                    .parse()
-                    .map_err(|_| anyhow!("Cannot parse assistant id"))?;
-
-                ActiveValue::Set(Some(assistant_id))
-            } else {
-                ActiveValue::Set(None)
+        match &update_dto.status {
+            Some(status) => {
+                model.status = ActiveValue::Set(status.clone());
             }
-        }
+            None => {}
+        };
 
-        if update_dto.metadata.is_some() {
-            let metadata = update_dto.metadata.unwrap();
-            model.metadata = ActiveValue::Set(Some(serialize_metadata_opt(metadata)));
-        }
+        match &update_dto.content {
+            Some(new_content) => {
+                let json_content = serde_json::to_string(&new_content).unwrap();
+                model.content = ActiveValue::Set(json_content);
+            }
+            None => {}
+        };
+
+        match &update_dto.assistant_id {
+            Some(new_assistant_id) => {
+                model.assistant_id = match new_assistant_id {
+                    Some(new_assistant_id) => {
+                        let assistant_id = new_assistant_id
+                            .parse()
+                            .map_err(|_| anyhow!("Cannot parse assistant id"))?;
+                        ActiveValue::Set(Some(assistant_id))
+                    }
+                    None => ActiveValue::Set(None),
+                }
+            }
+            None => {}
+        };
+
+        match &update_dto.metadata {
+            Some(new_metadata) => {
+                let json_metadata = serde_json::to_string(&new_metadata).unwrap();
+                model.metadata = ActiveValue::Set(Some(json_metadata));
+            }
+            None => {}
+        };
 
         let updated_model = model.update(conn.as_ref()).await.map_err(|e| anyhow!(e))?;
 

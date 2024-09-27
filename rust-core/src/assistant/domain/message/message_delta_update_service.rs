@@ -9,7 +9,7 @@ use crate::{
         message_delta::{
             MessageContentDelta, MessageDeltaDto, TextDeltaDto, ThreadMessageDeltaDto,
         },
-        MessageContent, ThreadMessageDto, UpdateThreadMessageDto,
+        DbUpdateThreadMessageDto, MessageContent, ThreadMessageDto,
     },
     chat_completion::ChatCompletionChunkObject,
 };
@@ -30,16 +30,19 @@ impl MessageDeltaUpdateService {
         chunk: &ChatCompletionChunkObject,
         message: &ThreadMessageDto,
     ) -> Result<(ThreadMessageDeltaDto, ThreadMessageDto), Box<dyn Error + Send>> {
+        let chunk_content = chunk.to_content_string();
         let new_content_text = self.get_new_text_content(chunk, message);
         let new_content = self.create_updated_text_content(&message.content, &new_content_text);
 
         let message = self
             .message_repository
-            .update(UpdateThreadMessageDto {
-                id: message.id.clone(),
-                content: Some(new_content.clone()),
-                ..UpdateThreadMessageDto::default()
-            })
+            .update(
+                &message.id,
+                &DbUpdateThreadMessageDto {
+                    content: Some(new_content.clone()),
+                    ..DbUpdateThreadMessageDto::default()
+                },
+            )
             .await?;
 
         Ok((
@@ -47,7 +50,7 @@ impl MessageDeltaUpdateService {
                 delta: MessageDeltaDto {
                     role: message.role.clone(),
                     content: vec![MessageContentDelta::Text(TextDeltaDto {
-                        value: Some(new_content_text),
+                        value: Some(chunk_content),
                         ..TextDeltaDto::default()
                     })],
                 },

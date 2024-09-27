@@ -143,11 +143,9 @@ impl MessageContent {
 }
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct UpdateThreadMessageDto {
+pub struct ApiUpdateThreadMessageDto {
     pub id: String,
-    pub status: Option<String>,
     pub content: Option<Vec<MessageContent>>,
-    pub assistant_id: Option<Option<String>>,
     pub metadata: Option<Option<Metadata>>,
 }
 

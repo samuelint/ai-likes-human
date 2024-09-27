@@ -5,8 +5,8 @@ mod tests {
     use crate::{
         assistant::domain::{
             dto::{
-                message_delta::MessageContentDelta, MessageContent, ThreadMessageDto,
-                UpdateThreadMessageDto,
+                message_delta::MessageContentDelta, DbUpdateThreadMessageDto, MessageContent,
+                ThreadMessageDto,
             },
             message::{message_repository::MockMessageRepository, MessageDeltaUpdateService},
         },
@@ -20,10 +20,9 @@ mod tests {
         // Given new chunk adding "World! to existing message"
         let thread_id = "some_thread_id";
         let message_id = "some_message_id";
-        let expected_update_message = UpdateThreadMessageDto {
-            id: message_id.to_string(),
+        let expected_update_message = DbUpdateThreadMessageDto {
             content: Some(vec![MessageContent::text("Hello World!")]),
-            ..UpdateThreadMessageDto::default()
+            ..DbUpdateThreadMessageDto::default()
         };
         let existing_message = ThreadMessageDto {
             id: message_id.to_string(),
@@ -68,13 +67,12 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_updated_message_from_chunk_delta_contains_chunk_text() {
+    async fn test_delta_contains_only_chunk_content() {
         let thread_id = "some_thread_id";
         let message_id = "some_message_id";
-        let expected_update_message = UpdateThreadMessageDto {
-            id: message_id.to_string(),
+        let expected_update_message = DbUpdateThreadMessageDto {
             content: Some(vec![MessageContent::text("Hello World!")]),
-            ..UpdateThreadMessageDto::default()
+            ..DbUpdateThreadMessageDto::default()
         };
         let existing_message = ThreadMessageDto {
             id: message_id.to_string(),
@@ -109,17 +107,16 @@ mod tests {
             _ => panic!("Expected Text MessageContentDelta"),
         };
 
-        assert_eq!(text_delta.value.clone().unwrap(), "Hello World!");
+        assert_eq!(text_delta.value.clone().unwrap(), "World!");
     }
 
     #[tokio::test]
     async fn test_updated_message_chunk_role_is_same_as_message() {
         let thread_id = "some_thread_id";
         let message_id = "some_message_id";
-        let expected_update_message = UpdateThreadMessageDto {
-            id: message_id.to_string(),
+        let expected_update_message = DbUpdateThreadMessageDto {
             content: Some(vec![MessageContent::text("Hello World!")]),
-            ..UpdateThreadMessageDto::default()
+            ..DbUpdateThreadMessageDto::default()
         };
         let existing_message = ThreadMessageDto {
             id: message_id.to_string(),
@@ -152,7 +149,7 @@ mod tests {
 
     fn message_repository_mocking_update(
         thread_id: &str,
-        update_message_dto: &UpdateThreadMessageDto,
+        update_message_dto: &DbUpdateThreadMessageDto,
     ) -> MockMessageRepository {
         let mut message_repository = MockMessageRepository::new();
         let thread_id = thread_id.to_string();
@@ -161,16 +158,17 @@ mod tests {
 
         message_repository
             .expect_update()
-            .withf_st(move |x| *x == update_message_dto_with)
-            .returning(move |_| {
-                let update_message_dto = update_message_dto.clone();
+            .withf_st(move |_id, dto| *dto == update_message_dto_with)
+            .returning(move |id, dto| {
                 let thread_id = thread_id.clone();
+                let status = dto.status.clone().unwrap_or("".to_string());
+                let id = id.to_string();
 
                 Box::pin(async {
                     Ok(ThreadMessageDto {
-                        id: update_message_dto.id,
+                        id: id,
                         thread_id: Some(thread_id),
-                        status: update_message_dto.status.unwrap_or("".to_string()),
+                        status: status,
                         role: "assistant".to_string(),
                         content: vec![MessageContent::text("Hello World!")],
                         ..ThreadMessageDto::default()

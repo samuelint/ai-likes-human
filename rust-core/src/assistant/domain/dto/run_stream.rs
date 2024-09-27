@@ -151,9 +151,9 @@ impl ThreadEventDto<StreamErrorDto> {
 }
 
 impl ThreadEventDto<String> {
-    pub fn done(data: &str) -> Self {
+    pub fn done() -> Self {
         Self {
-            data: data.to_string(),
+            data: "[DONE]".to_string(),
             event: "done".to_string(),
         }
     }

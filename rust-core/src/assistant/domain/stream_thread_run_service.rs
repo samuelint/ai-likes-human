@@ -6,7 +6,7 @@ use std::sync::Arc;
 
 use super::{
     dto::{ApiCreateRunDto, ApiCreateThreadAndRunDto, RunStep, RunStepDto, ThreadEvent},
-    message::MessageDeltaUpdateService,
+    message::{message_status_mutator::MessageStatusMutator, MessageDeltaUpdateService},
     run::{run_status_mutator::RunStatusMutator, RunFactory},
     stream_types::AssistantStream,
     thread::{ThreadMessageFactory, ThreadRepository},
@@ -22,6 +22,7 @@ pub struct StreamThreadRunService {
     thread_message_factory: Arc<ThreadMessageFactory>,
     message_delta_update_service: Arc<MessageDeltaUpdateService>,
     run_status_mutator: Arc<RunStatusMutator>,
+    message_status_mutator: Arc<MessageStatusMutator>,
 }
 
 impl StreamThreadRunService {
@@ -32,6 +33,7 @@ impl StreamThreadRunService {
         thread_message_factory: Arc<ThreadMessageFactory>,
         message_delta_update_service: Arc<MessageDeltaUpdateService>,
         run_status_mutator: Arc<RunStatusMutator>,
+        message_status_mutator: Arc<MessageStatusMutator>,
     ) -> Self {
         Self {
             run_factory,
@@ -40,6 +42,7 @@ impl StreamThreadRunService {
             thread_message_factory,
             message_delta_update_service,
             run_status_mutator,
+            message_status_mutator,
         }
     }
 
@@ -82,6 +85,7 @@ impl StreamThreadRunService {
         let thread_message_factory = self.thread_message_factory.clone();
         let message_delta_update_service = self.message_delta_update_service.clone();
         let run_status_mutator = self.run_status_mutator.clone();
+        let message_status_mutator = self.message_status_mutator.clone();
 
         let s = async_stream::try_stream! {
 
@@ -153,6 +157,14 @@ impl StreamThreadRunService {
                 yield ThreadEvent::ThreadMessageDelta(ThreadEventDto::thread_message_delta(&message_delta));
             }
 
+
+            let message = match message_status_mutator.mutate_to_completed(&message).await {
+                Ok(message) => message,
+                Err(e) => {
+                    yield ThreadEvent::Error(ThreadEventDto::std_error(e));
+                    return;
+                }
+            };
             yield ThreadEvent::ThreadMessageCompleted(ThreadEventDto::thread_message_completed(&message));
 
             yield ThreadEvent::ThreadRunStepCompleted(ThreadEventDto::run_step_completed(&run_step));
@@ -167,6 +179,7 @@ impl StreamThreadRunService {
                 }
             };
             yield ThreadEvent::ThreadRunCompleted(ThreadEventDto::run_completed(&run));
+            yield ThreadEvent::Done(ThreadEventDto::done());
         };
 
         Box::pin(s)
@@ -182,6 +195,7 @@ impl Clone for StreamThreadRunService {
             thread_message_factory: self.thread_message_factory.clone(),
             message_delta_update_service: self.message_delta_update_service.clone(),
             run_status_mutator: self.run_status_mutator.clone(),
+            message_status_mutator: self.message_status_mutator.clone(),
         }
     }
 }

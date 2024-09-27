@@ -9,6 +9,8 @@ use std::convert::Infallible;
 
 use crate::app_state::ServerState;
 
+use super::thread_event_adapter::result_to_sse_event;
+
 pub fn stream_create_thread_and_run(
     state: &ServerState,
     dto: &ApiCreateThreadAndRunDto,
@@ -19,10 +21,7 @@ pub fn stream_create_thread_and_run(
     Sse::new(try_stream! {
         let mut stream = service.stream_new_thread(&dto);
         while let Some(item) = stream.next().await {
-            let data = item.unwrap();
-            let json_data = serde_json::to_string(&data).unwrap();
-
-            yield Event::default().data(json_data)
+            yield result_to_sse_event(&item)
         }
     })
     .keep_alive(KeepAlive::default())
@@ -40,11 +39,12 @@ pub fn stream_create_thread_run(
     Sse::new(try_stream! {
         let mut stream = service.stream_new_run(&thread_id, &dto);
         while let Some(item) = stream.next().await {
-            let data = item.unwrap();
-            let json_data = serde_json::to_string(&data).unwrap();
-
-            yield Event::default().data(json_data)
+            yield result_to_sse_event(&item)
         }
+
+        yield Event::default()
+        .data("[DONE]")
+        .event("done");
     })
     .keep_alive(KeepAlive::default())
 }

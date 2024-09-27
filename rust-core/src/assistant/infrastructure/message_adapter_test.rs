@@ -7,26 +7,6 @@ mod test_from_messate_entity_model_to_thread_message_dto {
     };
 
     #[test]
-    fn test_object_is_thead_message() {
-        let model = message::Model {
-            id: 0,
-            created_at: TimeBuilder::now().into(),
-            content: "".to_string(),
-            role: "".to_string(),
-            attachments: None,
-            metadata: None,
-            thread_id: None,
-            run_id: None,
-            status: "".to_string(),
-            assistant_id: None,
-        };
-
-        let dto: ThreadMessageDto = model.into();
-
-        assert_eq!(dto.object, "thread.message");
-    }
-
-    #[test]
     fn test_status_is_the_same() {
         let model = message::Model {
             id: 0,

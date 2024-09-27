@@ -5,7 +5,7 @@ mod stream_thread_run_service_test;
 use std::sync::Arc;
 
 use super::{
-    dto::{ApiCreateRunDto, ApiCreateThreadAndRunDto, RunStepDto, ThreadEvent},
+    dto::{ApiCreateRunDto, ApiCreateThreadAndRunDto, RunStepDto},
     message::{message_status_mutator::MessageStatusMutator, MessageDeltaUpdateService},
     run::{run_status_mutator::RunStatusMutator, RunFactory},
     stream_types::AssistantStream,
@@ -54,11 +54,11 @@ impl StreamThreadRunService {
         let s = async_stream::try_stream! {
             let thread = match thread_repository.create((&dto).into()).await {
                 Ok(thread) => {
-                    yield ThreadEvent::ThreadCreated(ThreadEventDto::created_thread(&thread));
+                    yield ThreadEventDto::thread_created(&thread);
                     thread
                 },
                 Err(e) => {
-                    yield ThreadEvent::Error(ThreadEventDto::std_error(e));
+                    yield ThreadEventDto::std_error(e);
                     return;
                 }
             };
@@ -93,27 +93,27 @@ impl StreamThreadRunService {
             let run = match run_factory.create_run(&thread_id, &dto).await {
                 Ok(res) => res,
                 Err(e) => {
-                    yield ThreadEvent::Error(ThreadEventDto::std_error(e));
+                    yield ThreadEventDto::std_error(e);
                     return;
                 }
             };
-            yield ThreadEvent::ThreadRunCreated(ThreadEventDto::created_run(&run));
-            yield ThreadEvent::ThreadRunQueued(ThreadEventDto::run_queued(&run));
+            yield ThreadEventDto::thread_run_created(&run);
+            yield ThreadEventDto::thread_run_queued(&run);
 
             let run = match run_status_mutator.mutate_to_in_progress(&run).await {
                 Ok(run) => run,
                 Err(e) => {
-                    yield ThreadEvent::Error(ThreadEventDto::std_error(e));
+                    yield ThreadEventDto::std_error(e);
                     return;
                 }
             };
-            yield ThreadEvent::ThreadRunInProgress(ThreadEventDto::run_in_progress(&run));
+            yield ThreadEventDto::thread_run_in_progress(&run);
 
 
             let messages = match thread_repository.find_messages(&thread_id).await {
                 Ok(messages) => messages,
                 Err(e) => {
-                    yield ThreadEvent::Error(ThreadEventDto::std_error(e));
+                    yield ThreadEventDto::std_error(e);
                     return;
                 }
             };
@@ -124,81 +124,78 @@ impl StreamThreadRunService {
                     let run = match run_status_mutator.mutate_to_completed(&run).await {
                         Ok(run) => run,
                         Err(e) => {
-                            yield ThreadEvent::Error(ThreadEventDto::std_error(e));
+                            yield ThreadEventDto::std_error(e);
                             return;
                         }
                     };
-                    yield ThreadEvent::ThreadRunCompleted(ThreadEventDto::run_completed(&run));
-                    yield ThreadEvent::Done(ThreadEventDto::done());
+                    yield ThreadEventDto::thread_run_completed(&run);
                     return;
                 }
             };
 
             // Step
             let mut run_step = RunStepDto::message_creation_from_run("step-1", &last_message.id, "in_progress", &run);
-            yield ThreadEvent::ThreadRunStepCreated(ThreadEventDto::run_step_created(&run_step));
+            yield ThreadEventDto::run_step_created(&run_step);
+
             run_step.status = "in_progress".to_string();
-            yield ThreadEvent::ThreadRunStepInProgress(ThreadEventDto::run_step_in_progress(&run_step));
+            yield ThreadEventDto::run_step_in_progress(&run_step);
 
 
-            let mut stream = inference_service.stream(&run.model, &messages);
-
-            let mut message = match thread_message_factory.create_assistant(&thread_id, &run.id).await {
+            let mut response_message = match thread_message_factory.create_assistant(&thread_id, &run.id).await {
                 Ok(message) => message,
                 Err(e) => {
-                    yield ThreadEvent::Error(ThreadEventDto::std_error(e));
+                    yield ThreadEventDto::std_error(e);
                     return;
                 }
             };
+            yield ThreadEventDto::thread_message_created(&response_message);
+            yield ThreadEventDto::thread_message_in_progress(&response_message);
 
-            yield ThreadEvent::ThreadMessageCreated(ThreadEventDto::thread_message_created(&message));
-            yield ThreadEvent::ThreadMessageInProgress(ThreadEventDto::thread_message_in_progress(&message));
-
+            let mut stream = inference_service.stream(&run.model, &messages);
             while let Some(chunk) = stream.next().await {
                 let chunk = match chunk {
                     Ok(chunk) => chunk,
                     Err(e) => {
-                        yield ThreadEvent::Error(ThreadEventDto::std_error(e));
+                        yield ThreadEventDto::std_error(e);
                         return;
                     }
                 };
 
-                let (message_delta, updated_message) = match message_delta_update_service.from_chunk(&chunk, &message).await {
+                let (message_delta, updated_message) = match message_delta_update_service.from_chunk(&chunk, &response_message).await {
                     Ok(res) => res,
                     Err(e) => {
-                        yield ThreadEvent::Error(ThreadEventDto::std_error(e));
+                        yield ThreadEventDto::std_error(e);
                         return;
                     }
                 };
-                message = updated_message;
+                response_message = updated_message;
 
-                yield ThreadEvent::ThreadMessageDelta(ThreadEventDto::thread_message_delta(&message_delta));
+                yield ThreadEventDto::thread_message_delta(&message_delta);
             }
 
 
-            let message = match message_status_mutator.mutate_to_completed(&message).await {
+            let message = match message_status_mutator.mutate_to_completed(&response_message).await {
                 Ok(message) => message,
                 Err(e) => {
-                    yield ThreadEvent::Error(ThreadEventDto::std_error(e));
+                    yield ThreadEventDto::std_error(e);
                     return;
                 }
             };
-            yield ThreadEvent::ThreadMessageCompleted(ThreadEventDto::thread_message_completed(&message));
+            yield ThreadEventDto::thread_message_completed(&message);
 
             run_step.status = "completed".to_string();
-            yield ThreadEvent::ThreadRunStepCompleted(ThreadEventDto::run_step_completed(&run_step));
+            yield ThreadEventDto::run_step_completed(&run_step);
             // Step - End
 
 
             let run = match run_status_mutator.mutate_to_completed(&run).await {
                 Ok(run) => run,
                 Err(e) => {
-                    yield ThreadEvent::Error(ThreadEventDto::std_error(e));
+                    yield ThreadEventDto::std_error(e);
                     return;
                 }
             };
-            yield ThreadEvent::ThreadRunCompleted(ThreadEventDto::run_completed(&run));
-            yield ThreadEvent::Done(ThreadEventDto::done());
+            yield ThreadEventDto::thread_run_completed(&run);
         };
 
         Box::pin(s)

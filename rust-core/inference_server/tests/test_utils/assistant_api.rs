@@ -2,7 +2,7 @@ use std::pin::Pin;
 
 use app_core::assistant::domain::dto::{
     ApiCreateRunDto, ApiCreateThreadAndRunDto, ApiCreateThreadDto, ApiCreateThreadMessageDto,
-    MessageContent, RunDto, ThreadDto, ThreadEvent,
+    MessageContent, RunDto, ThreadDto, ThreadEventData,
 };
 use futures::{Stream, StreamExt};
 use hyper::StatusCode;
@@ -55,7 +55,7 @@ impl AssistantApiClient {
     pub async fn stream_new_thread_with_prompt(
         &self,
         prompt: &str,
-    ) -> impl Stream<Item = Result<ThreadEvent, axum::Error>> {
+    ) -> impl Stream<Item = Result<(String, ThreadEventData), axum::Error>> {
         let create_thread_run_dto = ApiCreateThreadAndRunDto {
             model: DEFAULT_LLM_MODEL.to_string(),
             thread: ApiCreateThreadDto {
@@ -77,7 +77,7 @@ impl AssistantApiClient {
     pub async fn stream_new_thread_with_prompt_as_chunks_vec(
         &self,
         prompt: &str,
-    ) -> Vec<ThreadEvent> {
+    ) -> Vec<(String, ThreadEventData)> {
         let stream = self.stream_new_thread_with_prompt(prompt).await;
 
         Self::stream_to_events_array(Box::pin(stream)).await
@@ -87,10 +87,13 @@ impl AssistantApiClient {
     pub async fn stream_create_thread_and_run(
         &self,
         request: &ApiCreateThreadAndRunDto,
-    ) -> impl Stream<Item = Result<ThreadEvent, axum::Error>> {
+    ) -> impl Stream<Item = Result<(String, ThreadEventData), axum::Error>> {
         let stream = self
             .client
-            .post_json_stream::<ApiCreateThreadAndRunDto, ThreadEvent>("/threads/runs", request);
+            .post_json_stream::<ApiCreateThreadAndRunDto, ThreadEventData>(
+                "/threads/runs",
+                request,
+            );
 
         stream
     }
@@ -118,10 +121,10 @@ impl AssistantApiClient {
         &self,
         thread_id: &str,
         request: &ApiCreateRunDto,
-    ) -> impl Stream<Item = Result<ThreadEvent, axum::Error>> {
+    ) -> impl Stream<Item = Result<(String, ThreadEventData), axum::Error>> {
         let stream = self
             .client
-            .post_json_stream::<ApiCreateRunDto, ThreadEvent>(
+            .post_json_stream::<ApiCreateRunDto, ThreadEventData>(
                 format!("/threads/{}/runs", thread_id).as_str(),
                 &ApiCreateRunDto {
                     model: if request.model.is_empty() {
@@ -142,7 +145,7 @@ impl AssistantApiClient {
         &self,
         thread_id: &str,
         request: &ApiCreateRunDto,
-    ) -> Vec<ThreadEvent> {
+    ) -> Vec<(String, ThreadEventData)> {
         let stream = self.stream_run(thread_id, request).await;
 
         Self::stream_to_events_array(Box::pin(stream)).await
@@ -160,8 +163,8 @@ impl AssistantApiClient {
     }
 
     pub async fn stream_to_events_array(
-        mut stream: Pin<Box<dyn Stream<Item = Result<ThreadEvent, axum::Error>>>>,
-    ) -> Vec<ThreadEvent> {
+        mut stream: Pin<Box<dyn Stream<Item = Result<(String, ThreadEventData), axum::Error>>>>,
+    ) -> Vec<(String, ThreadEventData)> {
         let mut responses = Vec::new();
         while let Some(chunk) = stream.next().await {
             let response = chunk.unwrap();

@@ -1,5 +1,6 @@
 use crate::test_utils::assistant_api::AssistantApiClient;
-use app_core::assistant::domain::dto::{ApiCreateRunDto, ThreadEvent};
+use app_core::assistant::domain::dto::ApiCreateRunDto;
+use pretty_assertions::assert_eq;
 
 #[tokio::test]
 async fn test_stream_new_thread_run_simple_sequence() {
@@ -8,70 +9,30 @@ async fn test_stream_new_thread_run_simple_sequence() {
         .stream_new_thread_with_prompt_as_chunks_vec("Tell me a joke.")
         .await;
 
-    assert!(
-        matches!(&chunks[0], ThreadEvent::ThreadCreated(_)),
-        "Events does not have ThreadCreated"
-    );
-    assert!(
-        matches!(&chunks[1], ThreadEvent::ThreadRunCreated(_)),
-        "Events does not have ThreadRunCreated"
-    );
-    assert!(
-        matches!(&chunks[2], ThreadEvent::ThreadRunQueued(_)),
-        "Events does not have ThreadRunQueued"
-    );
-    assert!(
-        matches!(&chunks[3], ThreadEvent::ThreadRunInProgress(_)),
-        "Events does not have ThreadRunInProgress"
-    );
-    assert!(
-        matches!(&chunks[4], ThreadEvent::ThreadRunStepCreated(_)),
-        "Events does not have ThreadRunStepCreated"
-    );
-    assert!(
-        matches!(&chunks[4], ThreadEvent::ThreadRunStepCreated(_)),
-        "Events does not have ThreadRunStepCreated"
-    );
-    assert!(
-        matches!(&chunks[5], ThreadEvent::ThreadRunStepInProgress(_)),
-        "Events does not have ThreadRunStepInProgress"
-    );
-    assert!(
-        matches!(&chunks[6], ThreadEvent::ThreadMessageCreated(_)),
-        "Events does not have ThreadMessageCreated"
-    );
-    assert!(
-        matches!(&chunks[7], ThreadEvent::ThreadMessageInProgress(_)),
-        "Events does not have ThreadMessageInProgress"
-    );
+    assert_eq!(&chunks[0].0, "thread.created");
+    assert_eq!(&chunks[1].0, "thread.run.created");
+    assert_eq!(&chunks[2].0, "thread.run.queued");
+    assert_eq!(&chunks[3].0, "thread.run.in_progress");
+    assert_eq!(&chunks[4].0, "thread.run.step.created");
+    assert_eq!(&chunks[5].0, "thread.run.step.in_progress");
+    assert_eq!(&chunks[6].0, "thread.message.created");
+    assert_eq!(&chunks[7].0, "thread.message.in_progress");
+
     // Deltas
     for i in 8..(chunks.len() - 4) {
         let event = &chunks[i];
-        assert!(
-            matches!(event, ThreadEvent::ThreadMessageDelta(_)),
-            "Events[{}] does not have ThreadMessageDelta",
-            i
-        );
+        assert_eq!(event.0, "thread.message.delta");
     }
     // Deltas - END
 
-    let last_item = chunks.get(chunks.len() - 3).unwrap();
-    assert!(
-        matches!(&last_item, ThreadEvent::ThreadMessageCompleted(_)),
-        "Events does not end with ThreadMessageCompleted"
-    );
+    let before_before_last_item = chunks.get(chunks.len() - 3).unwrap();
+    assert_eq!(&before_before_last_item.0, "thread.message.completed");
 
-    let last_item = chunks.get(chunks.len() - 2).unwrap();
-    assert!(
-        matches!(&last_item, ThreadEvent::ThreadRunStepCompleted(_)),
-        "Events does not end with ThreadRunStepCompleted"
-    );
+    let before_last_chunk = chunks.get(chunks.len() - 2).unwrap();
+    assert_eq!(&before_last_chunk.0, "thread.run.step.completed");
 
-    let last_chunk = chunks.last().unwrap();
-    assert!(
-        matches!(&last_chunk, ThreadEvent::ThreadRunCompleted(_)),
-        "Events does not end with Done"
-    );
+    let last_chunk = chunks.get(chunks.len() - 1).unwrap();
+    assert_eq!(&last_chunk.0, "thread.run.completed");
 }
 
 #[tokio::test]
@@ -82,64 +43,27 @@ async fn test_stream_new_run_on_existign_thread_simple_sequence() {
         .stream_run_as_chunks_array(&thread.id, &ApiCreateRunDto::default())
         .await;
 
-    assert!(
-        matches!(&chunks[0], ThreadEvent::ThreadRunCreated(_)),
-        "Events does not have ThreadRunCreated"
-    );
-    assert!(
-        matches!(&chunks[1], ThreadEvent::ThreadRunQueued(_)),
-        "Events does not have ThreadRunQueued"
-    );
-    assert!(
-        matches!(&chunks[2], ThreadEvent::ThreadRunInProgress(_)),
-        "Events does not have ThreadRunInProgress"
-    );
-    assert!(
-        matches!(&chunks[3], ThreadEvent::ThreadRunStepCreated(_)),
-        "Events does not have ThreadRunStepCreated"
-    );
-    assert!(
-        matches!(&chunks[3], ThreadEvent::ThreadRunStepCreated(_)),
-        "Events does not have ThreadRunStepCreated"
-    );
-    assert!(
-        matches!(&chunks[4], ThreadEvent::ThreadRunStepInProgress(_)),
-        "Events does not have ThreadRunStepInProgress"
-    );
-    assert!(
-        matches!(&chunks[5], ThreadEvent::ThreadMessageCreated(_)),
-        "Events does not have ThreadMessageCreated"
-    );
-    assert!(
-        matches!(&chunks[6], ThreadEvent::ThreadMessageInProgress(_)),
-        "Events does not have ThreadMessageInProgress"
-    );
+    assert_eq!(&chunks[0].0, "thread.run.created");
+    assert_eq!(&chunks[1].0, "thread.run.queued");
+    assert_eq!(&chunks[2].0, "thread.run.in_progress");
+    assert_eq!(&chunks[3].0, "thread.run.step.created");
+    assert_eq!(&chunks[4].0, "thread.run.step.in_progress");
+    assert_eq!(&chunks[5].0, "thread.message.created");
+    assert_eq!(&chunks[6].0, "thread.message.in_progress");
+
     // Deltas
     for i in 7..(chunks.len() - 4) {
         let event = &chunks[i];
-        assert!(
-            matches!(event, ThreadEvent::ThreadMessageDelta(_)),
-            "Events[{}] does not have ThreadMessageDelta",
-            i
-        );
+        assert_eq!(event.0, "thread.message.delta");
     }
     // Deltas - END
 
-    let last_item = chunks.get(chunks.len() - 3).unwrap();
-    assert!(
-        matches!(&last_item, ThreadEvent::ThreadMessageCompleted(_)),
-        "Events does not end with ThreadMessageCompleted"
-    );
+    let before_before_last_item = chunks.get(chunks.len() - 3).unwrap();
+    assert_eq!(&before_before_last_item.0, "thread.message.completed");
 
-    let last_item = chunks.get(chunks.len() - 2).unwrap();
-    assert!(
-        matches!(&last_item, ThreadEvent::ThreadRunStepCompleted(_)),
-        "Events does not end with ThreadRunStepCompleted"
-    );
+    let before_last_chunk = chunks.get(chunks.len() - 2).unwrap();
+    assert_eq!(&before_last_chunk.0, "thread.run.step.completed");
 
-    let last_chunk = chunks.last().unwrap();
-    assert!(
-        matches!(&last_chunk, ThreadEvent::ThreadRunCompleted(_)),
-        "Events does not end with Done"
-    );
+    let last_chunk = chunks.get(chunks.len() - 1).unwrap();
+    assert_eq!(&last_chunk.0, "thread.run.completed");
 }

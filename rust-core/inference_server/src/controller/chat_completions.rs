@@ -70,7 +70,7 @@ fn run_stream_chat_completions(
             }
         }
 
-        yield Event::default().data("[DONE]");
+        yield Event::default().event("done").data("[DONE]");
     })
     .keep_alive(KeepAlive::default())
 }

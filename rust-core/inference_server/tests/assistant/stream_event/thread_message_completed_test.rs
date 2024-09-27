@@ -1,4 +1,5 @@
-use app_core::assistant::domain::dto::{ApiCreateRunDto, ThreadEvent};
+use app_core::assistant::domain::dto::{ApiCreateRunDto, ThreadEventData};
+use pretty_assertions::assert_eq;
 
 use crate::test_utils::assistant_api::AssistantApiClient;
 
@@ -10,13 +11,17 @@ async fn test_message_completed_event_status_change_to_completed() {
         .stream_run_as_chunks_array(&thread.id, &ApiCreateRunDto::default())
         .await;
 
-    let event = chunks
+    let data = chunks
         .iter()
-        .find_map(|chunk| match chunk {
-            ThreadEvent::ThreadMessageCompleted(event) => Some(event),
+        .filter_map(|chunk| match chunk.0.as_str() {
+            "thread.message.completed" => Some(chunk),
+            _ => None,
+        })
+        .find_map(|chunk| match &chunk.1 {
+            ThreadEventData::ThreadMessage(data) => Some(data),
             _ => None,
         })
         .expect("ThreadMessageCompleted should be found");
 
-    assert_eq!(event.data.status, "completed");
+    assert_eq!(data.status, "completed");
 }

@@ -45,7 +45,6 @@ impl From<message::Model> for ThreadMessageDto {
 
         ThreadMessageDto {
             id: model.id.to_string(),
-            object: "thread.message".to_string(),
             created_at: TimeBuilder::from_string(&model.created_at).into(),
             thread_id: model.thread_id.map(|id| id.to_string()),
             status: model.status,

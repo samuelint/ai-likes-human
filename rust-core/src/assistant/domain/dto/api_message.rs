@@ -23,7 +23,6 @@ pub struct TextMessageContentDto {
 #[derive(Default, Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
 pub struct ThreadMessageDto {
     pub id: String,
-    pub object: String,
     pub created_at: i64,
     pub thread_id: Option<String>,
     pub status: String,

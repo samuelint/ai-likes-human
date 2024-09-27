@@ -146,21 +146,67 @@ impl RouterClient {
         &self,
         path: &str,
         body: &TRequestBody,
-    ) -> impl Stream<Item = Result<TResponseBody, axum::Error>>
+    ) -> impl Stream<Item = Result<(String, TResponseBody), axum::Error>>
     where
         TRequestBody: ?Sized + Serialize,
         TResponseBody: DeserializeOwned,
     {
         let stream = self.post_stream(path, body);
 
-        let stream = stream.map(|item| match item {
-            Ok(text) => {
-                let text = text.trim_start_matches("data: ");
-                let chunk: TResponseBody = serde_json::from_str(text).unwrap();
-                Ok(chunk)
-            }
-            Err(e) => Err(axum::Error::new(e)),
-        });
+        let stream = stream
+            .map(|item| match item {
+                Ok(text) => {
+                    let text = text.trim_start_matches("data: ");
+                    let mut parts = text.splitn(2, "\n");
+                    let a = parts.next().unwrap_or_default();
+
+                    let b = parts.next().unwrap_or_default();
+
+                    let (event, data) = if a.starts_with("event: ") {
+                        (a, b)
+                    } else {
+                        (b, a)
+                    };
+                    let (event, data) = (
+                        event.trim_start_matches("event: "),
+                        data.trim_start_matches("data: "),
+                    );
+
+                    if event.contains("error") {
+                        return Err(axum::Error::new(std::io::Error::new(
+                            std::io::ErrorKind::Other,
+                            data,
+                        )));
+                    } else if event.contains("done") {
+                        Ok(None)
+                    } else {
+                        Ok(Some((event.to_string(), data.to_string())))
+                    }
+                }
+                Err(e) => Err(axum::Error::new(e)),
+            })
+            .filter_map(|result| async {
+                match result {
+                    Ok(Some(data)) => Some(Ok(data)),
+                    Ok(None) => None,
+                    Err(e) => Some(Err(e)),
+                }
+            })
+            .map(|data| match data {
+                Ok((event, data)) => {
+                    let chunk: TResponseBody = match serde_json::from_str(&data) {
+                        Ok(chunk) => chunk,
+                        Err(e) => {
+                            return Err(axum::Error::new(std::io::Error::new(
+                                std::io::ErrorKind::Other,
+                                e,
+                            )))
+                        }
+                    };
+                    Ok((event, chunk))
+                }
+                Err(e) => Err(e),
+            });
 
         stream
     }

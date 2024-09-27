@@ -1,18 +1,18 @@
-use crate::assistant::domain::dto::{DbCreateRunDto, RunDto};
-use crate::assistant::domain::run_repository::RunRepository;
+use crate::assistant::domain::dto::{DbCreateRunDto, DbUpdateRunDto, RunDto};
+use crate::assistant::domain::run::RunRepository;
 use crate::entities::run;
 use crate::utils::time::TimeBuilder;
 use crate::utils::PageRequest;
 use anyhow::anyhow;
 use sea_orm::{
-    ActiveValue, ColumnTrait, ConnectionTrait, DatabaseConnection, DeleteResult, EntityTrait,
-    QueryFilter, QuerySelect,
+    ActiveModelTrait, ActiveValue, ColumnTrait, ConnectionTrait, DatabaseConnection, DeleteResult,
+    EntityTrait, QueryFilter, QuerySelect,
 };
 use std::error::Error;
 use std::num::ParseIntError;
 use std::sync::Arc;
 
-use super::metadata::serialize_metadata_opt;
+use super::metadata::{serialize_metadata, serialize_metadata_opt};
 
 pub struct SeaOrmRunRepository {
     connection: Arc<DatabaseConnection>,
@@ -20,7 +20,7 @@ pub struct SeaOrmRunRepository {
 
 #[async_trait::async_trait]
 impl RunRepository for SeaOrmRunRepository {
-    async fn find(&self, id: String) -> Result<Option<RunDto>, Box<dyn Error>> {
+    async fn find(&self, id: &str) -> Result<Option<RunDto>, Box<dyn Error>> {
         let id: i32 = id.parse()?;
         let conn = Arc::clone(&self.connection);
         let r = run::Entity::find_by_id(id).one(conn.as_ref()).await?;
@@ -61,9 +61,48 @@ impl RunRepository for SeaOrmRunRepository {
         Ok(r.into())
     }
 
+    async fn update(
+        &self,
+        id: &str,
+        update_dto: &DbUpdateRunDto,
+    ) -> Result<RunDto, Box<dyn Error + Send>> {
+        let conn = Arc::clone(&self.connection);
+        let id: i32 = id.parse().map_err(|e: ParseIntError| anyhow!(e))?;
+
+        let existing = run::Entity::find_by_id(id)
+            .one(conn.as_ref())
+            .await
+            .map_err(|e| anyhow!(e))?;
+
+        if existing.is_none() {
+            return Err(anyhow!("Message not found").into());
+        }
+
+        let mut model: run::ActiveModel = match existing {
+            Some(m) => m.into(),
+            None => return Err(anyhow!("Message not found").into()),
+        };
+
+        match &update_dto.status {
+            Some(updated_status) => model.status = ActiveValue::Set(updated_status.clone()),
+            None => (),
+        }
+
+        match &update_dto.metadata {
+            Some(updated_metadata) => {
+                model.metadata = ActiveValue::Set(Some(serialize_metadata(updated_metadata)))
+            }
+            None => (),
+        }
+
+        let updated_model = model.update(conn.as_ref()).await.map_err(|e| anyhow!(e))?;
+
+        Ok(updated_model.into())
+    }
+
     async fn list_by_thread_paginated(
         &self,
-        thread_id: String,
+        thread_id: &str,
         page: PageRequest,
     ) -> Result<Vec<RunDto>, Box<dyn Error>> {
         let thread_id: i32 = thread_id.parse()?;
@@ -84,7 +123,7 @@ impl RunRepository for SeaOrmRunRepository {
         Ok(result.iter().map(|r| r.clone().into()).collect())
     }
 
-    async fn delete(&self, id: String) -> Result<(), Box<dyn Error>> {
+    async fn delete(&self, id: &str) -> Result<(), Box<dyn Error>> {
         let id: i32 = id.parse()?;
         let conn = Arc::clone(&self.connection);
         run::Entity::delete_by_id(id).exec(conn.as_ref()).await?;

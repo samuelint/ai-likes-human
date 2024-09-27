@@ -12,3 +12,9 @@ pub struct DbCreateRunDto {
     pub temperature: Option<i32>,
     pub metadata: Option<Metadata>,
 }
+
+#[derive(Default, Serialize, Deserialize)]
+pub struct DbUpdateRunDto {
+    pub metadata: Option<Metadata>,
+    pub status: Option<String>,
+}

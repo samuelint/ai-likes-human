@@ -1,11 +1,13 @@
 use std::sync::Arc;
 
 use domain::{
-    message_delta_update_service::MessageDeltaUpdateService, message_repository::MessageRepository,
-    run_factory::RunFactory, run_repository::RunRepository,
+    message_delta_update_service::MessageDeltaUpdateService,
+    message_repository::MessageRepository,
+    run::{run_status_mutator::RunStatusMutator, RunFactory, RunRepository},
     stream_thread_run_service::StreamThreadRunService,
     thread_chat_completions_inference::ThreadChatCompletionInference,
-    thread_message_factory::ThreadMessageFactory, thread_repository::ThreadRepository,
+    thread_message_factory::ThreadMessageFactory,
+    thread_repository::ThreadRepository,
 };
 use infrastructure::{SeaOrmMessageRepository, SeaOrmRunRepository, SeaOrmThreadRepository};
 
@@ -79,6 +81,12 @@ impl AgentDIModule {
         ))
     }
 
+    pub fn get_run_status_mutator(&self) -> Arc<RunStatusMutator> {
+        let run_repository = self.get_run_repository();
+
+        Arc::new(RunStatusMutator::new(Arc::clone(&run_repository)))
+    }
+
     pub fn get_stream_run_service(&self) -> Arc<StreamThreadRunService> {
         let run_factory = self.get_run_factory();
         let interence_service = self.get_thread_inference_service();
@@ -89,6 +97,7 @@ impl AgentDIModule {
         let message_delta_update_service = Arc::new(MessageDeltaUpdateService::new(Arc::clone(
             &message_repository,
         )));
+        let run_status_mutator = self.get_run_status_mutator();
 
         Arc::new(StreamThreadRunService::new(
             run_factory,
@@ -96,6 +105,7 @@ impl AgentDIModule {
             thread_repository,
             thread_message_factory,
             message_delta_update_service,
+            run_status_mutator,
         ))
     }
 }

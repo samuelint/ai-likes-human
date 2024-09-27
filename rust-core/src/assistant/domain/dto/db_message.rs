@@ -11,6 +11,7 @@ pub struct DbCreateThreadMessageDto {
     pub run_id: Option<String>,
     pub attachments: Option<String>,
     pub metadata: Option<Metadata>,
+    pub assistant_id: Option<String>,
 }
 
 impl DbCreateThreadMessageDto {
@@ -32,6 +33,7 @@ impl Default for DbCreateThreadMessageDto {
             attachments: None,
             status: "in_progress".to_string(),
             metadata: None,
+            assistant_id: None,
         }
     }
 }

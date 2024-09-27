@@ -1,10 +1,11 @@
 use std::{error::Error, sync::Arc};
 
-use super::{
-    dto::{ApiCreateThreadAndRunDto, ApiCreateRunDto, DbCreateRunDto, RunDto, ThreadDto},
-    run_repository::RunRepository,
+use crate::assistant::domain::{
+    dto::{ApiCreateRunDto, ApiCreateThreadAndRunDto, DbCreateRunDto, RunDto, ThreadDto},
     thread_repository::ThreadRepository,
 };
+
+use super::RunRepository;
 
 pub struct RunFactory {
     run_repository: Arc<dyn RunRepository>,

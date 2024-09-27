@@ -28,6 +28,7 @@ impl From<&DbCreateThreadMessageDto> for message::ActiveModel {
             attachments: ActiveValue::Set(item.attachments.to_owned()),
             metadata: ActiveValue::Set(json_metadata),
             status: ActiveValue::Set(item.status.to_owned()),
+            assistant_id: ActiveValue::Set(item.assistant_id.to_owned()),
             ..Default::default()
         }
     }
@@ -50,7 +51,7 @@ impl From<message::Model> for ThreadMessageDto {
             status: model.status,
             role: model.role,
             content: content,
-            assistant_id: None,
+            assistant_id: model.assistant_id,
             run_id: model.run_id.map(|id| id.to_string()),
             metadata,
         }

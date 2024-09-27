@@ -1,7 +1,8 @@
 use app_core::assistant::domain::dto::{
-    ApiCreateRunDto, ApiCreateThreadAndRunDto, ApiCreateThreadDto, RunDto, ThreadDto, ThreadEvent,
+    ApiCreateRunDto, ApiCreateThreadAndRunDto, ApiCreateThreadDto, ApiCreateThreadMessageDto,
+    MessageContent, RunDto, ThreadDto, ThreadEvent,
 };
-use futures::Stream;
+use futures::{Stream, StreamExt};
 use hyper::StatusCode;
 
 use super::router_client::RouterClient;
@@ -27,6 +28,23 @@ impl AssistantApiClient {
             .unwrap();
 
         (dto.unwrap(), status)
+    }
+
+    #[allow(dead_code)]
+    pub async fn create_thread_with_prompt(&self, prompt: &str) -> ThreadDto {
+        let r = self
+            .create_thread(&ApiCreateThreadDto {
+                messages: vec![ApiCreateThreadMessageDto {
+                    role: "user".to_string(),
+                    content: vec![MessageContent::text(prompt)],
+                    ..ApiCreateThreadMessageDto::default()
+                }],
+                ..ApiCreateThreadDto::default()
+            })
+            .await
+            .0;
+
+        r
     }
 
     #[allow(dead_code)]
@@ -69,9 +87,40 @@ impl AssistantApiClient {
             .client
             .post_json_stream::<ApiCreateRunDto, ThreadEvent>(
                 format!("/threads/{}/runs", thread_id).as_str(),
-                request,
+                &ApiCreateRunDto {
+                    stream: Some(true),
+                    ..request.clone()
+                },
             );
 
         stream
+    }
+
+    #[allow(dead_code)]
+    pub async fn stream_run_as_chunks_array(
+        &self,
+        thread_id: &str,
+        request: &ApiCreateRunDto,
+    ) -> Vec<ThreadEvent> {
+        let mut stream = self.stream_run(thread_id, request).await;
+
+        let mut responses = Vec::new();
+        while let Some(chunk) = stream.next().await {
+            let response = chunk.unwrap();
+            responses.push(response);
+        }
+
+        responses
+    }
+
+    #[allow(dead_code)]
+    pub async fn get_run(&self, thread_id: &str, run_id: &str) -> (RunDto, StatusCode) {
+        let (dto, status) = self
+            .client
+            .get::<RunDto>(&format!("/threads/{}/runs/{}", thread_id, run_id))
+            .await
+            .unwrap();
+
+        (dto.unwrap(), status)
     }
 }

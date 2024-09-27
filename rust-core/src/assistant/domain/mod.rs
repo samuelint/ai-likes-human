@@ -1,8 +1,7 @@
 pub mod dto;
 pub mod message_delta_update_service;
 pub mod message_repository;
-pub mod run_factory;
-pub mod run_repository;
+pub mod run;
 pub mod stream_thread_run_service;
 pub mod stream_types;
 pub mod thread_chat_completions_inference;

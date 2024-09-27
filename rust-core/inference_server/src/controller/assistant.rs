@@ -215,7 +215,7 @@ pub async fn find_thread_run(
 ) -> impl IntoResponse {
     let service = state.core_container.agent_module.get_run_repository();
 
-    match service.find(run_id).await {
+    match service.find(&run_id).await {
         Ok(run) => {
             if run.is_none() {
                 return (StatusCode::NOT_FOUND, "").into_response();
@@ -235,7 +235,7 @@ pub async fn list_thread_runs(
     let service = state.core_container.agent_module.get_run_repository();
 
     match service
-        .list_by_thread_paginated(thread_id, page_request)
+        .list_by_thread_paginated(&thread_id, page_request)
         .await
     {
         Ok(run) => {

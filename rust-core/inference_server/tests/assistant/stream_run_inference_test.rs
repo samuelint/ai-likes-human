@@ -1,57 +1,25 @@
 use crate::test_utils::assistant_api::AssistantApiClient;
 use app_core::assistant::domain::dto::{
-    ApiCreateRunDto, ApiCreateThreadDto, ApiCreateThreadMessageDto, MessageContent, ThreadEvent,
+    message_delta::ThreadMessageDeltaDto, ApiCreateRunDto, ThreadEvent, ThreadEventDto,
 };
-use futures::{Stream, StreamExt};
 
 static LLM_MODEL: &str = "openai:gpt-4o-mini";
-
-async fn create_run_from_existing_thread_stream(
-    prompt: &str,
-) -> impl Stream<Item = Result<ThreadEvent, axum::Error>> {
-    let client: AssistantApiClient = AssistantApiClient::new().await;
-
-    let thread = client
-        .create_thread(&ApiCreateThreadDto {
-            messages: vec![ApiCreateThreadMessageDto {
-                role: "user".to_string(),
-                content: vec![MessageContent::text(prompt)],
-                ..ApiCreateThreadMessageDto::default()
-            }],
-            ..ApiCreateThreadDto::default()
-        })
-        .await
-        .0;
-
-    client
-        .stream_run(
-            &thread.id,
-            &ApiCreateRunDto {
-                model: LLM_MODEL.to_string(),
-                stream: Some(true),
-                ..ApiCreateRunDto::default()
-            },
-        )
-        .await
-}
-
-async fn stream_as_chunks_array(prompt: &str) -> Vec<ThreadEvent> {
-    let mut stream = create_run_from_existing_thread_stream(prompt).await;
-
-    let mut responses = Vec::new();
-    while let Some(chunk) = stream.next().await {
-        let response = chunk.unwrap();
-        responses.push(response);
-    }
-
-    responses
-}
 
 // Single Step Sequence
 
 #[tokio::test]
 async fn test_stream_run_single_step_is_sequenced_by_events() {
-    let chunks = stream_as_chunks_array("Tell me a joke.").await;
+    let client: AssistantApiClient = AssistantApiClient::new().await;
+    let thread = client.create_thread_with_prompt("Tell me a joke.").await;
+    let chunks = client
+        .stream_run_as_chunks_array(
+            &thread.id,
+            &ApiCreateRunDto {
+                model: LLM_MODEL.to_string(),
+                ..ApiCreateRunDto::default()
+            },
+        )
+        .await;
 
     assert!(
         matches!(&chunks[0], ThreadEvent::ThreadRunCreated(_)),
@@ -113,4 +81,87 @@ async fn test_stream_run_single_step_is_sequenced_by_events() {
         matches!(&last_chunk, ThreadEvent::ThreadRunCompleted(_)),
         "Events does not end with Done"
     );
+}
+
+#[tokio::test]
+async fn test_message_delta_events() {
+    let client: AssistantApiClient = AssistantApiClient::new().await;
+    let thread = client.create_thread_with_prompt("Tell me a joke.").await;
+    let chunks = client
+        .stream_run_as_chunks_array(
+            &thread.id,
+            &ApiCreateRunDto {
+                model: LLM_MODEL.to_string(),
+                ..ApiCreateRunDto::default()
+            },
+        )
+        .await;
+
+    let delta_chunks: Vec<ThreadEventDto<ThreadMessageDeltaDto>> = chunks
+        .iter()
+        .filter_map(|c| match c {
+            ThreadEvent::ThreadMessageDelta(delta) => Some(delta.clone()),
+            _ => None,
+        })
+        .collect();
+
+    for (i, chunk) in delta_chunks.iter().enumerate() {
+        assert_eq!(
+            chunk.event, "thread.message.delta",
+            "delta_chunks[{}] does not have thread.message.delta event",
+            i
+        );
+    }
+}
+
+#[tokio::test]
+async fn test_thread_run_completed_event_change_run_status() {
+    let client: AssistantApiClient = AssistantApiClient::new().await;
+    let thread = client.create_thread_with_prompt("Tell me a joke.").await;
+    let chunks = client
+        .stream_run_as_chunks_array(
+            &thread.id,
+            &ApiCreateRunDto {
+                model: LLM_MODEL.to_string(),
+                ..ApiCreateRunDto::default()
+            },
+        )
+        .await;
+
+    let run_completed_event = chunks
+        .iter()
+        .find_map(|chunk| match chunk {
+            ThreadEvent::ThreadRunCompleted(event) => Some(event),
+            _ => None,
+        })
+        .expect("ThreadRunCompleted should be found");
+
+    assert_eq!(run_completed_event.data.status, "completed");
+}
+
+#[tokio::test]
+async fn test_final_thread_run_status_is_completed() {
+    let client: AssistantApiClient = AssistantApiClient::new().await;
+    let thread = client.create_thread_with_prompt("Tell me a joke.").await;
+    let chunks = client
+        .stream_run_as_chunks_array(
+            &thread.id,
+            &ApiCreateRunDto {
+                model: LLM_MODEL.to_string(),
+                ..ApiCreateRunDto::default()
+            },
+        )
+        .await;
+
+    let run_completed_event = chunks
+        .iter()
+        .find_map(|chunk| match chunk {
+            ThreadEvent::ThreadRunCompleted(event) => Some(event),
+            _ => None,
+        })
+        .expect("ThreadRunCompleted should be found");
+    let run_id = &run_completed_event.data.id;
+
+    let (run, _status) = client.get_run(&thread.id, &run_id).await;
+    assert_eq!(run.status, "completed");
 }

@@ -67,5 +67,4 @@ pub struct MessageDeltaDto {
 pub struct ThreadMessageDeltaDto {
     pub id: String,
     pub delta: MessageDeltaDto,
-    pub object: String,
 }

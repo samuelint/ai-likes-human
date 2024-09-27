@@ -49,7 +49,7 @@ impl RunRepository for SeaOrmRunRepository {
             status: ActiveValue::Set(item.status.to_owned()),
             instructions: ActiveValue::Set(item.instructions),
             temperature: ActiveValue::Set(item.temperature),
-            metadata: ActiveValue::Set(Some(serialize_metadata_opt(item.metadata))),
+            metadata: ActiveValue::Set(serialize_metadata_opt(item.metadata)),
             ..Default::default()
         };
 
@@ -90,7 +90,7 @@ impl RunRepository for SeaOrmRunRepository {
 
         match &update_dto.metadata {
             Some(updated_metadata) => {
-                model.metadata = ActiveValue::Set(Some(serialize_metadata(updated_metadata)))
+                model.metadata = ActiveValue::Set(serialize_metadata(updated_metadata))
             }
             None => (),
         }

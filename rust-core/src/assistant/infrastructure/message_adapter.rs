@@ -17,7 +17,11 @@ impl From<&DbCreateThreadMessageDto> for message::ActiveModel {
         let thread_id: Option<i32> = item.thread_id.clone().map(|id| id.parse().unwrap());
         let run_id: Option<i32> = item.run_id.clone().map(|id| id.parse().unwrap());
         let json_content: String = serde_json::to_string(&item.content).unwrap();
-        let json_metadata = item.metadata.clone().map(|m| serialize_metadata(&m));
+        let json_metadata = item
+            .metadata
+            .clone()
+            .map(|m| serialize_metadata(&m))
+            .unwrap_or("{}".to_string());
 
         message::ActiveModel {
             created_at: ActiveValue::Set(TimeBuilder::now().into()),
@@ -41,7 +45,7 @@ impl From<message::Model> for ThreadMessageDto {
             Err(_) => vec![],
         };
 
-        let metadata = model.metadata.map(|m| deserialize_metadata(&m));
+        let metadata = deserialize_metadata(&model.metadata);
 
         ThreadMessageDto {
             id: model.id.to_string(),
@@ -52,7 +56,7 @@ impl From<message::Model> for ThreadMessageDto {
             content: content,
             assistant_id: model.assistant_id,
             run_id: model.run_id.map(|id| id.to_string()),
-            metadata,
+            metadata: Some(metadata),
         }
     }
 }

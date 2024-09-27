@@ -12,7 +12,7 @@ impl From<run::Model> for RunDto {
             instructions: model.instructions,
             model: model.model,
             status: model.status,
-            metadata: model.metadata.map(|m| deserialize_metadata(&m)),
+            metadata: Some(deserialize_metadata(&model.metadata)),
             temperature: model.temperature,
         }
     }
@@ -20,6 +20,7 @@ impl From<run::Model> for RunDto {
 
 impl From<RunDto> for run::Model {
     fn from(dto: RunDto) -> Self {
+        let metadata = dto.metadata.map(|m| serialize_metadata(&m)).unwrap_or("{}".to_string());
         run::Model {
             id: dto.id.parse().unwrap(),
             created_at: TimeBuilder::from_i64(dto.created_at).into(),
@@ -28,7 +29,7 @@ impl From<RunDto> for run::Model {
             instructions: dto.instructions,
             model: dto.model,
             status: dto.status,
-            metadata: dto.metadata.map(|m| serialize_metadata(&m)),
+            metadata,
             temperature: dto.temperature,
         }
     }

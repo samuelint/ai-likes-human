@@ -16,8 +16,8 @@ pub struct Model {
     pub role: String,
     #[sea_orm(column_type = "Text", nullable)]
     pub attachments: Option<String>,
-    #[sea_orm(column_type = "Text", nullable)]
-    pub metadata: Option<String>,
+    #[sea_orm(column_type = "Text")]
+    pub metadata: String,
     pub thread_id: Option<i32>,
     pub run_id: Option<i32>,
     #[sea_orm(column_type = "Text")]

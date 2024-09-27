@@ -30,7 +30,7 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Run::Model).string().not_null())
                     .col(ColumnDef::new(Run::Status).string().not_null())
                     .col(ColumnDef::new(Run::ThreadId).integer())
-                    .col(ColumnDef::new(Run::Metadata).json())
+                    .col(ColumnDef::new(Run::Metadata).json().not_null())
                     .col(ColumnDef::new(Run::Temperature).integer())
                     .foreign_key(
                         ForeignKey::create()

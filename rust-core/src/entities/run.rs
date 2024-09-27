@@ -19,8 +19,8 @@ pub struct Model {
     #[sea_orm(column_type = "Text")]
     pub status: String,
     pub thread_id: Option<i32>,
-    #[sea_orm(column_type = "Text", nullable)]
-    pub metadata: Option<String>,
+    #[sea_orm(column_type = "Text")]
+    pub metadata: String,
     pub temperature: Option<i32>,
 }
 

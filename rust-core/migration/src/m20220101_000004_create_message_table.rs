@@ -28,7 +28,7 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Message::Content).json().not_null())
                     .col(ColumnDef::new(Message::Role).string().not_null())
                     .col(ColumnDef::new(Message::Attachments).json())
-                    .col(ColumnDef::new(Message::Metadata).json())
+                    .col(ColumnDef::new(Message::Metadata).json().not_null())
                     .col(ColumnDef::new(Message::ThreadId).integer())
                     .col(ColumnDef::new(Message::RunId).integer())
                     .col(ColumnDef::new(Message::Status).string().not_null())

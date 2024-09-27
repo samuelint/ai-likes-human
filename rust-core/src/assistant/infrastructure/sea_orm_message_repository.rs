@@ -100,7 +100,7 @@ impl MessageRepository for SeaOrmMessageRepository {
         match &update_dto.metadata {
             Some(new_metadata) => {
                 let json_metadata = serde_json::to_string(&new_metadata).unwrap();
-                model.metadata = ActiveValue::Set(Some(json_metadata));
+                model.metadata = ActiveValue::Set(json_metadata);
             }
             None => {}
         };

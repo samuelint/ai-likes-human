@@ -13,6 +13,8 @@ use crate::assistant::domain::dto::{
 use crate::assistant::domain::message::MessageRepository;
 use crate::entities::message;
 
+use super::page_request_adapter::DbPageRequest;
+
 pub struct SeaOrmMessageRepository {
     connection: Arc<DatabaseConnection>,
 }
@@ -40,19 +42,20 @@ impl MessageRepository for SeaOrmMessageRepository {
         page: &PageRequest,
     ) -> Result<PageResponse<ThreadMessageDto>, Box<dyn Error + Send>> {
         let conn = Arc::clone(&self.connection);
+        let thread_id: i32 = thread_id.parse().map_err(|e: ParseIntError| anyhow!(e))?;
         let mut cursor = message::Entity::find()
             .filter(message::Column::ThreadId.eq(thread_id))
             .cursor_by(message::Column::Id);
 
-        if page.after.is_some() {
-            cursor.after(page.after);
-        }
-        if page.before.is_some() {
-            cursor.after(page.after);
-        }
-
-        let mut cursor = if let Some(limit) = page.limit {
-            cursor.limit(limit)
+        let db_page_request: DbPageRequest = page.into();
+        if db_page_request.after.is_some() {
+            cursor.after(db_page_request.after.unwrap());
+        };
+        if db_page_request.before.is_some() {
+            cursor.before(db_page_request.before.unwrap());
+        };
+        let mut cursor = if let Some(limit) = db_page_request.limit {
+            cursor.limit(limit as u64)
         } else {
             cursor
         };

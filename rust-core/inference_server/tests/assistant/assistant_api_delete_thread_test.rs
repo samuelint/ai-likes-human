@@ -1,7 +1,7 @@
-use crate::test_utils;
+use crate::test_utils::{self, assistant_api::AssistantApiClient};
 use app_core::assistant::domain::dto::{
     ApiCreateThreadAndRunDto, ApiCreateThreadDto, ApiCreateThreadMessageDto, MessageContent,
-    RunDto, ThreadDto, ThreadMessageDto,
+    ThreadDto,
 };
 use axum::http::StatusCode;
 use test_utils::router_client::RouterClient;
@@ -50,7 +50,7 @@ async fn test_deleted_thread_cannot_be_fetched_again() {
 
 #[tokio::test]
 async fn test_deleted_thread_also_deletes_associated_messages() {
-    let client = RouterClient::from_app("/openai/v1").await;
+    let client = AssistantApiClient::new().await;
 
     // Create thread with message
     let message1 = ApiCreateThreadMessageDto {
@@ -62,35 +62,19 @@ async fn test_deleted_thread_also_deletes_associated_messages() {
         messages: vec![message1],
         ..ApiCreateThreadDto::default()
     };
-    let (response, _status) = client
-        .post::<ApiCreateThreadDto, ThreadDto>("/threads", &body)
-        .await
-        .unwrap();
-    let created_thread = response.unwrap();
-    let (response, _status) = client
-        .get::<Vec<ThreadMessageDto>>(format!("/threads/{}/messages", created_thread.id).as_str())
-        .await
-        .unwrap();
-    let created_messages = response.unwrap();
+
+    let (created_thread, _status) = client.create_thread(&body).await;
+    let (messages_page, _status) = client.list_thread_messages(&created_thread.id).await;
+
+    let created_messages = messages_page.data;
     let created_message1 = &created_messages[0];
 
-    // Delete thread
-    client
-        .delete(format!("/threads/{}", created_thread.id).as_str())
-        .await
-        .unwrap();
+    let _ = client.delete_thread(&created_thread.id).await;
 
     // Assert message associated with thread is deleted
     let (_, status) = client
-        .get::<ThreadMessageDto>(
-            format!(
-                "/threads/{}/messages/{}",
-                created_thread.id, created_message1.id
-            )
-            .as_str(),
-        )
-        .await
-        .unwrap();
+        .get_thread_message(&created_thread.id, &created_message1.id)
+        .await;
 
     assert_eq!(
         status,
@@ -101,32 +85,21 @@ async fn test_deleted_thread_also_deletes_associated_messages() {
 
 #[tokio::test]
 async fn test_deleted_thread_also_deletes_associated_runs() {
-    let client = RouterClient::from_app("/openai/v1").await;
+    // let client = RouterClient::from_app("/openai/v1").await;
+    let client = AssistantApiClient::new().await;
+
     let create_thread_run_dto = ApiCreateThreadAndRunDto {
         model: "openai:gpt-4o-mini".to_string(),
         ..ApiCreateThreadAndRunDto::default()
     };
 
-    let run = client
-        .post::<ApiCreateThreadAndRunDto, RunDto>("/threads/runs", &create_thread_run_dto)
-        .await
-        .unwrap()
-        .0
-        .unwrap();
-
+    let (run, _) = client.create_thread_and_run(&create_thread_run_dto).await;
     let thread_id = run.thread_id.unwrap();
 
-    // Delete thread
-    client
-        .delete(format!("/threads/{}", thread_id).as_str())
-        .await
-        .unwrap();
+    let _ = client.delete_thread(&thread_id).await;
 
     // Assert run associated with thread is deleted
-    let (_, status) = client
-        .get::<RunDto>(format!("/threads/{}/runs/{}", thread_id, run.id).as_str())
-        .await
-        .unwrap();
+    let (_, status) = client.find_thread_run(&thread_id, &run.id).await;
 
     assert_eq!(
         status,

@@ -1,12 +1,12 @@
-use crate::test_utils;
+use crate::test_utils::{self, assistant_api::AssistantApiClient};
 use app_core::{
     assistant::domain::dto::{
-        ApiCreateThreadDto, ApiCreateThreadMessageDto, MessageContent, MetadataBuilder, ThreadDto,
-        ThreadMessageDto,
+        ApiCreateThreadDto, ApiCreateThreadMessageDto, MessageContent, MetadataBuilder,
+        PageRequest, ThreadDto, ThreadMessageDto,
     },
     utils::time::TimeBuilder,
 };
-use axum::http::StatusCode;
+use axum::http::{response, StatusCode};
 use serde_json::Value;
 use test_utils::router_client::RouterClient;
 
@@ -78,25 +78,16 @@ async fn test_created_thread_have_empty_metadata() {
 
 #[tokio::test]
 async fn test_created_threads_are_listed() {
-    let client = RouterClient::from_app("/openai/v1").await;
+    let client = AssistantApiClient::new().await;
     let body = ApiCreateThreadDto {
         ..ApiCreateThreadDto::default()
     };
 
-    let (response, _) = client
-        .post::<ApiCreateThreadDto, ThreadDto>("/threads", &body)
-        .await
-        .unwrap();
-    let thread_1 = response.unwrap();
+    let (thread_1, _) = client.create_thread(&body).await;
+    let (thread_2, _) = client.create_thread(&body).await;
 
-    let (response, _) = client
-        .post::<ApiCreateThreadDto, ThreadDto>("/threads", &body)
-        .await
-        .unwrap();
-    let thread_2 = response.unwrap();
-
-    let (response, _) = client.get::<Vec<ThreadDto>>("/threads").await.unwrap();
-    let threads = response.unwrap();
+    let (page, _) = client.list_threads(&PageRequest::default()).await;
+    let threads = page.data;
 
     assert_eq!(threads.len(), 2, "should have 2 threads");
     assert_eq!(threads[0].id, thread_1.id, "should have first thread");
@@ -130,7 +121,8 @@ async fn test_created_thread_with_message_is_successful() {
 
 #[tokio::test]
 async fn test_created_thread_with_message_have_id() {
-    let client = RouterClient::from_app("/openai/v1").await;
+    let client = AssistantApiClient::new().await;
+
     let message1 = ApiCreateThreadMessageDto {
         content: vec![MessageContent::text("Say Hello!")],
         role: "user".to_string(),
@@ -141,25 +133,16 @@ async fn test_created_thread_with_message_have_id() {
         ..ApiCreateThreadDto::default()
     };
 
-    let thread = client
-        .post::<ApiCreateThreadDto, ThreadDto>("/threads", &body)
-        .await
-        .unwrap()
-        .0
-        .unwrap();
-    let messages = client
-        .get::<Vec<ThreadMessageDto>>(format!("/threads/{}/messages", thread.id).as_str())
-        .await
-        .unwrap()
-        .0
-        .unwrap();
+    let (thread, _) = client.create_thread(&body).await;
+    let (page, _) = client.list_thread_messages(&thread.id).await;
+    let messages = page.data;
 
     assert!(messages[0].id.len() > 0, "Message should have an id");
 }
 
 #[tokio::test]
 async fn test_created_thread_with_message_have_same_content() {
-    let client = RouterClient::from_app("/openai/v1").await;
+    let client = AssistantApiClient::new().await;
     let message1 = ApiCreateThreadMessageDto {
         content: vec![MessageContent::text("Say Hello!")],
         role: "user".to_string(),
@@ -170,27 +153,19 @@ async fn test_created_thread_with_message_have_same_content() {
         ..ApiCreateThreadDto::default()
     };
 
-    let (response, _status) = client
-        .post::<ApiCreateThreadDto, ThreadDto>("/threads", &body)
-        .await
-        .unwrap();
-    let (response, _status) = client
-        .get::<Vec<ThreadMessageDto>>(
-            format!("/threads/{}/messages", response.unwrap().id).as_str(),
-        )
-        .await
-        .unwrap();
+    let (response, _status) = client.create_thread(&body).await;
+    let (page, _status) = client.list_thread_messages(&response.id).await;
+    let messages = page.data;
 
-    let first_element = &response.unwrap()[0];
+    let first_element = &messages[0];
     assert_eq!(first_element.to_string_content(), "Say Hello!".to_string());
     assert_eq!(first_element.role, "user".to_string());
 }
 
 #[tokio::test]
 async fn test_created_thread_with_message_can_be_retrieved() {
-    let client = RouterClient::from_app("/openai/v1").await;
+    let client = AssistantApiClient::new().await;
 
-    // Create thread with message
     let message1 = ApiCreateThreadMessageDto {
         content: vec![MessageContent::text("Say Hello!")],
         role: "user".to_string(),
@@ -200,33 +175,19 @@ async fn test_created_thread_with_message_can_be_retrieved() {
         messages: vec![message1],
         ..ApiCreateThreadDto::default()
     };
-    let (response, _status) = client
-        .post::<ApiCreateThreadDto, ThreadDto>("/threads", &body)
-        .await
-        .unwrap();
-    let created_thread = response.unwrap();
-    let (response, _status) = client
-        .get::<Vec<ThreadMessageDto>>(format!("/threads/{}/messages", created_thread.id).as_str())
-        .await
-        .unwrap();
-    let created_messages = response.unwrap();
+
+    let (created_thread, _) = client.create_thread(&body).await;
+
+    let (page, _status) = client.list_thread_messages(&created_thread.id).await;
+    let created_messages = page.data;
     let created_message1 = &created_messages[0];
 
-    // Assert message associated with thread is found
-    let (response, status) = client
-        .get::<ThreadMessageDto>(
-            format!(
-                "/threads/{}/messages/{}",
-                created_thread.id, created_message1.id
-            )
-            .as_str(),
-        )
-        .await
-        .unwrap();
-    let message = response.unwrap();
+    let (message, status) = client
+        .get_thread_message(&created_thread.id, &created_message1.id)
+        .await;
 
     assert_eq!(status, StatusCode::OK);
-    assert_eq!(message.to_string_content(), "Say Hello!");
+    assert_eq!(message.unwrap().to_string_content(), "Say Hello!");
 }
 
 #[tokio::test]

@@ -13,6 +13,7 @@ use std::error::Error;
 use std::sync::Arc;
 
 use super::metadata::serialize_metadata_opt;
+use super::page_request_adapter::DbPageRequest;
 use super::{SeaOrmMessageRepository, SeaOrmRunRepository};
 
 pub struct SeaOrmThreadRepository {
@@ -113,20 +114,20 @@ impl ThreadRepository for SeaOrmThreadRepository {
 
     async fn list_by_page(
         &self,
-        page: PageRequest,
+        page: &PageRequest,
     ) -> Result<PageResponse<ThreadDto>, Box<dyn Error>> {
         let conn = Arc::clone(&self.connection);
         let mut cursor = thread::Entity::find().cursor_by(thread::Column::Id);
 
-        if page.after.is_some() {
-            cursor.after(page.after);
-        }
-        if page.before.is_some() {
-            cursor.after(page.after);
-        }
-
-        let mut cursor = if let Some(limit) = page.limit {
-            cursor.limit(limit)
+        let db_page_request: DbPageRequest = page.into();
+        if db_page_request.after.is_some() {
+            cursor.after(db_page_request.after.unwrap());
+        };
+        if db_page_request.before.is_some() {
+            cursor.before(db_page_request.before.unwrap());
+        };
+        let mut cursor = if let Some(limit) = db_page_request.limit {
+            cursor.limit(limit as u64)
         } else {
             cursor
         };

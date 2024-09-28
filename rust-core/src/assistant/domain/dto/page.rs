@@ -2,9 +2,9 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct PageRequest {
-    pub after: Option<u64>,
-    pub before: Option<u64>,
-    pub limit: Option<u64>,
+    pub after: Option<String>,
+    pub before: Option<String>,
+    pub limit: Option<String>,
 }
 
 #[derive(Default, Serialize, Deserialize)]

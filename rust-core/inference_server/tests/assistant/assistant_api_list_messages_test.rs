@@ -11,7 +11,7 @@ async fn test_thread_messages_after_a_run_are_listed() {
         .stream_run_as_chunks_array(&thread.id, &ApiCreateRunDto::default())
         .await;
 
-    let messages = client.list_thread_messages(&thread.id).await.0;
+    let messages = client.list_thread_messages(&thread.id).await.0.data;
 
     assert_eq!(
         messages.len(),
@@ -28,7 +28,7 @@ async fn test_thread_run_after_a_run_is_listed() {
         .stream_run_as_chunks_array(&thread.id, &ApiCreateRunDto::default())
         .await;
 
-    let runs = client.list_thread_runs(&thread.id).await.0;
+    let runs = client.list_thread_runs(&thread.id).await.0.data;
 
     assert_eq!(runs.len(), 1, "Should have a run.");
 }

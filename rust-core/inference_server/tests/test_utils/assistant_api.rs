@@ -2,10 +2,12 @@ use std::pin::Pin;
 
 use app_core::assistant::domain::dto::{
     ApiCreateRunDto, ApiCreateThreadAndRunDto, ApiCreateThreadDto, ApiCreateThreadMessageDto,
-    MessageContent, RunDto, ThreadDto, ThreadEventData, ThreadMessageDto,
+    MessageContent, PageRequest, PageResponse, RunDto, ThreadDto, ThreadEventData,
+    ThreadMessageDto,
 };
 use futures::{Stream, StreamExt};
 use hyper::StatusCode;
+use url::form_urlencoded;
 
 use super::router_client::RouterClient;
 
@@ -54,6 +56,17 @@ impl AssistantApiClient {
             .0;
 
         r
+    }
+
+    #[allow(dead_code)]
+    pub async fn delete_thread(&self, thread_id: &str) -> StatusCode {
+        let status = self
+            .client
+            .delete(format!("/threads/{}", thread_id).as_str())
+            .await
+            .unwrap();
+
+        status
     }
 
     #[allow(dead_code)]
@@ -138,6 +151,20 @@ impl AssistantApiClient {
     }
 
     #[allow(dead_code)]
+    pub async fn create_thread_and_run(
+        &self,
+        request: &ApiCreateThreadAndRunDto,
+    ) -> (RunDto, StatusCode) {
+        let (dto, status) = self
+            .client
+            .post::<ApiCreateThreadAndRunDto, RunDto>("/threads/runs", request)
+            .await
+            .unwrap();
+
+        (dto.unwrap(), status)
+    }
+
+    #[allow(dead_code)]
     pub async fn create_run(
         &self,
         thread_id: &str,
@@ -205,10 +232,10 @@ impl AssistantApiClient {
     pub async fn list_thread_messages(
         &self,
         thread_id: &str,
-    ) -> (Vec<ThreadMessageDto>, StatusCode) {
+    ) -> (PageResponse<ThreadMessageDto>, StatusCode) {
         let (dto, status) = self
             .client
-            .get::<Vec<ThreadMessageDto>>(&format!("/threads/{}/messages", thread_id))
+            .get::<PageResponse<ThreadMessageDto>>(&format!("/threads/{}/messages", thread_id))
             .await
             .unwrap();
 
@@ -216,14 +243,66 @@ impl AssistantApiClient {
     }
 
     #[allow(dead_code)]
-    pub async fn list_thread_runs(&self, thread_id: &str) -> (Vec<RunDto>, StatusCode) {
+    pub async fn list_thread_runs(&self, thread_id: &str) -> (PageResponse<RunDto>, StatusCode) {
         let (dto, status) = self
             .client
-            .get::<Vec<RunDto>>(&format!("/threads/{}/runs", thread_id))
+            .get::<PageResponse<RunDto>>(&format!("/threads/{}/runs", thread_id))
             .await
             .unwrap();
 
         (dto.unwrap(), status)
+    }
+
+    #[allow(dead_code)]
+    pub async fn list_threads(
+        &self,
+        page_request: &PageRequest,
+    ) -> (PageResponse<ThreadDto>, StatusCode) {
+        let path = format!(
+            "/threads?{}",
+            Self::page_request_to_query_params(page_request)
+        );
+
+        let (response, status) = self
+            .client
+            .get::<PageResponse<ThreadDto>>(&path)
+            .await
+            .unwrap();
+        let response = response.unwrap();
+
+        (response, status)
+    }
+
+    #[allow(dead_code)]
+    pub async fn get_thread_message(
+        &self,
+        thread_id: &str,
+        message_id: &str,
+    ) -> (Option<ThreadMessageDto>, StatusCode) {
+        let (dto, status) = self
+            .client
+            .get::<ThreadMessageDto>(
+                format!("/threads/{}/messages/{}", thread_id, message_id).as_str(),
+            )
+            .await
+            .unwrap();
+
+        (dto, status)
+    }
+
+    #[allow(dead_code)]
+    pub async fn find_thread_run(
+        &self,
+        thread_id: &str,
+        run_id: &str,
+    ) -> (Option<RunDto>, StatusCode) {
+        let (dto, status) = self
+            .client
+            .get::<RunDto>(format!("/threads/{}/runs/{}", thread_id, run_id).as_str())
+            .await
+            .unwrap();
+
+        (dto, status)
     }
 
     pub async fn stream_to_events_array(
@@ -236,5 +315,32 @@ impl AssistantApiClient {
         }
 
         responses
+    }
+
+    fn to_query_params(params: &Vec<(&str, &str)>) -> String {
+        form_urlencoded::Serializer::new(String::new())
+            .extend_pairs(params)
+            .finish()
+    }
+
+    fn page_request_to_query_params(page_request: &PageRequest) -> String {
+        let mut query_params: Vec<(&str, &str)> = vec![];
+
+        match &page_request.after {
+            Some(after) => query_params.push(("after", after)),
+            None => (),
+        };
+
+        match &page_request.before {
+            Some(before) => query_params.push(("before", before)),
+            None => (),
+        };
+
+        match &page_request.limit {
+            Some(limit) => query_params.push(("limit", limit)),
+            None => (),
+        };
+
+        Self::to_query_params(&query_params)
     }
 }

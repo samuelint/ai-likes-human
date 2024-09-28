@@ -13,7 +13,7 @@ pub trait RunRepository: Sync + Send {
     async fn list_by_thread_paginated(
         &self,
         thread_id: &str,
-        page: PageRequest,
+        page: &PageRequest,
     ) -> Result<PageResponse<RunDto>, Box<dyn Error>>;
     async fn find(&self, id: &str) -> Result<Option<RunDto>, Box<dyn Error>>;
     async fn update(&self, id: &str, dto: &DbUpdateRunDto)

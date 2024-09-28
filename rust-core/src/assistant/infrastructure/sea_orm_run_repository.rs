@@ -1,4 +1,6 @@
-use crate::assistant::domain::dto::{DbCreateRunDto, DbUpdateRunDto, PageRequest, PageResponse, RunDto};
+use crate::assistant::domain::dto::{
+    DbCreateRunDto, DbUpdateRunDto, PageRequest, PageResponse, RunDto,
+};
 use crate::assistant::domain::run::RunRepository;
 use crate::entities::run;
 use crate::utils::time::TimeBuilder;
@@ -13,6 +15,7 @@ use std::num::ParseIntError;
 use std::sync::Arc;
 
 use super::metadata::{serialize_metadata, serialize_metadata_opt};
+use super::page_request_adapter::DbPageRequest;
 
 pub struct SeaOrmRunRepository {
     connection: Arc<DatabaseConnection>,
@@ -103,22 +106,22 @@ impl RunRepository for SeaOrmRunRepository {
     async fn list_by_thread_paginated(
         &self,
         thread_id: &str,
-        page: PageRequest,
+        page: &PageRequest,
     ) -> Result<PageResponse<RunDto>, Box<dyn Error>> {
         let conn = Arc::clone(&self.connection);
         let mut cursor = run::Entity::find()
             .filter(run::Column::ThreadId.eq(thread_id))
             .cursor_by(run::Column::Id);
 
-        if page.after.is_some() {
-            cursor.after(page.after);
-        }
-        if page.before.is_some() {
-            cursor.after(page.after);
-        }
-
-        let mut cursor = if let Some(limit) = page.limit {
-            cursor.limit(limit)
+        let db_page_request: DbPageRequest = page.into();
+        if db_page_request.after.is_some() {
+            cursor.after(db_page_request.after.unwrap());
+        };
+        if db_page_request.before.is_some() {
+            cursor.before(db_page_request.before.unwrap());
+        };
+        let mut cursor = if let Some(limit) = db_page_request.limit {
+            cursor.limit(limit as u64)
         } else {
             cursor
         };

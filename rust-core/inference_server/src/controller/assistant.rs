@@ -76,7 +76,7 @@ pub async fn list_threads(
 ) -> impl IntoResponse {
     let service = state.core_container.agent_module.get_thread_repository();
 
-    match service.list_by_page(page_request).await {
+    match service.list_by_page(&page_request).await {
         Ok(page) => return Json::<PageResponse<ThreadDto>>(page).into_response(),
         Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
     }
@@ -222,7 +222,7 @@ pub async fn list_thread_runs(
     let service = state.core_container.agent_module.get_run_repository();
 
     match service
-        .list_by_thread_paginated(&thread_id, page_request)
+        .list_by_thread_paginated(&thread_id, &page_request)
         .await
     {
         Ok(page) => return Json::<PageResponse<RunDto>>(page).into_response(),

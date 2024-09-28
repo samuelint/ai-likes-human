@@ -13,7 +13,7 @@ pub trait ThreadRepository: Sync + Send {
     async fn update(&self, thread: DbUpdateThreadDto) -> Result<ThreadDto, Box<dyn Error>>;
     async fn list_by_page(
         &self,
-        args: PageRequest,
+        args: &PageRequest,
     ) -> Result<PageResponse<ThreadDto>, Box<dyn Error>>;
     async fn find(&self, id: &str) -> Result<Option<ThreadDto>, Box<dyn Error>>;
     async fn delete(&self, id: &str) -> Result<(), Box<dyn Error>>;

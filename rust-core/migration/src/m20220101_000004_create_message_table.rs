@@ -1,6 +1,6 @@
 use sea_orm_migration::prelude::*;
 
-use crate::m20220101_000002_create_thread_table::Thread;
+use crate::{m20220101_000002_create_thread_table::Thread, m20220101_000003_create_run_table::Run};
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -35,7 +35,6 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Message::AssistantId).string())
                     .foreign_key(
                         ForeignKey::create()
-                            .name("fk_thread")
                             .from(Message::Table, Message::ThreadId)
                             .to(Thread::Table, Thread::Id)
                             .on_delete(ForeignKeyAction::Cascade)
@@ -43,11 +42,8 @@ impl MigrationTrait for Migration {
                     )
                     .foreign_key(
                         ForeignKey::create()
-                            .name("fk_run")
                             .from(Message::Table, Message::RunId)
-                            .to(Thread::Table, Thread::Id)
-                            .on_delete(ForeignKeyAction::Cascade)
-                            .on_update(ForeignKeyAction::Cascade),
+                            .to(Run::Table, Run::Id),
                     )
                     .to_owned(),
             )

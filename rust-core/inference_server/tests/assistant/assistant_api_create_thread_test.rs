@@ -2,11 +2,11 @@ use crate::test_utils::{self, assistant_api::AssistantApiClient};
 use app_core::{
     assistant::domain::dto::{
         ApiCreateThreadDto, ApiCreateThreadMessageDto, MessageContent, MetadataBuilder,
-        PageRequest, ThreadDto, ThreadMessageDto,
+        PageRequest, ThreadDto,
     },
     utils::time::TimeBuilder,
 };
-use axum::http::{response, StatusCode};
+use axum::http::StatusCode;
 use serde_json::Value;
 use test_utils::router_client::RouterClient;
 

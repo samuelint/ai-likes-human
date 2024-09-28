@@ -25,8 +25,9 @@ pub struct SeaOrmRunRepository {
 impl RunRepository for SeaOrmRunRepository {
     async fn find(&self, id: &str) -> Result<Option<RunDto>, Box<dyn Error>> {
         let id: i32 = id.parse()?;
-        let conn = Arc::clone(&self.connection);
-        let r = run::Entity::find_by_id(id).one(conn.as_ref()).await?;
+        let r = run::Entity::find_by_id(id)
+            .one(self.connection.as_ref())
+            .await?;
 
         if r.is_none() {
             return Ok(None);
@@ -38,7 +39,6 @@ impl RunRepository for SeaOrmRunRepository {
     }
 
     async fn create(&self, item: DbCreateRunDto) -> Result<RunDto, Box<dyn Error + Send>> {
-        let conn: Arc<DatabaseConnection> = Arc::clone(&self.connection);
         let thread_id: i32 = item
             .thread_id
             .parse()
@@ -57,7 +57,7 @@ impl RunRepository for SeaOrmRunRepository {
         };
 
         let r = run::Entity::insert(model)
-            .exec_with_returning(conn.as_ref())
+            .exec_with_returning(self.connection.as_ref())
             .await
             .map_err(|e| anyhow!(e))?;
 
@@ -69,11 +69,10 @@ impl RunRepository for SeaOrmRunRepository {
         id: &str,
         update_dto: &DbUpdateRunDto,
     ) -> Result<RunDto, Box<dyn Error + Send>> {
-        let conn = Arc::clone(&self.connection);
         let id: i32 = id.parse().map_err(|e: ParseIntError| anyhow!(e))?;
 
         let existing = run::Entity::find_by_id(id)
-            .one(conn.as_ref())
+            .one(self.connection.as_ref())
             .await
             .map_err(|e| anyhow!(e))?;
 
@@ -98,7 +97,10 @@ impl RunRepository for SeaOrmRunRepository {
             None => (),
         }
 
-        let updated_model = model.update(conn.as_ref()).await.map_err(|e| anyhow!(e))?;
+        let updated_model = model
+            .update(self.connection.as_ref())
+            .await
+            .map_err(|e| anyhow!(e))?;
 
         Ok(updated_model.into())
     }
@@ -108,7 +110,6 @@ impl RunRepository for SeaOrmRunRepository {
         thread_id: &str,
         page: &PageRequest,
     ) -> Result<PageResponse<RunDto>, Box<dyn Error>> {
-        let conn = Arc::clone(&self.connection);
         let mut cursor = run::Entity::find()
             .filter(run::Column::ThreadId.eq(thread_id))
             .cursor_by(run::Column::Id);
@@ -126,7 +127,7 @@ impl RunRepository for SeaOrmRunRepository {
             cursor
         };
 
-        let result = cursor.all(conn.as_ref()).await?;
+        let result = cursor.all(self.connection.as_ref()).await?;
         let result: Vec<RunDto> = result.iter().map(|r| r.clone().into()).collect();
 
         Ok(PageResponse {
@@ -139,8 +140,9 @@ impl RunRepository for SeaOrmRunRepository {
 
     async fn delete(&self, id: &str) -> Result<(), Box<dyn Error>> {
         let id: i32 = id.parse()?;
-        let conn = Arc::clone(&self.connection);
-        run::Entity::delete_by_id(id).exec(conn.as_ref()).await?;
+        run::Entity::delete_by_id(id)
+            .exec(self.connection.as_ref())
+            .await?;
 
         Ok(())
     }

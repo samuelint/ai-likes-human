@@ -34,7 +34,6 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Run::Temperature).integer())
                     .foreign_key(
                         ForeignKey::create()
-                            .name("fk_thread")
                             .from(Run::Table, Run::ThreadId)
                             .to(Thread::Table, Thread::Id)
                             .on_delete(ForeignKeyAction::Cascade)

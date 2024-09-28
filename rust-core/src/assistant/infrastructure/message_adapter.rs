@@ -16,7 +16,12 @@ impl From<&DbCreateThreadMessageDto> for message::ActiveModel {
     fn from(item: &DbCreateThreadMessageDto) -> Self {
         let thread_id: Option<i32> = item.thread_id.clone().map(|id| id.parse().unwrap());
         let run_id: Option<i32> = item.run_id.clone().map(|id| id.parse().unwrap());
-        let json_content: String = serde_json::to_string(&item.content).unwrap();
+
+        let json_content = match item.content.is_empty() {
+            true => "[]".to_string(),
+            false => serde_json::to_string(&item.content).unwrap(),
+        };
+
         let json_metadata = item
             .metadata
             .clone()
@@ -27,8 +32,8 @@ impl From<&DbCreateThreadMessageDto> for message::ActiveModel {
             created_at: ActiveValue::Set(TimeBuilder::now().into()),
             content: ActiveValue::Set(json_content),
             role: ActiveValue::Set(item.role.to_owned()),
-            thread_id: ActiveValue::Set(thread_id),
-            run_id: ActiveValue::Set(run_id),
+            thread_id: ActiveValue::Set(thread_id.to_owned()),
+            run_id: ActiveValue::Set(run_id.to_owned()),
             attachments: ActiveValue::Set(item.attachments.to_owned()),
             metadata: ActiveValue::Set(json_metadata),
             status: ActiveValue::Set(item.status.to_owned()),

@@ -39,9 +39,10 @@ impl SeaOrmThreadRepository {
 #[async_trait::async_trait]
 impl ThreadRepository for SeaOrmThreadRepository {
     async fn find(&self, id: &str) -> Result<Option<ThreadDto>, Box<dyn Error>> {
-        let conn = Arc::clone(&self.connection);
         let id: i32 = id.parse()?;
-        let r = thread::Entity::find_by_id(id).one(conn.as_ref()).await?;
+        let r = thread::Entity::find_by_id(id)
+            .one(self.connection.as_ref())
+            .await?;
 
         if r.is_none() {
             return Ok(None);
@@ -55,9 +56,7 @@ impl ThreadRepository for SeaOrmThreadRepository {
         &self,
         new_thread: DbCreateThreadDto,
     ) -> Result<ThreadDto, Box<dyn Error + Send>> {
-        let conn = Arc::clone(&self.connection);
-
-        let txn = conn.begin().await.map_err(|e| anyhow!(e))?;
+        let txn = self.connection.begin().await.map_err(|e| anyhow!(e))?;
 
         let model = thread::ActiveModel {
             metadata: ActiveValue::Set(serialize_metadata_opt(new_thread.metadata)),
@@ -93,11 +92,10 @@ impl ThreadRepository for SeaOrmThreadRepository {
     }
 
     async fn update(&self, thread: DbUpdateThreadDto) -> Result<ThreadDto, Box<dyn Error>> {
-        let conn = Arc::clone(&self.connection);
         let thread_id: i32 = thread.id.parse()?;
 
         let existing = thread::Entity::find_by_id(thread_id)
-            .one(conn.as_ref())
+            .one(self.connection.as_ref())
             .await?;
 
         if existing.is_none() {
@@ -107,7 +105,7 @@ impl ThreadRepository for SeaOrmThreadRepository {
         let mut model: thread::ActiveModel = existing.unwrap().into();
         model.metadata = ActiveValue::Set(serialize_metadata_opt(thread.metadata));
 
-        let updated_model = model.update(conn.as_ref()).await?;
+        let updated_model = model.update(self.connection.as_ref()).await?;
 
         Ok(updated_model.into())
     }
@@ -116,7 +114,6 @@ impl ThreadRepository for SeaOrmThreadRepository {
         &self,
         page: &PageRequest,
     ) -> Result<PageResponse<ThreadDto>, Box<dyn Error>> {
-        let conn = Arc::clone(&self.connection);
         let mut cursor = thread::Entity::find().cursor_by(thread::Column::Id);
 
         let db_page_request: DbPageRequest = page.into();
@@ -132,7 +129,7 @@ impl ThreadRepository for SeaOrmThreadRepository {
             cursor
         };
 
-        let result = cursor.all(conn.as_ref()).await?;
+        let result = cursor.all(self.connection.as_ref()).await?;
         let result: Vec<ThreadDto> = result.iter().map(|r| r.clone().into()).collect();
 
         Ok(PageResponse {
@@ -145,9 +142,8 @@ impl ThreadRepository for SeaOrmThreadRepository {
 
     async fn delete(&self, id: &str) -> Result<(), Box<dyn Error>> {
         let id = id.parse()?;
-        let conn = Arc::clone(&self.connection);
 
-        let txn = conn.begin().await?;
+        let txn = self.connection.begin().await?;
 
         thread::Entity::delete_by_id(id).exec(&txn).await?;
         self.message_repository

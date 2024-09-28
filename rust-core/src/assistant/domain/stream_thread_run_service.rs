@@ -84,13 +84,14 @@ impl StreamThreadRunService {
     pub fn stream_new_run(&self, thread_id: &str, dto: &ApiCreateRunDto) -> AssistantStream {
         let dto = dto.clone();
         let thread_id = thread_id.to_string();
-        let run_factory = self.run_factory.clone();
-        let message_repository = self.message_repository.clone();
-        let inference_service = self.inference_service.clone();
-        let thread_message_factory = self.thread_message_factory.clone();
-        let message_delta_update_service = self.message_delta_update_service.clone();
-        let run_status_mutator = self.run_status_mutator.clone();
-        let message_status_mutator = self.message_status_mutator.clone();
+        let thread_message_factory = Arc::clone(&self.thread_message_factory);
+        let run_factory = Arc::clone(&self.run_factory);
+        let message_repository = Arc::clone(&self.message_repository);
+        let inference_service = Arc::clone(&self.inference_service);
+
+        let message_delta_update_service = Arc::clone(&self.message_delta_update_service);
+        let run_status_mutator = Arc::clone(&self.run_status_mutator);
+        let message_status_mutator = Arc::clone(&self.message_status_mutator);
 
         let s = async_stream::try_stream! {
 
@@ -210,14 +211,14 @@ impl StreamThreadRunService {
 impl Clone for StreamThreadRunService {
     fn clone(&self) -> Self {
         StreamThreadRunService {
-            run_factory: self.run_factory.clone(),
-            inference_service: self.inference_service.clone(),
-            thread_repository: self.thread_repository.clone(),
-            message_repository: self.message_repository.clone(),
-            thread_message_factory: self.thread_message_factory.clone(),
-            message_delta_update_service: self.message_delta_update_service.clone(),
-            run_status_mutator: self.run_status_mutator.clone(),
-            message_status_mutator: self.message_status_mutator.clone(),
+            run_factory: Arc::clone(&self.run_factory),
+            inference_service: Arc::clone(&self.inference_service),
+            thread_repository: Arc::clone(&self.thread_repository),
+            message_repository: Arc::clone(&self.message_repository),
+            thread_message_factory: Arc::clone(&self.thread_message_factory),
+            message_delta_update_service: Arc::clone(&self.message_delta_update_service),
+            run_status_mutator: Arc::clone(&self.run_status_mutator),
+            message_status_mutator: Arc::clone(&self.message_status_mutator),
         }
     }
 }

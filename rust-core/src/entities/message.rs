@@ -29,13 +29,13 @@ pub struct Model {
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(
-        belongs_to = "super::thread::Entity",
+        belongs_to = "super::run::Entity",
         from = "Column::RunId",
-        to = "super::thread::Column::Id",
-        on_update = "Cascade",
-        on_delete = "Cascade"
+        to = "super::run::Column::Id",
+        on_update = "NoAction",
+        on_delete = "NoAction"
     )]
-    Thread2,
+    Run,
     #[sea_orm(
         belongs_to = "super::thread::Entity",
         from = "Column::ThreadId",
@@ -43,7 +43,19 @@ pub enum Relation {
         on_update = "Cascade",
         on_delete = "Cascade"
     )]
-    Thread1,
+    Thread,
+}
+
+impl Related<super::run::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Run.def()
+    }
+}
+
+impl Related<super::thread::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Thread.def()
+    }
 }
 
 impl ActiveModelBehavior for ActiveModel {}

@@ -41,7 +41,6 @@ impl MessageRepository for SeaOrmMessageRepository {
         thread_id: &str,
         page: &PageRequest,
     ) -> Result<PageResponse<ThreadMessageDto>, Box<dyn Error + Send>> {
-        let conn = Arc::clone(&self.connection);
         let thread_id: i32 = thread_id.parse().map_err(|e: ParseIntError| anyhow!(e))?;
         let mut cursor = message::Entity::find()
             .filter(message::Column::ThreadId.eq(thread_id))
@@ -60,7 +59,10 @@ impl MessageRepository for SeaOrmMessageRepository {
             cursor
         };
 
-        let result = cursor.all(conn.as_ref()).await.map_err(|e| anyhow!(e))?;
+        let result = cursor
+            .all(self.connection.as_ref())
+            .await
+            .map_err(|e| anyhow!(e))?;
         let result: Vec<ThreadMessageDto> = result.iter().map(|r| r.clone().into()).collect();
 
         Ok(PageResponse {
@@ -76,11 +78,10 @@ impl MessageRepository for SeaOrmMessageRepository {
         id: &str,
         update_dto: &DbUpdateThreadMessageDto,
     ) -> Result<ThreadMessageDto, Box<dyn Error + Send>> {
-        let conn = Arc::clone(&self.connection);
         let id: i32 = id.parse().map_err(|e: ParseIntError| anyhow!(e))?;
 
         let existing = message::Entity::find_by_id(id)
-            .one(conn.as_ref())
+            .one(self.connection.as_ref())
             .await
             .map_err(|e| anyhow!(e))?;
 
@@ -131,7 +132,10 @@ impl MessageRepository for SeaOrmMessageRepository {
             None => {}
         };
 
-        let updated_model = model.update(conn.as_ref()).await.map_err(|e| anyhow!(e))?;
+        let updated_model = model
+            .update(self.connection.as_ref())
+            .await
+            .map_err(|e| anyhow!(e))?;
 
         Ok(updated_model.into())
     }
@@ -140,11 +144,9 @@ impl MessageRepository for SeaOrmMessageRepository {
         &self,
         item: DbCreateThreadMessageDto,
     ) -> Result<ThreadMessageDto, Box<dyn Error + Send>> {
-        let conn = Arc::clone(&self.connection);
         let model: message::ActiveModel = (&item).into();
-
         let r = message::Entity::insert(model)
-            .exec_with_returning(conn.as_ref())
+            .exec_with_returning(self.connection.as_ref())
             .await
             .map_err(|e| anyhow!(e))?;
 
@@ -155,17 +157,16 @@ impl MessageRepository for SeaOrmMessageRepository {
         &self,
         messages: Vec<DbCreateThreadMessageDto>,
     ) -> Result<(), Box<dyn Error + Send>> {
-        let conn = Arc::clone(&self.connection);
-        self.tx_create_many(conn.as_ref(), &messages).await?;
+        self.tx_create_many(self.connection.as_ref(), &messages)
+            .await?;
 
         Ok(())
     }
 
     async fn delete(&self, id: String) -> Result<(), Box<dyn Error>> {
         let id: i32 = id.parse()?;
-        let conn = Arc::clone(&self.connection);
         message::Entity::delete_by_id(id)
-            .exec(conn.as_ref())
+            .exec(self.connection.as_ref())
             .await?;
 
         Ok(())

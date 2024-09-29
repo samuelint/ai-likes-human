@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod test_from_entity_model_to_dto {
     use crate::{
-        assistant::domain::dto::{MessageContent, ThreadMessageDto},
+        assistant::domain::dto::{ApiMessageContent, ThreadMessageDto},
         entities::message,
         utils::time::TimeBuilder,
     };
@@ -89,7 +89,7 @@ mod test_from_entity_model_to_dto {
 
     #[test]
     fn test_content_is_deserialized_from_json() {
-        let content: Vec<MessageContent> = vec![MessageContent::text("hello")];
+        let content: Vec<ApiMessageContent> = vec![ApiMessageContent::text("hello")];
         let json_content = serde_json::to_string(&content).unwrap();
         let model = message::Model {
             id: 0,
@@ -113,7 +113,7 @@ mod test_from_entity_model_to_dto {
 #[cfg(test)]
 mod test_from_db_dto_to_entity_model {
     use crate::{
-        assistant::domain::dto::{DbCreateThreadMessageDto, MessageContent},
+        assistant::domain::dto::{ApiMessageContent, DbCreateThreadMessageDto, DbMessageContent},
         entities::message,
     };
     use pretty_assertions::assert_eq;
@@ -157,7 +157,7 @@ mod test_from_db_dto_to_entity_model {
     #[test]
     fn test_content_is_serialized_to_json() {
         let dto = DbCreateThreadMessageDto {
-            content: vec![MessageContent::text("hello")],
+            content: vec![DbMessageContent::text_annotated("hello")],
             ..DbCreateThreadMessageDto::default()
         };
 
@@ -168,7 +168,8 @@ mod test_from_db_dto_to_entity_model {
             _ => panic!("Should be a string"),
         };
         let value = value.unwrap();
-        let expected_value = serde_json::to_string(&vec![MessageContent::text("hello")]).unwrap();
+        let expected_value =
+            serde_json::to_string(&vec![ApiMessageContent::text("hello")]).unwrap();
         assert_eq!(value.as_ref(), &expected_value);
     }
 }

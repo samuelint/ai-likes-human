@@ -5,7 +5,7 @@ mod message_adapter_test;
 use sea_orm::ActiveValue;
 
 use crate::{
-    assistant::domain::dto::{DbCreateThreadMessageDto, MessageContent, ThreadMessageDto},
+    assistant::domain::dto::{DbCreateThreadMessageDto, ApiMessageContent, ThreadMessageDto},
     entities::message,
     utils::time::TimeBuilder,
 };
@@ -45,7 +45,7 @@ impl From<&DbCreateThreadMessageDto> for message::ActiveModel {
 
 impl From<message::Model> for ThreadMessageDto {
     fn from(model: message::Model) -> Self {
-        let content: Vec<MessageContent> = match serde_json::from_str(&model.content) {
+        let content: Vec<ApiMessageContent> = match serde_json::from_str(&model.content) {
             Ok(content) => content,
             Err(_) => vec![],
         };

@@ -1,6 +1,6 @@
 use crate::test_utils::{self, assistant_api::AssistantApiClient};
 use app_core::assistant::domain::dto::{
-    ApiCreateThreadAndRunDto, ApiCreateThreadDto, ApiCreateThreadMessageDto, MessageContent,
+    ApiCreateThreadAndRunDto, ApiCreateThreadDto, ApiCreateThreadMessageDto, ApiMessageContent,
     ThreadDto,
 };
 use axum::http::StatusCode;
@@ -54,7 +54,7 @@ async fn test_deleted_thread_also_deletes_associated_messages() {
 
     // Create thread with message
     let message1 = ApiCreateThreadMessageDto {
-        content: vec![MessageContent::text("Say Hello!")],
+        content: vec![ApiMessageContent::text("Say Hello!")],
         role: "user".to_string(),
         ..ApiCreateThreadMessageDto::default()
     };

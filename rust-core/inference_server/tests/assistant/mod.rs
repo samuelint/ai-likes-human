@@ -1,3 +1,4 @@
+mod assistant_api_create_message_test;
 mod assistant_api_create_thread_and_run_test;
 mod assistant_api_create_thread_runs_test;
 mod assistant_api_create_thread_test;

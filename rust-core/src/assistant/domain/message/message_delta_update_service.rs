@@ -9,7 +9,7 @@ use crate::{
         message_delta::{
             MessageContentDelta, MessageDeltaDto, TextDeltaDto, ThreadMessageDeltaDto,
         },
-        DbUpdateThreadMessageDto, MessageContent, ThreadMessageDto,
+        DbUpdateThreadMessageDto, ApiMessageContent, ThreadMessageDto,
     },
     chat_completion::ChatCompletionChunkObject,
 };
@@ -74,18 +74,18 @@ impl MessageDeltaUpdateService {
 
     fn create_updated_text_content(
         &self,
-        existing_content: &Vec<MessageContent>,
+        existing_content: &Vec<ApiMessageContent>,
         new_content: &str,
-    ) -> Vec<MessageContent> {
-        let mut content: Vec<MessageContent> = existing_content
+    ) -> Vec<ApiMessageContent> {
+        let mut content: Vec<ApiMessageContent> = existing_content
             .iter()
             .filter_map(|c| match c {
-                MessageContent::Text { .. } => None,
+                ApiMessageContent::Text { .. } => None,
                 c => Some(c.clone()),
             })
             .collect();
 
-        content.push(MessageContent::text(new_content));
+        content.push(ApiMessageContent::text(new_content));
 
         content
     }

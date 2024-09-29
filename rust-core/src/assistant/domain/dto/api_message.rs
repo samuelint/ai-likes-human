@@ -6,7 +6,10 @@ use crate::chat_completion::ChatCompletionMessageDto;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
-use super::{annotation::MessageAnnotation, DbCreateThreadMessageDto, Metadata};
+use super::{
+    annotation::MessageAnnotation, DbCreateThreadMessageDto, DbMessageContent, ImageUrlContent,
+    Metadata,
+};
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
 pub struct TextContentDto {
@@ -27,7 +30,7 @@ pub struct ThreadMessageDto {
     pub thread_id: Option<String>,
     pub status: String,
     pub role: String,
-    pub content: Vec<MessageContent>,
+    pub content: Vec<ApiMessageContent>,
     pub assistant_id: Option<String>,
     pub run_id: Option<String>,
     pub metadata: Option<Metadata>,
@@ -38,10 +41,67 @@ impl ThreadMessageDto {
         self.content
             .iter()
             .filter_map(|c| match c {
-                MessageContent::Text { text } => Some(text.to_string()),
+                ApiMessageContent::Text { text } => Some(text.to_string()),
                 _ => None,
             })
             .join("")
+    }
+}
+
+#[derive(Default, Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ApiUpdateThreadMessageDto {
+    pub id: String,
+    pub content: Option<Vec<ApiMessageContent>>,
+    pub metadata: Option<Option<Metadata>>,
+}
+
+impl From<ThreadMessageDto> for ChatCompletionMessageDto {
+    fn from(dto: ThreadMessageDto) -> Self {
+        ChatCompletionMessageDto {
+            content: dto.to_string_content(),
+            role: dto.role,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct ApiCreateThreadMessageDto {
+    pub content: Vec<ApiMessageContent>,
+    pub role: String,
+    pub attachments: Option<String>,
+    pub metadata: Option<Metadata>,
+}
+
+impl ApiCreateThreadMessageDto {
+    pub fn user() -> Self {
+        Self {
+            role: "user".to_string(),
+            ..Self::default()
+        }
+    }
+}
+
+impl From<&ApiCreateThreadMessageDto> for DbCreateThreadMessageDto {
+    fn from(dto: &ApiCreateThreadMessageDto) -> Self {
+        DbCreateThreadMessageDto {
+            content: dto.content.iter().map(DbMessageContent::from).collect(),
+            role: dto.role.clone(),
+            attachments: dto.attachments.clone(),
+            metadata: dto.metadata.clone(),
+            status: "completed".to_string(),
+            ..DbCreateThreadMessageDto::default()
+        }
+    }
+}
+
+impl Default for ApiCreateThreadMessageDto {
+    fn default() -> Self {
+        Self {
+            content: vec![],
+            role: "user".to_string(),
+            attachments: None,
+            metadata: None,
+        }
     }
 }
 
@@ -84,50 +144,14 @@ impl Default for TextContent {
     }
 }
 
-#[derive(Default, Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
-pub struct AnnotatedTextDto {
-    pub value: String,
-    pub annotations: Vec<MessageAnnotation>,
-}
-
-#[derive(Default, Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
-pub struct ImageUrl {
-    pub url: String,
-    pub details: Option<String>, // auto, low, high
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
-pub struct ImageUrlContent {
-    pub image_url: ImageUrl,
-}
-
-impl ImageUrlContent {
-    pub fn url(url: &str) -> Self {
-        ImageUrlContent {
-            image_url: ImageUrl {
-                url: url.to_string(),
-                ..ImageUrl::default()
-            },
-        }
-    }
-}
-
-impl Default for ImageUrlContent {
-    fn default() -> Self {
-        Self {
-            image_url: ImageUrl::default(),
-        }
-    }
-}
-
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
 #[serde(tag = "type", rename_all = "snake_case")]
-pub enum MessageContent {
+pub enum ApiMessageContent {
     Text { text: TextContent },
     ImageUrl { image_url: ImageUrlContent },
 }
 
-impl MessageContent {
+impl ApiMessageContent {
     pub fn text(value: &str) -> Self {
         Self::Text {
             text: TextContent::annotated(value),
@@ -141,59 +165,16 @@ impl MessageContent {
     }
 }
 
-#[derive(Default, Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct ApiUpdateThreadMessageDto {
-    pub id: String,
-    pub content: Option<Vec<MessageContent>>,
-    pub metadata: Option<Option<Metadata>>,
-}
-
-impl From<ThreadMessageDto> for ChatCompletionMessageDto {
-    fn from(dto: ThreadMessageDto) -> Self {
-        ChatCompletionMessageDto {
-            content: dto.to_string_content(),
-            role: dto.role,
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Clone)]
-pub struct ApiCreateThreadMessageDto {
-    pub content: Vec<MessageContent>,
-    pub role: String,
-    pub attachments: Option<String>,
-    pub metadata: Option<Metadata>,
-}
-
-impl ApiCreateThreadMessageDto {
-    pub fn user() -> Self {
-        Self {
-            role: "user".to_string(),
-            ..Self::default()
-        }
-    }
-}
-
-impl From<&ApiCreateThreadMessageDto> for DbCreateThreadMessageDto {
-    fn from(dto: &ApiCreateThreadMessageDto) -> Self {
-        DbCreateThreadMessageDto {
-            content: dto.content.clone(),
-            role: dto.role.clone(),
-            attachments: dto.attachments.clone(),
-            metadata: dto.metadata.clone(),
-            status: "completed".to_string(),
-            ..DbCreateThreadMessageDto::default()
-        }
-    }
-}
-
-impl Default for ApiCreateThreadMessageDto {
-    fn default() -> Self {
-        Self {
-            content: vec![],
-            role: "user".to_string(),
-            attachments: None,
-            metadata: None,
+impl From<&ApiMessageContent> for DbMessageContent {
+    fn from(content: &ApiMessageContent) -> Self {
+        match content {
+            ApiMessageContent::Text { text } => {
+                let text_content = text.to_string();
+                DbMessageContent::text_annotated(&text_content)
+            }
+            ApiMessageContent::ImageUrl { image_url } => DbMessageContent::ImageUrl {
+                image_url: image_url.clone(),
+            },
         }
     }
 }

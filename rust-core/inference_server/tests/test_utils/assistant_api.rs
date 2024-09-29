@@ -2,7 +2,7 @@ use std::pin::Pin;
 
 use app_core::assistant::domain::dto::{
     ApiCreateRunDto, ApiCreateThreadAndRunDto, ApiCreateThreadDto, ApiCreateThreadMessageDto,
-    MessageContent, PageRequest, PageResponse, RunDto, ThreadDto, ThreadEventData,
+    ApiMessageContent, PageRequest, PageResponse, RunDto, ThreadDto, ThreadEventData,
     ThreadMessageDto,
 };
 use futures::{Stream, StreamExt};
@@ -47,7 +47,7 @@ impl AssistantApiClient {
             .create_thread(&ApiCreateThreadDto {
                 messages: vec![ApiCreateThreadMessageDto {
                     role: "user".to_string(),
-                    content: vec![MessageContent::text(prompt)],
+                    content: vec![ApiMessageContent::text(prompt)],
                     ..ApiCreateThreadMessageDto::default()
                 }],
                 ..ApiCreateThreadDto::default()
@@ -96,7 +96,7 @@ impl AssistantApiClient {
         self.create_message(
             thread_id,
             &ApiCreateThreadMessageDto {
-                content: vec![MessageContent::text(prompt)],
+                content: vec![ApiMessageContent::text(prompt)],
                 ..ApiCreateThreadMessageDto::user()
             },
         )
@@ -112,7 +112,7 @@ impl AssistantApiClient {
             model: DEFAULT_LLM_MODEL.to_string(),
             thread: ApiCreateThreadDto {
                 messages: vec![ApiCreateThreadMessageDto {
-                    content: vec![MessageContent::text(prompt)],
+                    content: vec![ApiMessageContent::text(prompt)],
                     ..ApiCreateThreadMessageDto::user()
                 }],
                 ..ApiCreateThreadDto::default()

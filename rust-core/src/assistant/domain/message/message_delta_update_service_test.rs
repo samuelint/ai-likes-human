@@ -5,7 +5,7 @@ mod tests {
     use crate::{
         assistant::domain::{
             dto::{
-                message_delta::MessageContentDelta, DbUpdateThreadMessageDto, MessageContent,
+                message_delta::MessageContentDelta, DbUpdateThreadMessageDto, ApiMessageContent,
                 ThreadMessageDto,
             },
             message::{message_repository::MockMessageRepository, MessageDeltaUpdateService},
@@ -21,13 +21,13 @@ mod tests {
         let thread_id = "some_thread_id";
         let message_id = "some_message_id";
         let expected_update_message = DbUpdateThreadMessageDto {
-            content: Some(vec![MessageContent::text("Hello World!")]),
+            content: Some(vec![ApiMessageContent::text("Hello World!")]),
             ..DbUpdateThreadMessageDto::default()
         };
         let existing_message = ThreadMessageDto {
             id: message_id.to_string(),
             thread_id: Some(thread_id.to_string()),
-            content: vec![MessageContent::text("Hello ")],
+            content: vec![ApiMessageContent::text("Hello ")],
             ..ThreadMessageDto::default()
         };
         let chunk = ChatCompletionChunkObject {
@@ -54,7 +54,7 @@ mod tests {
             .content
             .iter()
             .filter_map(|c| match c {
-                MessageContent::Text { text } => Some(text),
+                ApiMessageContent::Text { text } => Some(text),
                 _ => None,
             })
             .collect::<Vec<_>>();
@@ -71,13 +71,13 @@ mod tests {
         let thread_id = "some_thread_id";
         let message_id = "some_message_id";
         let expected_update_message = DbUpdateThreadMessageDto {
-            content: Some(vec![MessageContent::text("Hello World!")]),
+            content: Some(vec![ApiMessageContent::text("Hello World!")]),
             ..DbUpdateThreadMessageDto::default()
         };
         let existing_message = ThreadMessageDto {
             id: message_id.to_string(),
             thread_id: Some(thread_id.to_string()),
-            content: vec![MessageContent::text("Hello ")],
+            content: vec![ApiMessageContent::text("Hello ")],
             ..ThreadMessageDto::default()
         };
         let chunk = ChatCompletionChunkObject {
@@ -115,13 +115,13 @@ mod tests {
         let thread_id = "some_thread_id";
         let message_id = "some_message_id";
         let expected_update_message = DbUpdateThreadMessageDto {
-            content: Some(vec![MessageContent::text("Hello World!")]),
+            content: Some(vec![ApiMessageContent::text("Hello World!")]),
             ..DbUpdateThreadMessageDto::default()
         };
         let existing_message = ThreadMessageDto {
             id: message_id.to_string(),
             thread_id: Some(thread_id.to_string()),
-            content: vec![MessageContent::text("Hello ")],
+            content: vec![ApiMessageContent::text("Hello ")],
             role: "assistant".to_string(),
             ..ThreadMessageDto::default()
         };
@@ -152,13 +152,13 @@ mod tests {
         let thread_id = "some_thread_id";
         let message_id = "some_message_id";
         let expected_update_message = DbUpdateThreadMessageDto {
-            content: Some(vec![MessageContent::text("Hello World!")]),
+            content: Some(vec![ApiMessageContent::text("Hello World!")]),
             ..DbUpdateThreadMessageDto::default()
         };
         let existing_message = ThreadMessageDto {
             id: message_id.to_string(),
             thread_id: Some(thread_id.to_string()),
-            content: vec![MessageContent::text("Hello ")],
+            content: vec![ApiMessageContent::text("Hello ")],
             role: "assistant".to_string(),
             ..ThreadMessageDto::default()
         };
@@ -207,7 +207,7 @@ mod tests {
                         thread_id: Some(thread_id),
                         status: status,
                         role: "assistant".to_string(),
-                        content: vec![MessageContent::text("Hello World!")],
+                        content: vec![ApiMessageContent::text("Hello World!")],
                         ..ThreadMessageDto::default()
                     })
                 })

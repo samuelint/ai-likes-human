@@ -1,10 +1,10 @@
 use serde::{Deserialize, Serialize};
 
-use super::{MessageContent, Metadata};
+use super::{ApiMessageContent, DbMessageContent, Metadata};
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct DbCreateThreadMessageDto {
-    pub content: Vec<MessageContent>,
+    pub content: Vec<DbMessageContent>,
     pub role: String,
     pub status: String,
     pub thread_id: Option<String>,
@@ -42,7 +42,7 @@ impl Default for DbCreateThreadMessageDto {
 #[derive(Default, Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct DbUpdateThreadMessageDto {
     pub status: Option<String>,
-    pub content: Option<Vec<MessageContent>>,
+    pub content: Option<Vec<ApiMessageContent>>,
     pub assistant_id: Option<Option<String>>,
     pub metadata: Option<Option<Metadata>>,
 }

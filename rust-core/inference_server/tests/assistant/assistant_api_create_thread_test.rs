@@ -1,7 +1,7 @@
 use crate::test_utils::{self, assistant_api::AssistantApiClient};
 use app_core::{
     assistant::domain::dto::{
-        ApiCreateThreadDto, ApiCreateThreadMessageDto, MessageContent, MetadataBuilder,
+        ApiCreateThreadDto, ApiCreateThreadMessageDto, ApiMessageContent, MetadataBuilder,
         PageRequest, ThreadDto,
     },
     utils::time::TimeBuilder,
@@ -98,7 +98,7 @@ async fn test_created_threads_are_listed() {
 async fn test_created_thread_with_message_is_successful() {
     let client = RouterClient::from_app("/openai/v1").await;
     let message1 = ApiCreateThreadMessageDto {
-        content: vec![MessageContent::text("Say Hello!")],
+        content: vec![ApiMessageContent::text("Say Hello!")],
         role: "user".to_string(),
         ..ApiCreateThreadMessageDto::default()
     };
@@ -124,7 +124,7 @@ async fn test_created_thread_with_message_have_id() {
     let client = AssistantApiClient::new().await;
 
     let message1 = ApiCreateThreadMessageDto {
-        content: vec![MessageContent::text("Say Hello!")],
+        content: vec![ApiMessageContent::text("Say Hello!")],
         role: "user".to_string(),
         ..ApiCreateThreadMessageDto::default()
     };
@@ -144,7 +144,7 @@ async fn test_created_thread_with_message_have_id() {
 async fn test_created_thread_with_message_have_same_content() {
     let client = AssistantApiClient::new().await;
     let message1 = ApiCreateThreadMessageDto {
-        content: vec![MessageContent::text("Say Hello!")],
+        content: vec![ApiMessageContent::text("Say Hello!")],
         role: "user".to_string(),
         ..ApiCreateThreadMessageDto::default()
     };
@@ -167,7 +167,7 @@ async fn test_created_thread_with_message_can_be_retrieved() {
     let client = AssistantApiClient::new().await;
 
     let message1 = ApiCreateThreadMessageDto {
-        content: vec![MessageContent::text("Say Hello!")],
+        content: vec![ApiMessageContent::text("Say Hello!")],
         role: "user".to_string(),
         ..ApiCreateThreadMessageDto::default()
     };

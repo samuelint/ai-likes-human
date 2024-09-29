@@ -11,7 +11,7 @@ export function useListThreads({ limit = '10' }: Props = {}) {
   const { data, error, isLoading, mutate } = useSWR('/openai/v1/threads', createApiJsonFetcher({ queryParams: { limit } }));
 
   return {
-    data: data?.map(toThreadPreview),
+    data: data?.data.map(toThreadPreview),
     error,
     isLoading,
     revalidate: () => mutate(),

@@ -130,31 +130,38 @@ mod test_create {
         }
     }
 
-    #[test]
-    fn test_returns_compatible_llm() {
+    #[tokio::test]
+    async fn test_returns_compatible_llm() {
         let mut factory1 = MockLLMFactory::new();
         factory1
             .expect_is_compatible()
             .with(predicate::eq("openai:gpt-4o"))
             .returning(|_| true);
-        factory1
-            .expect_create()
-            .returning(|_| Ok(Box::new(MockLLMStub::new())));
+        factory1.expect_create().returning(|_| {
+            Box::pin(async {
+                let val = Box::new(MockLLMStub::new()) as Box<dyn LLM>;
+
+                Ok(val)
+            })
+        });
 
         let instance = LLMFactoryRouter {
             llm_factories: vec![Arc::new(factory1)],
         };
 
-        let result = instance.create(CreateLLMParameters {
-            model: "openai:gpt-4o".to_string(),
-        });
+        let result = instance
+            .create(&CreateLLMParameters {
+                model: "openai:gpt-4o".to_string(),
+                ..CreateLLMParameters::default()
+            })
+            .await;
         let result = result;
 
         assert!(result.is_ok());
     }
 
-    #[test]
-    fn test_returns_error_when_no_compatible_llm_is_found() {
+    #[tokio::test]
+    async fn test_returns_error_when_no_compatible_llm_is_found() {
         let mut factory1 = MockLLMFactory::new();
         factory1
             .expect_is_compatible()
@@ -165,9 +172,12 @@ mod test_create {
             llm_factories: vec![Arc::new(factory1)],
         };
 
-        let result = instance.create(CreateLLMParameters {
-            model: "openai:gpt-4o".to_string(),
-        });
+        let result = instance
+            .create(&CreateLLMParameters {
+                model: "openai:gpt-4o".to_string(),
+                ..CreateLLMParameters::default()
+            })
+            .await;
 
         assert!(result.is_err());
     }

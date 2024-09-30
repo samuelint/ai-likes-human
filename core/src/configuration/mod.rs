@@ -22,7 +22,7 @@ impl ConfigurationDIModule {
         Arc::clone(&self.connection)
     }
 
-    fn get_configuration_repository(&self) -> Arc<dyn ConfigurationRepository> {
+    pub fn get_configuration_repository(&self) -> Arc<dyn ConfigurationRepository> {
         let connection = self.get_connection();
         Arc::new(SeaOrmConfigurationRepository::new(Arc::clone(&connection)))
     }

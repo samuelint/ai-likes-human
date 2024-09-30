@@ -44,7 +44,7 @@ impl ApiFacade {
     pub async fn find_configuration(
         &self,
         key: &str,
-    ) -> Result<Option<ConfigurationDto>, Box<dyn std::error::Error>> {
+    ) -> Result<Option<ConfigurationDto>, Box<dyn std::error::Error + Send>> {
         self.container
             .configuration_module
             .get_configuration_service()
@@ -56,7 +56,7 @@ impl ApiFacade {
         &self,
         key: &str,
         value: &str,
-    ) -> Result<ConfigurationDto, Box<dyn std::error::Error>> {
+    ) -> Result<ConfigurationDto, Box<dyn std::error::Error + Send>> {
         let configuration_service = self
             .container
             .configuration_module

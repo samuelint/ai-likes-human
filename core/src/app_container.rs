@@ -9,7 +9,7 @@ use crate::{
 pub struct AppContainer {
     pub config: CoreConfiguration,
     pub sea_orm_connection: Arc<::sea_orm::DatabaseConnection>,
-    pub configuration_module: ConfigurationDIModule,
+    pub configuration_module: Arc<ConfigurationDIModule>,
     pub llm_module: Arc<LLMDIModule>,
     pub chat_completion_module: Arc<ChatCompletionDIModule>,
     pub agent_module: AgentDIModule,
@@ -20,8 +20,8 @@ impl AppContainer {
         let connection_factory = ConnectionFactory::new(config.database_url.clone());
         let connection: Arc<::sea_orm::DatabaseConnection> = connection_factory.create().await?;
 
-        let configuration_module = ConfigurationDIModule::new(Arc::clone(&connection));
-        let llm_module = Arc::new(LLMDIModule::new());
+        let configuration_module = Arc::new(ConfigurationDIModule::new(Arc::clone(&connection)));
+        let llm_module = Arc::new(LLMDIModule::new(configuration_module.clone()));
         let chat_completion_module = Arc::new(ChatCompletionDIModule::new(Arc::clone(&llm_module)));
         let agent_module: AgentDIModule =
             AgentDIModule::new(Arc::clone(&connection), Arc::clone(&chat_completion_module));

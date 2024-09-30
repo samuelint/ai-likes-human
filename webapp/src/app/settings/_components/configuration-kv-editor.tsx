@@ -44,7 +44,7 @@ export function ConfigurationKvEditor({ label, kv_key, isSecret }: Props) {
         onSubmit={handleSubmit}
         className="grid w-full max-w-sm items-center gap-1.5"
       >
-        <fieldset disabled={isLoading || error}>
+        <fieldset disabled={isLoading || !!error}>
           <Label htmlFor={kv_key}>{label || kv_key}</Label>
           <div className="flex w-full max-w-sm items-center space-x-2">
             { isSecret ?

@@ -64,6 +64,8 @@ jobs:
       - name: Setup Tauri
         id: prepare-tauri
         uses: ./.github/actions/prepare_tauri
+        with:
+          platform: ${{ matrix.platform }}
 
       - name: Build
         run: |

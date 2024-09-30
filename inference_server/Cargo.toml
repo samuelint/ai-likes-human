@@ -9,7 +9,7 @@ name = "inference_server"
 path = "src/lib.rs"
 
 [dependencies]
-app-core = { path = ".." }
+app-core = { path = "../core" }
 axum = "0.7.5"
 futures = "0.3.30"
 http-body-util = "0.1.2"

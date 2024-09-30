@@ -19,7 +19,7 @@
         "type": "shell",
         // change this to your `beforeBuildCommand`:
         "command": "pnpm",
-        "args": ["run", "build:webapp", "&&", "bash", "./copy-server-bin.sh"]
+        "args": ["run", "build:webapp", "&&", "bash"]
       }
     ]
   }

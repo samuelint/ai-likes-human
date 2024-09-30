@@ -9,83 +9,7 @@ on:
 #   pull_request:
 
 jobs:
-  bundle_core:
-    defaults:
-      run:
-        working-directory: core
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: "macos-latest" # for Arm based macs (M1 and above).
-            args: "--target aarch64-apple-darwin"
-          # - platform: 'macos-latest' # for Intel based macs.
-          #   args: '--target x86_64-apple-darwin'
-          - platform: "ubuntu-22.04" # for Tauri v1 you could replace this with ubuntu-20.04.
-            args: ""
-          - platform: "windows-latest"
-            args: ""
-    runs-on: ${{ matrix.platform }}
-    environment: release
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12.3"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install poetry
-          poetry install
-
-
-      - name: Prepare MacOS Keychain
-        if: matrix.platform == 'macos-latest'
-        timeout-minutes: 2
-        env:
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          TMP_KEYCHAIN_PASSWORD: some
-          APP_PATH: dist/core-aarch64-apple-darwin
-          ENTITLEMENTS_PATH: ./entitlements.plist
-        run: |
-          echo "Creating a temporary keychain"
-          security create-keychain -p $TMP_KEYCHAIN_PASSWORD build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p $TMP_KEYCHAIN_PASSWORD build.keychain
-
-          echo "Importing the certificate"
-          echo "$APPLE_CERTIFICATE" | base64 --decode > certificate.p12
-          security import certificate.p12 -k build.keychain -P $APPLE_CERTIFICATE_PASSWORD -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $TMP_KEYCHAIN_PASSWORD build.keychain
-          
-      - name: Bundle
-        env:
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-        run: |
-          make bundle
-          
-      - name: Teardown MacOS Keychain
-        if: matrix.platform == 'macos-latest'
-        timeout-minutes: 0.5
-        run: |
-          echo "Deleting the temporary keychain"
-          security delete-keychain build.keychain
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: core-${{ matrix.platform }}
-          retention-days: 1
-          path: core/dist/*
-
   bundle_desktop:
-    needs: bundle_core
     permissions:
       contents: write
     strategy:
@@ -94,8 +18,8 @@ jobs:
         include:
           - platform: "macos-latest" # for Arm based macs (M1 and above).
             args: "--target aarch64-apple-darwin"
-          # - platform: 'macos-latest' # for Intel based macs.
-          #   args: '--target x86_64-apple-darwin'
+          - platform: "macos-latest" # for Intel based macs.
+            args: "--target x86_64-apple-darwin"
           - platform: "ubuntu-22.04"
             args: ""
           - platform: "windows-latest"

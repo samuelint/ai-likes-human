@@ -1,57 +1,63 @@
+#[cfg(test)]
+#[path = "./message_delta_test.rs"]
+mod message_delta_test;
+
 use serde::{Deserialize, Serialize};
 
-use super::annotation::MessageAnnotation;
+use super::{ImageUrlContent, TextContent};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub enum MessageContentDelta {
-    Text(TextDeltaDto),
-    ImageUrl(ImageURLDeltaBlock),
-    ImageFile(ImageFileDeltaBlock),
+#[serde(untagged)]
+pub enum MessageDeltaContent {
+    Text {
+        index: i32,
+        #[serde(rename = "type")]
+        type_: String,
+        text: TextContent,
+    },
+    ImageUrl {
+        index: i32,
+        #[serde(rename = "type")]
+        type_: String,
+        image_url: ImageUrlContent,
+    },
 }
 
-#[derive(Default, Serialize, Deserialize, Clone, Debug)]
-pub struct TextDeltaDto {
-    pub index: i32,
-    pub value: Option<String>,
-    pub annotations: Vec<MessageAnnotation>,
+impl MessageDeltaContent {
+    pub fn text(text: &str) -> Self {
+        Self::Text {
+            index: 0,
+            type_: "text".to_string(),
+            text: TextContent::annotated(text),
+        }
+    }
+
+    pub fn image_url(url: &str) -> Self {
+        Self::ImageUrl {
+            index: 0,
+            type_: "image_url".to_string(),
+            image_url: ImageUrlContent::url(url),
+        }
+    }
 }
 
-#[derive(Default, Serialize, Deserialize, Clone, Debug)]
-pub struct ImageURLDeltaBlock {
-    pub index: i32,
-    pub r#type: String,
-    pub image_url: Option<ImageURLDelta>,
-}
-
-#[derive(Default, Serialize, Deserialize, Clone, Debug)]
-pub struct ImageURLDelta {
-    pub detail: Option<String>,
-    pub url: Option<String>,
-}
-
-#[derive(Default, Serialize, Deserialize, Clone, Debug)]
-pub struct ImageFileDeltaBlock {
-    pub index: i32,
-    pub r#type: String,
-    pub image_file: Option<ImageFileDelta>,
-}
-
-#[derive(Default, Serialize, Deserialize, Clone, Debug)]
-pub struct ImageFileDelta {
-    /// Specifies the detail level of the image if specified by the user.
-    ///
-    /// `low` uses fewer tokens, you can opt in to high resolution using `high`.
-    pub detail: Option<String>,
-    /// The [File](https://platform.openai.com/docs/api-reference/files) ID of the image
-    /// in the message content. Set `purpose="vision"` when uploading the File if you
-    /// need to later display the file content.
-    pub file_id: Option<String>,
+impl Default for MessageDeltaContent {
+    fn default() -> Self {
+        Self::Text {
+            index: 0,
+            type_: "text".to_string(),
+            text: TextContent::Annotated {
+                value: "".to_string(),
+                annotations: vec![],
+            },
+        }
+    }
 }
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
 pub struct MessageDeltaDto {
     pub role: String,
-    pub content: Vec<MessageContentDelta>,
+    pub content: Vec<MessageDeltaContent>,
 }
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]

@@ -5,7 +5,7 @@ mod tests {
     use crate::{
         assistant::domain::{
             dto::{
-                message_delta::MessageContentDelta, DbUpdateThreadMessageDto, ApiMessageContent,
+                message_delta::MessageDeltaContent, ApiMessageContent, DbUpdateThreadMessageDto,
                 ThreadMessageDto,
             },
             message::{message_repository::MockMessageRepository, MessageDeltaUpdateService},
@@ -102,12 +102,12 @@ mod tests {
         assert!(delta.delta.content.len() > 0);
         let message_content = &delta.delta.content[0];
 
-        let text_delta = match message_content {
-            MessageContentDelta::Text(event) => event,
+        let text_delta = match &message_content {
+            MessageDeltaContent::Text { text, .. } => text.to_string(),
             _ => panic!("Expected Text MessageContentDelta"),
         };
 
-        assert_eq!(text_delta.value.clone().unwrap(), "World!");
+        assert_eq!(text_delta, "World!");
     }
 
     #[tokio::test]

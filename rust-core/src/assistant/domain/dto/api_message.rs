@@ -151,6 +151,17 @@ pub enum ApiMessageContent {
     ImageUrl { image_url: ImageUrlContent },
 }
 
+impl Default for ApiMessageContent {
+    fn default() -> Self {
+        Self::Text {
+            text: TextContent::Annotated {
+                value: "".to_string(),
+                annotations: vec![],
+            },
+        }
+    }
+}
+
 impl ApiMessageContent {
     pub fn text(value: &str) -> Self {
         Self::Text {

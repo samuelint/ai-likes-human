@@ -6,10 +6,8 @@ use std::{error::Error, sync::Arc};
 
 use crate::{
     assistant::domain::dto::{
-        message_delta::{
-            MessageContentDelta, MessageDeltaDto, TextDeltaDto, ThreadMessageDeltaDto,
-        },
-        DbUpdateThreadMessageDto, ApiMessageContent, ThreadMessageDto,
+        message_delta::{MessageDeltaContent, MessageDeltaDto, ThreadMessageDeltaDto},
+        ApiMessageContent, DbUpdateThreadMessageDto, ThreadMessageDto,
     },
     chat_completion::ChatCompletionChunkObject,
 };
@@ -50,10 +48,7 @@ impl MessageDeltaUpdateService {
                 id: message.id.clone(),
                 delta: MessageDeltaDto {
                     role: message.role.clone(),
-                    content: vec![MessageContentDelta::Text(TextDeltaDto {
-                        value: Some(chunk_content),
-                        ..TextDeltaDto::default()
-                    })],
+                    content: vec![MessageDeltaContent::text(&chunk_content)],
                 },
                 ..ThreadMessageDeltaDto::default()
             },

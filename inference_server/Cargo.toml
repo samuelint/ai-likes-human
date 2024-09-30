@@ -1,0 +1,46 @@
+[package]
+name = "inference-server"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+name = "inference_server"
+path = "src/lib.rs"
+
+[dependencies]
+app-core = { path = "../core" }
+axum = "0.7.5"
+futures = "0.3.30"
+http-body-util = "0.1.2"
+hyper = { version = "1.4.1", features = ["full"] }
+serde = { version = "1.0.210", features = ["derive"] }
+tokio = { version = "1.40.0", features = ["full"] }
+tower-http = { version = "0.5.2", features = [
+    "add-extension",
+    "auth",
+    "compression-full",
+    "limit",
+    "trace",
+    "cors",
+] }
+tower = { version = "0.4", features = [
+    "util",
+    "timeout",
+    "load-shed",
+    "limit",
+] }
+tracing = "0.1.40"
+serde_json = "1.0.128"
+reqwest = { version = "0.12.7", features = ["stream", "blocking"] }
+futures-util = "0.3.30"
+bytes = "1.7.1"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+async-stream = "0.3.5"
+url = "2.5.2"
+
+[dev-dependencies]
+mockall = "0.13.0"
+openai-api-rs = "5.0.8"
+pretty_assertions = "1.4.1"
+serial_test = "3.1.1"

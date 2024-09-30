@@ -1,0 +1,46 @@
+use std::{error::Error, sync::Arc};
+
+use crate::{
+    app_configuration::CoreConfiguration, assistant::AgentDIModule,
+    chat_completion::ChatCompletionDIModule, configuration::ConfigurationDIModule,
+    infrastructure::sea_orm::ConnectionFactory, llm::LLMDIModule,
+};
+
+pub struct AppContainer {
+    pub config: CoreConfiguration,
+    pub sea_orm_connection: Arc<::sea_orm::DatabaseConnection>,
+    pub configuration_module: ConfigurationDIModule,
+    pub llm_module: Arc<LLMDIModule>,
+    pub chat_completion_module: Arc<ChatCompletionDIModule>,
+    pub agent_module: AgentDIModule,
+}
+
+impl AppContainer {
+    pub async fn new(config: CoreConfiguration) -> Result<Self, Box<dyn Error>> {
+        let connection_factory = ConnectionFactory::new(config.database_url.clone());
+        let connection: Arc<::sea_orm::DatabaseConnection> = connection_factory.create().await?;
+
+        let configuration_module = ConfigurationDIModule::new(Arc::clone(&connection));
+        let llm_module = Arc::new(LLMDIModule::new());
+        let chat_completion_module = Arc::new(ChatCompletionDIModule::new(Arc::clone(&llm_module)));
+        let agent_module: AgentDIModule =
+            AgentDIModule::new(Arc::clone(&connection), Arc::clone(&chat_completion_module));
+
+        Ok(Self {
+            config,
+            sea_orm_connection: connection,
+            configuration_module,
+            llm_module,
+            chat_completion_module,
+            agent_module,
+        })
+    }
+
+    pub async fn new_in_memory() -> Result<Self, Box<dyn Error>> {
+        let config = CoreConfiguration {
+            database_url: "sqlite::memory:".to_string(),
+            ..CoreConfiguration::default()
+        };
+        Self::new(config).await
+    }
+}

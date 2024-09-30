@@ -1,0 +1,3 @@
+[workspace]
+
+members = ["desktop", "core", "inference_server"]

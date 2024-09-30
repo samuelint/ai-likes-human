@@ -8,7 +8,7 @@ interface Props {
 }
 
 export function useListThreads({ limit = '10' }: Props = {}) {
-  const { data, error, isLoading, mutate } = useSWR('/assistant/openai/v1/threads', createApiJsonFetcher({ queryParams: { limit } }));
+  const { data, error, isLoading, mutate } = useSWR('/openai/v1/threads', createApiJsonFetcher({ queryParams: { limit } }));
 
   return {
     data: data?.data.map(toThreadPreview),

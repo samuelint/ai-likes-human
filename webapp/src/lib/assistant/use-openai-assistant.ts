@@ -68,10 +68,10 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model, temperat
               ...messages.slice(0, messages.length - 1),
               snapshot
             ]))
-            .on('messageDone', (message: Message) => [
+            .on('messageDone', (message: Message) => setMessages(messages => [
               ...messages.slice(0, messages.length - 1),
               message
-            ])
+            ]))
             .on('error', (error) => rejects(error))
             .on('abort', () => resolve())
             .on('end', () => resolve());
@@ -87,7 +87,7 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model, temperat
       streamRef.current = null;
       setStatus('awaiting_message');
     }
-  }, [assistantId, messages, model, openai.beta.threads.runs, setUnknownError, status, temperature, threadId]);
+  }, [assistantId, model, openai.beta.threads.runs, setUnknownError, status, temperature, threadId]);
 
   const isLastMessageFromUser = useCallback(() => {
     return messages.at(-1)?.role === 'user';

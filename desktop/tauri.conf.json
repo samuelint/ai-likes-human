@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/@tauri-apps/cli/schema.json",
   "build": {
-    "beforeBuildCommand": "pnpm run build:webapp && bash ./copy-server-bin.sh",
+    "beforeBuildCommand": "pnpm run build:webapp",
     "beforeDevCommand": "pnpm run dev:webapp",
     "devPath": "http://localhost:5173",
     "distDir": "../webapp/dist"
@@ -20,18 +20,6 @@
       "http": {
         "all": true,
         "request": true
-      },
-      "shell": {
-        "all": false,
-        "execute": true,
-        "sidecar": true,
-        "open": false,
-        "scope": [
-          {
-            "name": "bin/core",
-            "sidecar": true
-          }
-        ]
       }
     },
     "bundle": {
@@ -41,9 +29,7 @@
       "deb": {
         "depends": []
       },
-      "externalBin": [
-        "bin/core"
-      ],
+      "externalBin": [],
       "resources": [],
       "icon": [
         "icons/32x32.png",

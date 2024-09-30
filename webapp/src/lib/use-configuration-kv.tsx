@@ -1,29 +1,28 @@
 import useSWR from 'swr';
-import { fetchApiJson } from './api-fetcher';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { findConfiguration, upsertConfiguration } from './tauri-command';
+import { useErrorNotification } from '@/app/_components/use-error-notification';
 
-
-interface ConfigurationKv {
-  key: string
-  value: string
-}
 
 
 export function useConfigurationKV(key: string) {
-  const url = `/configuration/kv/${key}`;
-  const { data, error, isLoading, mutate: mutateCache } = useSWR<ConfigurationKv>(url, fetchApiJson);
+  const { data, error: fetchError, isLoading, mutate: mutateCache } = useSWR(`/configuration/kv/${key}`, async () => await findConfiguration(key));
+
+  const [error, setError] = useState<unknown | undefined>(undefined);
+
+  useEffect(() => setError(fetchError), [fetchError]);
 
   const mutate = useCallback<(newValue: string) => Promise<void>>(async (newValue) => {
-    if (!data) return;
+    try {
+      const config = await upsertConfiguration({ key, value: newValue });
+      mutateCache(config, { revalidate: false });
+    } catch (e) {
+      setError(e);
+    }
 
-    await fetchApiJson(url, {
-      method: 'PUT',
-      body: JSON.stringify({ key, value: newValue }),
-    });
+  }, [key, mutateCache]);
 
-    mutateCache({ ...data, value: newValue }, { revalidate: false });
-
-  }, [key, url, mutateCache, data]);
+  useErrorNotification(error);
 
   return {
     data,

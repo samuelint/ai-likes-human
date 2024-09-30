@@ -2,7 +2,7 @@ use std::{error::Error, sync::Arc};
 
 use async_stream::stream;
 
-use crate::llm::domain::llm_factory::LLMFactory;
+use crate::llm::domain::llm_factory::{CreateLLMParameters, LLMFactory};
 
 use super::{
     dto::{ChatCompletionChunkObject, ChatCompletionMessageDto, ChatCompletionObject},
@@ -28,7 +28,10 @@ impl InferenceService {
             messages.iter().map(|m| m.clone().into()).collect();
         let llm = self
             .llm_factory
-            .from_model(model)
+            .create(&CreateLLMParameters {
+                model: model.to_string(),
+                ..CreateLLMParameters::default()
+            }).await
             .map_err(|e| e as Box<dyn Error>)?;
 
         let result = llm.generate(&messages[..]).await?;
@@ -50,7 +53,10 @@ impl InferenceService {
         let model = model.to_string();
         let llm_factory = Arc::clone(&self.llm_factory);
         let stream = stream! {
-            let llm = match llm_factory.from_model(&model) {
+            let llm = match llm_factory.create(&CreateLLMParameters {
+                model: model.clone(),
+                ..CreateLLMParameters::default()
+            }).await {
                 Ok(llm) => llm,
                 Err(e) => {
                     yield Err(e);

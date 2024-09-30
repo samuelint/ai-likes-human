@@ -27,6 +27,7 @@ impl LLMFactoryRouter {
     }
 }
 
+#[async_trait::async_trait]
 impl LLMFactory for LLMFactoryRouter {
     fn is_compatible(&self, model: &str) -> bool {
         for factory in &self.llm_factories {
@@ -38,14 +39,14 @@ impl LLMFactory for LLMFactoryRouter {
         false
     }
 
-    fn create(
+    async fn create(
         &self,
-        parameters: CreateLLMParameters,
+        parameters: &CreateLLMParameters,
     ) -> Result<Box<dyn LLM>, Box<dyn Error + Send>> {
         let factory = self.find_factory(&parameters.model);
 
         if let Some(factory) = factory {
-            return factory.create(parameters);
+            return factory.create(parameters).await;
         }
 
         Err(anyhow!("No corresponding LLM for {}", parameters.model).into())

@@ -1,4 +1,4 @@
 pub mod dto;
-mod repository;
+pub mod repository;
 
 pub use repository::ConfigurationRepository;

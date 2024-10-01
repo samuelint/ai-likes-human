@@ -6,8 +6,7 @@ pub mod core;
 pub mod screencapture;
 pub mod system_tray;
 
-use app::configuration::AppConfigurationBuilder;
-use app_state::app_state::AppState;
+use app_state::{app_state::AppState, app_state_factory};
 use core::tauri_command::{
     find_configuration, get_app_directory_path, get_inference_server_url, is_server_up,
     upsert_configuration,
@@ -50,21 +49,16 @@ async fn main() {
 }
 
 fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error + 'static>> {
-    let data_path = app.handle().path_resolver().app_data_dir().unwrap();
-
-    let app_configuration = AppConfigurationBuilder::new()
-        .with_app_data_directory_path(&data_path)
-        .with_local_database()
-        .with_local_server_port(1234)
-        .create();
-
     let app_handle = app.handle();
     tauri::async_runtime::spawn(async move {
-        let state = AppState::new(app_configuration).await;
+        match app_state_factory::create_and_bind(&app_handle).await {
+            Ok(_) => {}
+            Err(e) => {
+                panic!("Failed to create app state: {}", e);
+            }
+        }
 
-        app_handle.manage(state);
         let state: State<'_, AppState> = app_handle.state();
-
         state.inference_server.serve().await;
     });
 

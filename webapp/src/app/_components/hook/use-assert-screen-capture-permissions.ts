@@ -1,5 +1,5 @@
 import { useToast } from '@/components/ui/use-toast';
-import { assertScreenCapturePermissions } from '@/lib/api/tauri-command/screen-capture';
+import { assertScreenCapturePermissions } from '@/lib/api/tauri/screen-capture';
 import { useMount } from 'react-use';
 
 export function useAssertScreenCapturePermissions() {

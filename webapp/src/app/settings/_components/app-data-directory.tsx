@@ -1,5 +1,5 @@
 import { ReadonlyKV } from '@/components/readonly-kv';
-import { getAppDirectoryPath } from '@/lib/api/tauri-command';
+import { getAppDirectoryPath } from '@/lib/api/tauri';
 
 import { useAsync } from 'react-use';
 

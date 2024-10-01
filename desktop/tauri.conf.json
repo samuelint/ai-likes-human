@@ -7,12 +7,12 @@
     "distDir": "../webapp/dist"
   },
   "package": {
-    "productName": "assistant",
+    "productName": "AI Likes Human",
     "version": "0.1.0"
   },
   "tauri": {
     "systemTray": {
-      "iconPath": "icons/icon.png",
+      "iconPath": "icons/system_tray.png",
       "iconAsTemplate": true
     },
     "allowlist": {
@@ -38,7 +38,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.samuelint.assistant",
+      "identifier": "com.samuelint.alh",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -57,7 +57,7 @@
     "security": {
       "csp": {
         "default-src": "'self' customprotocol: asset:",
-        "connect-src": "ipc: http://localhost:8000",
+        "connect-src": "ipc: http://localhost:1234",
         "img-src": "'self' data: *"
       }
     },
@@ -69,7 +69,7 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "Assistant",
+        "title": "AI Likes Human",
         "width": 1024
       }
     ]

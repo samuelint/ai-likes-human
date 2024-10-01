@@ -94,10 +94,10 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model, temperat
   }, [messages]);
 
   useEffect(() => {
-    if (isLastMessageFromUser()) {
+    if (isLastMessageFromUser() && !error) {
       streamRun();
     }
-  }, [streamRun, isLastMessageFromUser]);
+  }, [streamRun, isLastMessageFromUser, error]);
 
 
   const append = useCallback(async (

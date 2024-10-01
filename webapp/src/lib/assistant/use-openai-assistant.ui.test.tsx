@@ -11,6 +11,7 @@ import { useOpenAiAssistant } from './use-openai-assistant';
 import { buildOpenAiApiFetchMock, CreateMessageMock, CreateRunMock, CreateThreadMock, ErrorMock } from '@/lib/assistant/openai-fetch-mock';
 import { useOpenaiClient } from './openai-client';
 import { useState } from 'react';
+import { ListThreadSingleMessageMock } from './openai-fetch-mock/list-thread-message-mock';
 
 
 vi.mock('./openai-client');
@@ -312,6 +313,7 @@ describe('new-conversation', () => {
 });
 
 describe('existing-thread', () => {
+  const threadId = 'thread_abc123';
   const fetch = vi.fn();
   const TestComponent = () => {
     when(useOpenaiClient).mockReturnValue(new OpenAI({
@@ -320,7 +322,7 @@ describe('existing-thread', () => {
       dangerouslyAllowBrowser: true,
     }));
 
-    const { status, messages, error, append } = useOpenAiAssistant({ threadId: 'some-thread-id' });
+    const { status, messages, error, append } = useOpenAiAssistant({ threadId });
 
     return (
       <div>
@@ -348,74 +350,182 @@ describe('existing-thread', () => {
     cleanup();
   });
 
-  describe('load existing messages', () => {
-    const messages = [{
-      'id': 'msg_abc123',
-      'object': 'thread.message',
-      'created_at': 1699016383,
-      'assistant_id': null,
-      'thread_id': 'thread_abc123',
-      'run_id': null,
-      'role': 'user',
-      'content': [
-        {
-          'type': 'text',
-          'text': {
-            'value': 'How does AI work? Explain it in simple terms.',
-            'annotations': []
-          }
-        }
-      ],
-      'attachments': [],
-      'metadata': {}
-    },
-    {
-      'id': 'msg_abc456',
-      'object': 'thread.message',
-      'created_at': 1699016383,
-      'assistant_id': null,
-      'thread_id': 'thread_abc123',
-      'run_id': null,
-      'role': 'user',
-      'content': [
-        {
-          'type': 'text',
-          'text': {
-            'value': 'Hello, what is AI?',
-            'annotations': []
-          }
-        }
-      ],
-      'attachments': [],
-      'metadata': {}
-    }];
-
+  describe('with last message from user', () => {
     beforeEach(() => {
-      fetch.mockImplementation(async (url: string) => {
-        if (url.endsWith('/threads/some-thread-id/messages')) {
-          return {
-            ok: true,
-            status: 200,
-            headers: new Map([['content-type', 'application/json']]),
-            json: async () => ({
-              'object': 'list',
-              'data': messages,
-              'first_id': 'msg_abc123',
-              'last_id': 'msg_abc456',
-              'has_more': false
-            })
-          };
-        }
-      });
+
+      fetch.mockImplementation(buildOpenAiApiFetchMock([
+        new ListThreadSingleMessageMock({
+          messageId: 'msg_abc123',
+          threadId,
+          role: 'user',
+          text_content: 'How does AI work? Explain it in simple terms.',
+        }),
+        new CreateRunMock({
+          chunks: [
+            { event: 'thread.run.created',
+              data: {
+                'id': 'run_abc123',
+                'object': 'thread.run',
+                'created_at': 1699063290,
+                'assistant_id': 'asst_abc123',
+                'thread_id': 'thread_abc123',
+                'status': 'queued',
+                'started_at': 1699063290,
+                'completed_at': 1699063291,
+                'model': 'gpt-4-turbo',
+                'tools': [],
+                'metadata': {},
+                'temperature': 1.0,
+                'top_p': 1.0,
+                'max_prompt_tokens': 1000,
+                'max_completion_tokens': 1000,
+                'response_format': 'auto',
+                'tool_choice': 'auto',
+              }
+            },
+            {
+              event: 'thread.message.created',
+              data: {
+                'id': 'msg_123',
+                'object': 'thread.message',
+                'created_at': 1713226573,
+                'assistant_id': 'asst_abc123',
+                'thread_id': 'thread_abc123',
+                'run_id': 'run_abc123',
+                'role': 'assistant',
+                'content': [
+                ],
+                'attachments': [],
+                'metadata': {}
+              }
+            },
+            {
+              event: 'thread.message.delta',
+              data: {
+                'id': 'msg_123',
+                'object': 'thread.message.delta',
+                'delta': {
+                  'content': [
+                    {
+                      'index': 0,
+                      'type': 'text',
+                      'text': { 'value': 'Hello human', 'annotations': [] }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              event: 'thread.message.completed',
+              data: {
+                'id': 'msg_123',
+                'object': 'thread.message',
+                'created_at': 1698983503,
+                'thread_id': 'thread_abc123',
+                'role': 'assistant',
+                'content': [
+                  {
+                    'index': 0,
+                    'type': 'text',
+                    'text': {
+                      'value': 'Hello human',
+                      'annotations': []
+                    }
+                  }
+                ],
+                'assistant_id': 'asst_abc123',
+                'run_id': 'run_abc123',
+                'attachments': [],
+                'metadata': {}
+              }
+            },
+            {
+              event: 'thread.run.completed',
+              data: {
+                'id': 'run_abc123',
+                'object': 'thread.run',
+                'created_at': 1699063290,
+                'assistant_id': 'asst_abc123',
+                'thread_id': 'thread_abc123',
+                'status': 'completed',
+                'started_at': 1699063290,
+                'completed_at': 1699063291,
+                'model': 'gpt-4-turbo',
+                'tools': [],
+                'metadata': {},
+                'usage': null,
+                'temperature': 1.0,
+                'top_p': 1.0,
+                'max_prompt_tokens': 1000,
+                'max_completion_tokens': 1000,
+
+                'response_format': 'auto',
+                'tool_choice': 'auto',
+              }
+            }]
+        }),
+      ]));
 
       render(<TestComponent />);
     });
 
     it('should show existing message content', async () => {
-      await screen.findByTestId('message-0');
+      await waitFor(async () => {
+        await screen.findByTestId('message-0');
 
-      expect(screen.getByTestId('message-0')).toHaveTextContent('How does AI work? Explain it in simple terms.');
-      expect(screen.getByTestId('message-1')).toHaveTextContent('Hello, what is AI?');
+        expect(screen.getByTestId('message-0')).toHaveTextContent('How does AI work? Explain it in simple terms.');
+      });
+    });
+
+    it('should start run automatically', async () => {
+      await waitFor(async () => {
+        await screen.findByTestId('message-1');
+        expect(screen.getByTestId('message-1')).toHaveTextContent('Hello human');
+      });
+    });
+  });
+
+  describe('with last message from user and error on run', () => {
+    let runCallMock: ErrorMock;
+    beforeEach(() => {
+      runCallMock = new ErrorMock({ status: 400, errorMessage: 'Not found', url_match: '/runs' });
+
+      fetch.mockImplementation(buildOpenAiApiFetchMock([
+        new ListThreadSingleMessageMock({
+          messageId: 'msg_abc123',
+          threadId,
+          role: 'user',
+          text_content: 'How does AI work? Explain it in simple terms.',
+        }),
+        runCallMock,
+      ]));
+
+      render(<TestComponent />);
+    });
+
+    it('should have an error', async () => {
+      await screen.findByTestId('error');
+      expect(screen.getByTestId('error')).toHaveTextContent(
+        'Error: 400 Not found',
+      );
+    });
+
+    it('should automatically start a new run only once', async () => {
+      await waitFor(async () => {
+        expect(runCallMock.callCount).toBe(1);
+      });
+
+      // There's no way to test that the value is never greater than 1 in this context.
+      // The callCount is 1 at some point, then after some times it becomes 2, and 3, and so on..
+      // When doing:
+      //
+      // await waitFor(async () => {
+      //   expect(runCallMock.callCount).toBe(1);
+      // });
+      // The test pass since the counter is set to one. But that does not test that it does not increment further.
+      // This is why there's a wait here.
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      expect(runCallMock.callCount).toBe(1);
     });
   });
 });

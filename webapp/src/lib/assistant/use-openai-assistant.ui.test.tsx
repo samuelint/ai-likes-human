@@ -12,19 +12,15 @@ import { buildOpenAiApiFetchMock, CreateMessageMock, CreateRunMock, CreateThread
 import { useOpenaiClient } from './openai-client';
 import { useState } from 'react';
 import { ListThreadSingleMessageMock } from './openai-fetch-mock/list-thread-message-mock';
+import { ListNoThreadSingleMessageMock } from './openai-fetch-mock/list-no-thread-message-mock';
 
 
 vi.mock('./openai-client');
 describe('new-conversation', () => {
   const fetch = vi.fn();
-  const TestComponent = () => {
-    const threadId = 'thread_abc123';
-    when(useOpenaiClient).mockReturnValue(new OpenAI({
-      apiKey: 'abc',
-      fetch,
-      dangerouslyAllowBrowser: true,
-    }));
+  const threadId = 'thread_abc123';
 
+  const TestComponent = () => {
     const { status, messages, error, append, abort } = useOpenAiAssistant({ threadId });
     const [appendError, setAppendError] = useState<Error>();
 
@@ -58,6 +54,14 @@ describe('new-conversation', () => {
       </div>
     );
   };
+
+  beforeEach(() => {
+    when(useOpenaiClient).mockReturnValue(new OpenAI({
+      apiKey: 'abc',
+      fetch,
+      dangerouslyAllowBrowser: true,
+    }));
+  });
 
   afterEach(() => {
     vi.restoreAllMocks();
@@ -174,6 +178,7 @@ describe('new-conversation', () => {
             }]
         }),
         new CreateThreadMock(),
+        new ListNoThreadSingleMessageMock(),
       ]));
 
       render(<TestComponent />);
@@ -259,6 +264,7 @@ describe('new-conversation', () => {
 
     beforeEach(() => {
       fetch.mockImplementation(buildOpenAiApiFetchMock([
+        new ListNoThreadSingleMessageMock(),
         new CreateMessageMock(),
         new CreateThreadMock(),
         new CreateRunMock({
@@ -266,7 +272,6 @@ describe('new-conversation', () => {
             finishGeneration = resolve;
           })
         }),
-
       ]));
 
       render(<TestComponent />);
@@ -289,6 +294,7 @@ describe('new-conversation', () => {
   describe('abort', () => {
     beforeEach(() => {
       fetch.mockImplementation(buildOpenAiApiFetchMock([
+        new ListNoThreadSingleMessageMock(),
         new CreateMessageMock(),
         new CreateThreadMock(),
         new CreateRunMock({
@@ -316,12 +322,6 @@ describe('existing-thread', () => {
   const threadId = 'thread_abc123';
   const fetch = vi.fn();
   const TestComponent = () => {
-    when(useOpenaiClient).mockReturnValue(new OpenAI({
-      apiKey: 'abc',
-      fetch,
-      dangerouslyAllowBrowser: true,
-    }));
-
     const { status, messages, error, append } = useOpenAiAssistant({ threadId });
 
     return (
@@ -344,6 +344,14 @@ describe('existing-thread', () => {
       </div>
     );
   };
+
+  beforeEach(() => {
+    when(useOpenaiClient).mockReturnValue(new OpenAI({
+      apiKey: 'abc',
+      fetch,
+      dangerouslyAllowBrowser: true,
+    }));
+  });
 
   afterEach(() => {
     vi.restoreAllMocks();

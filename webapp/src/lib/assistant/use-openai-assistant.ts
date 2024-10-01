@@ -146,8 +146,7 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model, temperat
       }
     };
     fetchMessages();
-
-  }, [openai.beta.threads.messages, threadId, setUnknownError]);
+  }, [openai, threadId, setUnknownError]);
 
   const submitMessage = async (
     event?: React.FormEvent<HTMLFormElement>,

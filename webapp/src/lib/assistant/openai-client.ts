@@ -1,5 +1,6 @@
 import { openai_api_url } from '@/app.config';
 import OpenAI from 'openai';
+import { useMemo } from 'react';
 
 
 const default_openai = new OpenAI({
@@ -13,5 +14,5 @@ interface Props {
 }
 
 export function useOpenaiClient({ openai }: Props = { openai: default_openai }) {
-  return openai;
+  return useMemo(() => openai, [openai]);
 }

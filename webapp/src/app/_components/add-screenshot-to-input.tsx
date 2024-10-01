@@ -2,7 +2,7 @@ import { TakeScreenshotButton } from '@/components/take-screenshot-button';
 import { useToast } from '@/components/ui/use-toast';
 import { useCallback, useState } from 'react';
 import { AddImageAttachments } from '@/lib/assistant/image-attachment.type';
-import { captureBase64Screens } from '@/lib/tauri-command/screen-capture';
+import { captureBase64Screens } from '@/lib/api/tauri-command/screen-capture';
 import { useAssertScreenCapturePermissions } from './hook/use-assert-screen-capture-permissions';
 
 

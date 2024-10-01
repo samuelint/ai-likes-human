@@ -1,5 +1,5 @@
 import { Thread } from 'openai/resources/beta/threads/threads.mjs';
-import { toDate } from '../date';
+import { toDate } from '@/lib/utils/date';
 
 
 export interface ThreadPreviewDto {

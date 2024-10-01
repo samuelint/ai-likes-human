@@ -1,7 +1,7 @@
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { Run } from 'openai/resources/beta/threads/runs/runs.mjs';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
-import { toFromNowFormattedDate } from '@/lib/date';
+import { toFromNowFormattedDate } from '@/lib/utils/date';
 import { ReactNode } from 'react';
 
 

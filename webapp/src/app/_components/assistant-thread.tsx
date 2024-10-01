@@ -1,13 +1,12 @@
 
 import { useErrorNotification } from '@/app/_components/use-error-notification';
 import Chat from '@/components/chat';
-import { useLLMModel } from '@/lib/use-llm-model';
-import { useLlmTemperature } from '@/lib/use-llm-temperature';
+import { useLLMModel, useLlmTemperature } from '@/lib/models';
 import { useOpenAiAssistant } from '@/lib/assistant/use-openai-assistant';
 import { useThreadRuns } from '@/lib/assistant/use-thread-runs';
 import NewAssistantMessage from './new-assistant-message';
 import { References } from '@/components/references';
-import { useMessagesReferences } from '@/lib/use-messages-references';
+import { useMessagesReferences } from '@/lib/assistant/use-messages-references';
 
 
 interface Props {

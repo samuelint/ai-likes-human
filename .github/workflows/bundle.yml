@@ -59,8 +59,6 @@ jobs:
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
-          # tagName: ${{ steps.tag.outputs.tag }}
-          # releaseName: ${{ steps.tag.outputs.tag }}
           releaseDraft: true
           args: ${{ matrix.args }}
 
@@ -69,21 +67,12 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            desktop/target/**/release/bundle/**/*.dmg
-            desktop/target/**/release/bundle/**/*.app
-            desktop/target/release/bundle/**/*.dmg
-            desktop/target/release/bundle/**/*.app
+            target/release/bundle/**/*.dmg
+            target/release/bundle/**/*.app
 
-            desktop/target/release/bundle/**/*.deb
-            desktop/target/release/bundle/**/*.rpm
-            desktop/target/release/bundle/**/*.AppImage
+            target/release/bundle/**/*.deb
+            target/release/bundle/**/*.rpm
+            target/release/bundle/**/*.AppImage
 
-            desktop/target/release/bundle/**/*.exe
-            desktop/target/release/bundle/**/*.msi
-
-      # # Project rules must be updated to push changes
-      # # GH013: Repository rule violations found for refs/heads/main.
-      # - uses: stefanzweifel/git-auto-commit-action@v5
-      #   with:
-      #     commit_message: Bump version to ${{ env.VERSION }}
-      #     branch: main
+            target/release/bundle/**/*.exe
+            target/release/bundle/**/*.msi

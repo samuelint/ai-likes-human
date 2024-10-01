@@ -1,5 +1,5 @@
 import { ReadonlyKV } from '@/components/readonly-kv';
-import { getInferenceServerUrl } from '@/lib/tauri-command';
+import { getInferenceServerUrl } from '@/lib/api/tauri';
 import { useAsync } from 'react-use';
 
 

@@ -1,4 +1,4 @@
-import { useConfigurationKV } from '@/lib/use-configuration-kv';
+import { useConfigurationKV } from '@/lib/configuration/use-configuration-kv';
 
 
 export function useUsername() {

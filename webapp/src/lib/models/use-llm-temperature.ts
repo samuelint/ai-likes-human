@@ -1,4 +1,4 @@
-import { useConfigurationKV } from './use-configuration-kv';
+import { useConfigurationKV } from '@/lib/configuration/use-configuration-kv';
 
 export function useLlmTemperature() {
   const { data } = useConfigurationKV('DEFAULT_LLM_TEMPERATURE');

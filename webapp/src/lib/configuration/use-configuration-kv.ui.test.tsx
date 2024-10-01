@@ -1,10 +1,10 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useConfigurationKV } from './use-configuration-kv';
-import { findConfiguration, upsertConfiguration } from './tauri-command';
+import { findConfiguration, upsertConfiguration } from '@/lib/api/tauri';
 import { when } from 'jest-when';
 
-vi.mock('./tauri-command');
+vi.mock('@/lib/api/tauri');
 describe('stream data stream', () => {
   const TestComponent = () => {
     const { data, error, mutate } = useConfigurationKV('some-key');

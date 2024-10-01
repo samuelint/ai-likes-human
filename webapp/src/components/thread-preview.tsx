@@ -3,7 +3,7 @@ import { type ThreadPreviewDto } from '@/lib/assistant/thread.type';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from './ui/button';
 import { ThreadPreviewContextMenu } from './thread-preview-context-menu';
-import { toFromNowFormattedDate } from '@/lib/date';
+import { toFromNowFormattedDate } from '@/lib/utils/date';
 
 
 export type ThreadPreviewComponentDto = Pick<ThreadPreviewDto, 'id' | 'title' | 'created_at' | 'assistantId'>;

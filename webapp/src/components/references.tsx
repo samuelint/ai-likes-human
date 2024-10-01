@@ -1,4 +1,4 @@
-import { MessageReference } from '@/lib/message-reference.type';
+import { MessageReference } from '@/lib/assistant/message-reference.type';
 import { AppLink } from './app-link';
 
 

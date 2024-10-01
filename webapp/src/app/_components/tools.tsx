@@ -1,6 +1,6 @@
 import { AddImageAttachments } from '@/lib/assistant/image-attachment.type';
 import { AddScreenshotToInput } from './add-screenshot-to-input';
-import { useIsInDesktopApp } from '@/lib/is-in-desktop-app';
+import { useIsInDesktopApp } from '@/lib/utils';
 
 
 interface Props {

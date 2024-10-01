@@ -16,7 +16,7 @@ export function Section({ id, title, description, children }: Props) {
         <CardTitle>{title}</CardTitle>
         { description && <CardDescription>{description}</CardDescription> }
       </CardHeader>
-      <CardContent>
+      <CardContent className='flex flex-col gap-4'>
         { children }
       </CardContent>
     </Card>

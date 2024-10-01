@@ -41,32 +41,35 @@ jobs:
         run: |
           pnpm run build
 
-  desktop:
-    name: Desktop (Tauri)
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: "macos-latest" # for Arm based macs (M1 and above).
-            args: "--target aarch64-apple-darwin"
-          # - platform: "macos-latest" # for Intel based macs.
-          #   args: "--target x86_64-apple-darwin"
-          # - platform: "ubuntu-22.04"
-          #   args: ""
-          # - platform: "windows-latest"
-          #   args: ""
-    runs-on: ${{ matrix.platform }}
-    defaults:
-      run:
-        working-directory: desktop
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Tauri
-        id: prepare-tauri
-        uses: ./.github/actions/prepare_tauri
-        with:
-          platform: ${{ matrix.platform }}
+  ## Comment Note
+  ## Tauri Build is slow. Making CI/CD run costly and longer on each PR. If this is a problem, we can add a Tauri build job.
+  ##
+  # desktop:
+  #   name: Desktop (Tauri)
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       include:
+  #         - platform: "macos-latest" # for Arm based macs (M1 and above).
+  #           args: "--target aarch64-apple-darwin"
+  #         # - platform: "macos-latest" # for Intel based macs.
+  #         #   args: "--target x86_64-apple-darwin"
+  #         # - platform: "ubuntu-22.04"
+  #         #   args: ""
+  #         # - platform: "windows-latest"
+  #         #   args: ""
+  #   runs-on: ${{ matrix.platform }}
+  #   defaults:
+  #     run:
+  #       working-directory: desktop
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Setup Tauri
+  #       id: prepare-tauri
+  #       uses: ./.github/actions/prepare_tauri
+  #       with:
+  #         platform: ${{ matrix.platform }}
 
-      - name: Build
-        run: |
-          pnpm run build
+  #     - name: Build
+  #       run: |
+  #         pnpm run build

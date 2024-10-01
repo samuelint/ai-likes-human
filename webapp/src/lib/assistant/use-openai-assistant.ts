@@ -94,10 +94,10 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model, temperat
   }, [messages]);
 
   useEffect(() => {
-    if (isLastMessageFromUser()) {
+    if (isLastMessageFromUser() && !error) {
       streamRun();
     }
-  }, [streamRun, isLastMessageFromUser]);
+  }, [streamRun, isLastMessageFromUser, error]);
 
 
   const append = useCallback(async (
@@ -146,8 +146,7 @@ export function useOpenAiAssistant({ assistantId = '', threadId, model, temperat
       }
     };
     fetchMessages();
-
-  }, [openai.beta.threads.messages, threadId, setUnknownError]);
+  }, [openai, threadId, setUnknownError]);
 
   const submitMessage = async (
     event?: React.FormEvent<HTMLFormElement>,

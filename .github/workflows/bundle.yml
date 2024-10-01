@@ -67,8 +67,8 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            target/release/**/bundle/**/*.dmg
-            target/release/**/bundle/**/*.app
+            target/**/release/bundle/**/*.dmg
+            target/**/release/**/bundle/**/*.app
 
             target/release/bundle/**/*.deb
             target/release/bundle/**/*.rpm

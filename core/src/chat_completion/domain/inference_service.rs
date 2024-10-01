@@ -31,7 +31,8 @@ impl InferenceService {
             .create(&CreateLLMParameters {
                 model: model.to_string(),
                 ..CreateLLMParameters::default()
-            }).await
+            })
+            .await
             .map_err(|e| e as Box<dyn Error>)?;
 
         let result = llm.generate(&messages[..]).await?;
@@ -73,7 +74,13 @@ impl InferenceService {
             };
 
             while let Some(chunk) = llm_stream.next().await {
-                let chunk = chunk.unwrap();
+                let chunk = match chunk {
+                    Ok(chunk) => chunk,
+                    Err(e) => {
+                        yield Err(Box::new(e));
+                        return;
+                    }
+                };
                 let chunk = ChatCompletionChunkObject::new_assistant_chunk(&chunk.content, &model);
 
                 yield Ok(chunk);

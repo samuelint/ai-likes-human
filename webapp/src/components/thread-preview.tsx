@@ -19,7 +19,7 @@ export function ThreadPreview<TThread extends ThreadPreviewComponentDto = Thread
 
   return (
     <ThreadPreviewContextMenu onDelete={() => onDelete && onDelete(thread)}>
-      <Link href={`/thread/${id}`} className={cn(buttonVariants({ variant: isActive ? 'secondary' : 'outline' }), 'flex flex-col items-start')}>
+      <Link href={`/thread/${id}`} className={cn(buttonVariants({ variant: isActive ? 'secondary' : 'outline' }), 'flex flex-col items-start select-none')}>
         <span className=''>{title}</span>
         <span className='text-xs text-slate-400'>{toFromNowFormattedDate(created_at)}</span>
         <span className='text-xs font-bold text-slate-400'>{ thread.assistantId }</span>

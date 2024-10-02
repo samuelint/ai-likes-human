@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 
 import { toThreadPreview } from './thread.type';
-import { createApiJsonFetcher } from '@/lib/api/api-fetcher';
+import { createApiJsonFetcher } from '@/lib/core-api';
 
 
 interface Props {

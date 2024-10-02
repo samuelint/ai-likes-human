@@ -2,7 +2,7 @@
 
 import { ModelSelectorModal } from '@/components/model-settings-modal';
 import { Button } from '@/components/ui/button';
-import { useModelSettingsFormControls } from '@/lib/models/use-model-settings-form';
+import { useModelSettingsFormControls } from '@/lib/llm';
 
 
 export default function AssistantModelSettingsModal() {

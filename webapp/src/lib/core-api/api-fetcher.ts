@@ -13,7 +13,6 @@ export class FetchError extends Error {
 
 export async function fetchApi(path: string, init?: RequestInit) {
   const url = `${appConfig.api_url}${path}`;
-  console.log(url);
   const result = await fetch(url, init);
   if (!result.ok) {
     const msg = await result.text();

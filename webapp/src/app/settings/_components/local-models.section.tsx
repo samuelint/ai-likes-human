@@ -1,6 +1,6 @@
 import { ModelCard } from '@/components/model-card';
 import { Section } from '@/components/section';
-import { useLocalModelsList } from '@/lib/models/use-local-models-list';
+import { useLocalModelsList } from '@/lib/llm';
 
 
 export default function LocalModelsSection() {

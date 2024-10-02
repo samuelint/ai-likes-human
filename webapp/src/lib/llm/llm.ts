@@ -1,5 +1,5 @@
 import { LLM_API_KEYS_KEYS } from '@/app.config';
-import { findConfiguration } from './tauri';
+import { findConfiguration } from '../core-api/tauri';
 
 export async function isAtLeastOneLlmApiKeySet(): Promise<boolean> {
   for (const key of LLM_API_KEYS_KEYS) {

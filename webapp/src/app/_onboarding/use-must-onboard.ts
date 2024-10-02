@@ -1,4 +1,4 @@
-import { isAtLeastOneLlmApiKeySet } from '@/lib/api/llm';
+import { isAtLeastOneLlmApiKeySet } from '@/lib/llm';
 import { useAsyncRetry, useInterval } from 'react-use';
 
 interface Props {

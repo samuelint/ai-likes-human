@@ -2,7 +2,7 @@ import useSWR from 'swr';
 import { useCallback, useEffect, useState } from 'react';
 
 import { useErrorNotification } from '@/app/_components/use-error-notification';
-import { findConfiguration, upsertConfiguration } from '@/lib/api/tauri';
+import { findConfiguration, upsertConfiguration } from '@/lib/core-api/tauri';
 
 
 

@@ -1,7 +1,7 @@
 
 import { useErrorNotification } from '@/app/_components/use-error-notification';
 import Chat from '@/components/chat';
-import { useLLMModel, useLlmTemperature } from '@/lib/models';
+import { useLLMModel, useLlmTemperature } from '@/lib/llm';
 import { useOpenAiAssistant } from '@/lib/assistant/use-openai-assistant';
 import { useThreadRuns } from '@/lib/assistant/use-thread-runs';
 import NewAssistantMessage from './new-assistant-message';

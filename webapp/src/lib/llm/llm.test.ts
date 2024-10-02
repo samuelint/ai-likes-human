@@ -1,9 +1,9 @@
 import { when } from 'jest-when';
 import { isAtLeastOneLlmApiKeySet } from './llm';
-import { findConfiguration } from './tauri';
+import { findConfiguration } from '@/lib/core-api/tauri';
 import { LLM_API_KEYS_KEYS } from '@/app.config';
 
-vi.mock('./tauri');
+vi.mock('@/lib/core-api/tauri');
 describe('isAtLeastOneLlmApiKeySet', () => {
 
   it('should return false when each api key value is empty', async () => {

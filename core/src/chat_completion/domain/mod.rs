@@ -1,5 +1,6 @@
-mod dto;
+pub mod dto;
 mod inference_service;
+mod langchain_adapter;
 mod types;
 
 use std::sync::Arc;

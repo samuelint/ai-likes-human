@@ -4,7 +4,7 @@ mod message_delta_test;
 
 use serde::{Deserialize, Serialize};
 
-use super::{ImageUrlContent, TextContent};
+use crate::chat_completion::{ApiTextContent, ImageUrl};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(untagged)]
@@ -13,13 +13,13 @@ pub enum MessageDeltaContent {
         index: i32,
         #[serde(rename = "type")]
         type_: String,
-        text: TextContent,
+        text: ApiTextContent,
     },
     ImageUrl {
         index: i32,
         #[serde(rename = "type")]
         type_: String,
-        image_url: ImageUrlContent,
+        image_url: ImageUrl,
     },
 }
 
@@ -28,7 +28,7 @@ impl MessageDeltaContent {
         Self::Text {
             index: 0,
             type_: "text".to_string(),
-            text: TextContent::annotated(text),
+            text: ApiTextContent::annotated(text),
         }
     }
 
@@ -36,7 +36,7 @@ impl MessageDeltaContent {
         Self::ImageUrl {
             index: 0,
             type_: "image_url".to_string(),
-            image_url: ImageUrlContent::url(url),
+            image_url: ImageUrl::url(url),
         }
     }
 }
@@ -46,7 +46,7 @@ impl Default for MessageDeltaContent {
         Self::Text {
             index: 0,
             type_: "text".to_string(),
-            text: TextContent::Annotated {
+            text: ApiTextContent::Annotated {
                 value: "".to_string(),
                 annotations: vec![],
             },

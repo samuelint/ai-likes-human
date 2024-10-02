@@ -1,7 +1,9 @@
 use crate::test_utils::{self, assistant_api::AssistantApiClient};
-use app_core::assistant::domain::dto::{
-    ApiCreateThreadAndRunDto, ApiCreateThreadDto, ApiCreateThreadMessageDto, ApiMessageContent,
-    ThreadDto,
+use app_core::{
+    assistant::domain::dto::{
+        ApiCreateThreadAndRunDto, ApiCreateThreadDto, ApiCreateThreadMessageDto, ThreadDto,
+    },
+    chat_completion::ApiMessageContent,
 };
 use axum::http::StatusCode;
 use test_utils::router_client::RouterClient;

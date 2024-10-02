@@ -15,8 +15,8 @@ use std::{convert::Infallible, error::Error, sync::Arc};
 
 use crate::app_state::ServerState;
 
-#[derive(Serialize, Deserialize, Clone)]
-pub struct ChatCompletionParameters {
+#[derive(Default, Serialize, Deserialize, Clone)]
+pub struct ApiChatCompletionRequestDto {
     pub model: String,
     pub stream: Option<bool>,
     pub messages: Vec<ChatCompletionMessageDto>,
@@ -26,7 +26,7 @@ pub struct ChatCompletionParameters {
 
 pub async fn run_chat_completions(
     axum::extract::State(state): axum::extract::State<Arc<ServerState>>,
-    extract::Json(payload): extract::Json<ChatCompletionParameters>,
+    extract::Json(payload): extract::Json<ApiChatCompletionRequestDto>,
 ) -> impl IntoResponse {
     let use_stream = payload.stream.unwrap_or(false);
 
@@ -42,7 +42,7 @@ pub async fn run_chat_completions(
 
 async fn run_json_chat_completions(
     state: Arc<ServerState>,
-    payload: ChatCompletionParameters,
+    payload: ApiChatCompletionRequestDto,
 ) -> Result<Json<ChatCompletionObject>, Box<dyn Error>> {
     let result = state
         .api
@@ -54,7 +54,7 @@ async fn run_json_chat_completions(
 
 fn run_stream_chat_completions(
     state: Arc<ServerState>,
-    payload: ChatCompletionParameters,
+    payload: ApiChatCompletionRequestDto,
 ) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
     let model = payload.model.clone();
 

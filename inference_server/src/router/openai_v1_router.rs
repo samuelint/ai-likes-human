@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use axum::{
+    extract::DefaultBodyLimit,
     routing::{delete, get, post},
     Router,
 };
@@ -42,5 +43,6 @@ fn create_thread_router(state: Arc<ServerState>) -> Router<Arc<ServerState>> {
         .route("/:thread_id/runs", post(create_run_and_execute))
         .route("/:thread_id/runs/:run_id", get(find_thread_run))
         .route("/:thread_id/runs", get(list_thread_runs))
+        .layer(DefaultBodyLimit::max(1024 * 1024 * 100))
         .with_state(Arc::clone(&state))
 }

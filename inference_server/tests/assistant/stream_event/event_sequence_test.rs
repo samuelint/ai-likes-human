@@ -1,4 +1,4 @@
-use crate::test_utils::assistant_api::AssistantApiClient;
+use crate::test_utils::{assistant_api::AssistantApiClient, messages_builder::MessagesBuilder};
 use app_core::assistant::domain::dto::ApiCreateRunDto;
 use pretty_assertions::assert_eq;
 
@@ -6,7 +6,7 @@ use pretty_assertions::assert_eq;
 async fn test_stream_new_thread_run_simple_sequence() {
     let client: AssistantApiClient = AssistantApiClient::new().await;
     let chunks = client
-        .stream_new_thread_with_prompt_as_chunks_vec("Tell me a joke.")
+        .stream_new_thread_as_chunks_vec(MessagesBuilder::from_text("Tell me a joke.").into())
         .await;
 
     assert_eq!(&chunks[0].0, "thread.created");

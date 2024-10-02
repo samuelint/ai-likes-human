@@ -1,9 +1,8 @@
 #[cfg(test)]
 mod test_from_entity_model_to_dto {
     use crate::{
-        assistant::domain::dto::{ApiMessageContent, ThreadMessageDto},
-        entities::message,
-        utils::time::TimeBuilder,
+        assistant::domain::dto::ThreadMessageDto, chat_completion::ApiMessageContent,
+        entities::message, utils::time::TimeBuilder,
     };
     use pretty_assertions::assert_eq;
 
@@ -113,7 +112,8 @@ mod test_from_entity_model_to_dto {
 #[cfg(test)]
 mod test_from_db_dto_to_entity_model {
     use crate::{
-        assistant::domain::dto::{ApiMessageContent, DbCreateThreadMessageDto, DbMessageContent},
+        assistant::domain::dto::{DbCreateThreadMessageDto, DbMessageContent},
+        chat_completion::ApiMessageContent,
         entities::message,
     };
     use pretty_assertions::assert_eq;

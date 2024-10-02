@@ -1,13 +1,13 @@
 use app_core::assistant::domain::dto::{ApiCreateRunDto, ThreadEventData};
 use pretty_assertions::assert_eq;
 
-use crate::test_utils::assistant_api::AssistantApiClient;
+use crate::test_utils::{assistant_api::AssistantApiClient, messages_builder::MessagesBuilder};
 
 #[tokio::test]
 async fn test_run_stream_ends_with_thread_run_completed_run_id_is_the_same_as_run_created_event() {
     let client: AssistantApiClient = AssistantApiClient::new().await;
     let chunks = client
-        .stream_new_thread_with_prompt_as_chunks_vec("Tell me a joke.")
+        .stream_new_thread_as_chunks_vec(MessagesBuilder::from_text("Tell me a joke.").into())
         .await;
     let run_created_data = chunks
         .iter()

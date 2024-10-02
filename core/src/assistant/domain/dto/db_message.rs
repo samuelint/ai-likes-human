@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 
-use super::{ApiMessageContent, DbMessageContent, Metadata};
+use crate::chat_completion::ApiMessageContent;
+
+use super::{DbMessageContent, Metadata};
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct DbCreateThreadMessageDto {

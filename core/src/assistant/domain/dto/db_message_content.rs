@@ -1,12 +1,12 @@
 use serde::{Deserialize, Serialize};
 
-use super::annotation::MessageAnnotation;
+use crate::chat_completion::{ImageUrl, MessageAnnotation};
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum DbMessageContent {
     Text { text: DbTextContent },
-    ImageUrl { image_url: ImageUrlContent },
+    ImageUrl { image_url: ImageUrl },
 }
 
 impl DbMessageContent {
@@ -56,43 +56,4 @@ impl Default for DbTextContent {
 pub struct AnnotatedTextDto {
     pub value: String,
     pub annotations: Vec<MessageAnnotation>,
-}
-
-#[derive(Default, Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
-pub struct ImageUrl {
-    pub url: String,
-    pub details: Option<String>, // auto, low, high
-}
-
-impl ImageUrl {
-    pub fn url(url: &str) -> Self {
-        Self {
-            url: url.to_string(),
-            details: None,
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
-pub struct ImageUrlContent {
-    pub image_url: ImageUrl,
-}
-
-impl ImageUrlContent {
-    pub fn url(url: &str) -> Self {
-        ImageUrlContent {
-            image_url: ImageUrl {
-                url: url.to_string(),
-                ..ImageUrl::default()
-            },
-        }
-    }
-}
-
-impl Default for ImageUrlContent {
-    fn default() -> Self {
-        Self {
-            image_url: ImageUrl::default(),
-        }
-    }
 }

@@ -1,27 +1,35 @@
 #[cfg(test)]
 mod openai_message_tests {
-    use crate::chat_completion::domain::dto::ChatCompletionMessageDto;
+    use crate::chat_completion::{domain::dto::ChatCompletionMessageDto, ApiMessageContent};
 
     #[test]
     fn test_create_assistant_message() {
-        let result = ChatCompletionMessageDto::new_assistant("Hello");
+        let result = ChatCompletionMessageDto::assistant("Hello");
 
         assert!(result.role == "assistant");
     }
 
     #[test]
     fn test_create_message_string_content() {
-        let result = ChatCompletionMessageDto::new_assistant("Hello");
+        let result = ChatCompletionMessageDto::assistant("Hello");
 
-        assert!(result.content == "Hello");
+        assert!(result.to_string_content() == "Hello");
     }
 
     #[test]
-    fn test_conversion_to_langchain_message_have_content() {
-        let result: langchain_rust::schemas::Message =
-            ChatCompletionMessageDto::new_assistant("Hello").into();
+    fn test_text_content_are_all_join_in_a_string() {
+        let message = ChatCompletionMessageDto {
+            content: vec![
+                ApiMessageContent::text("Hello"),
+                ApiMessageContent::text(" World"),
+                ApiMessageContent::text("!"),
+            ],
+            ..ChatCompletionMessageDto::default()
+        };
 
-        assert!(result.content == "Hello");
+        let result = message.to_string_content();
+
+        assert_eq!(result, "Hello World!");
     }
 }
 
@@ -55,19 +63,19 @@ mod chat_completion_object_tests {
 
     #[test]
     fn test_openaichat_completion_object_single_choice() {
-        let message = ChatCompletionMessageDto::new_assistant("Hello");
+        let message = ChatCompletionMessageDto::assistant("Hello");
         let result = ChatCompletionObject::new_single_choice(message, "");
 
         let choice1 = &result.choices[0];
         assert!(choice1.index == 0);
         assert!(choice1.message.is_some());
-        assert!(choice1.message.as_ref().unwrap().content == "Hello");
+        assert!(choice1.message.as_ref().unwrap().to_string_content() == "Hello");
         assert!(choice1.message.as_ref().unwrap().role == "assistant");
     }
 
     #[test]
     fn test_openaichat_completion_object_single_choice_finish_reason_is_stop() {
-        let message = ChatCompletionMessageDto::new_assistant("Hello");
+        let message = ChatCompletionMessageDto::assistant("Hello");
         let result = ChatCompletionObject::new_single_choice(message, "");
 
         let choice1 = &result.choices[0];

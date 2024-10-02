@@ -4,7 +4,7 @@ mod service;
 pub mod types;
 
 #[allow(unused_imports)]
-pub use controller::chat_completions::{run_chat_completions, ChatCompletionParameters};
+pub use controller::chat_completions::{run_chat_completions, ApiChatCompletionRequestDto};
 pub use types::*;
 
 #[allow(unused_imports)]

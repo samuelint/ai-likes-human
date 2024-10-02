@@ -2,14 +2,11 @@
 #[path = "./api_message_test.rs"]
 mod api_message_test;
 
-use crate::chat_completion::ChatCompletionMessageDto;
+use crate::chat_completion::{ApiMessageContent, ChatCompletionMessageDto, MessageAnnotation};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
-use super::{
-    annotation::MessageAnnotation, DbCreateThreadMessageDto, DbMessageContent, ImageUrlContent,
-    Metadata,
-};
+use super::{DbCreateThreadMessageDto, DbMessageContent, Metadata};
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
 pub struct TextContentDto {
@@ -58,7 +55,7 @@ pub struct ApiUpdateThreadMessageDto {
 impl From<ThreadMessageDto> for ChatCompletionMessageDto {
     fn from(dto: ThreadMessageDto) -> Self {
         ChatCompletionMessageDto {
-            content: dto.to_string_content(),
+            content: dto.content,
             role: dto.role,
         }
     }
@@ -101,77 +98,6 @@ impl Default for ApiCreateThreadMessageDto {
             role: "user".to_string(),
             attachments: None,
             metadata: None,
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
-#[serde(untagged)]
-pub enum TextContent {
-    String(String),
-    Annotated {
-        value: String,
-        annotations: Vec<MessageAnnotation>,
-    },
-}
-
-impl TextContent {
-    pub fn annotated(text: &str) -> Self {
-        Self::Annotated {
-            value: text.to_string(),
-            annotations: vec![],
-        }
-    }
-
-    pub fn string(text: &str) -> Self {
-        Self::String(text.to_string())
-    }
-
-    pub fn to_string(&self) -> String {
-        match self {
-            TextContent::String(text) => text.to_string(),
-            TextContent::Annotated { value, .. } => value.to_string(),
-        }
-    }
-}
-
-impl Default for TextContent {
-    fn default() -> Self {
-        Self::Annotated {
-            value: "".to_string(),
-            annotations: vec![],
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
-#[serde(tag = "type", rename_all = "snake_case")]
-pub enum ApiMessageContent {
-    Text { text: TextContent },
-    ImageUrl { image_url: ImageUrlContent },
-}
-
-impl Default for ApiMessageContent {
-    fn default() -> Self {
-        Self::Text {
-            text: TextContent::Annotated {
-                value: "".to_string(),
-                annotations: vec![],
-            },
-        }
-    }
-}
-
-impl ApiMessageContent {
-    pub fn text(value: &str) -> Self {
-        Self::Text {
-            text: TextContent::annotated(value),
-        }
-    }
-
-    pub fn image_url(url: &str) -> Self {
-        Self::ImageUrl {
-            image_url: ImageUrlContent::url(url),
         }
     }
 }

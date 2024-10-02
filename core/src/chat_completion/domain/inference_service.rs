@@ -37,7 +37,7 @@ impl InferenceService {
 
         let result = llm.generate(&messages[..]).await?;
 
-        let message = ChatCompletionMessageDto::new_assistant(&result.generation);
+        let message = ChatCompletionMessageDto::assistant(&result.generation);
         let data = ChatCompletionObject::new_single_choice(message, model);
 
         Ok(data)

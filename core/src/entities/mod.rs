@@ -4,5 +4,6 @@ pub mod prelude;
 
 pub mod configuration;
 pub mod message;
+pub mod profile;
 pub mod run;
 pub mod thread;

@@ -3,6 +3,7 @@ use std::sync::Arc;
 use crate::{
     chat_completion::{ChatCompletionMessageDto, ChatCompletionResult, ChatCompletionStream},
     configuration::ConfigurationDto,
+    profile::domain::dto::ProfileDto,
     AppContainer,
 };
 
@@ -63,5 +64,15 @@ impl ApiFacade {
             .get_configuration_service();
 
         configuration_service.upsert(key, value).await
+    }
+
+    pub async fn get_selected_profiles(
+        &self,
+    ) -> Result<Vec<ProfileDto>, Box<dyn std::error::Error + Send>> {
+        self.container
+            .profile_module
+            .get_selected_profiles_service()
+            .get()
+            .await
     }
 }

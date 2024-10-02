@@ -4,6 +4,7 @@ use axum::{
     routing::{delete, get, post},
     Router,
 };
+use tower_http::limit::RequestBodyLimitLayer;
 
 use crate::{
     app_state::ServerState,
@@ -38,7 +39,10 @@ fn create_thread_router(state: Arc<ServerState>) -> Router<Arc<ServerState>> {
             "/:thread_id/messages/:message_id",
             delete(delete_thread_message),
         )
-        .route("/:thread_id/messages", post(create_thread_message))
+        .route(
+            "/:thread_id/messages",
+            post(create_thread_message).layer(RequestBodyLimitLayer::new(1024 * 1024 * 100)), // 100 MB
+        )
         .route("/:thread_id/runs", post(create_run_and_execute))
         .route("/:thread_id/runs/:run_id", get(find_thread_run))
         .route("/:thread_id/runs", get(list_thread_runs))

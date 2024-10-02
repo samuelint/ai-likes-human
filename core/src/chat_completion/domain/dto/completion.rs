@@ -1,36 +1,59 @@
 #[cfg(test)]
-#[path = "./dto_test.rs"]
-mod dto_test;
+#[path = "./completion_test.rs"]
+mod completion_test;
 
+use super::{ApiMessageContent, ImageUrl};
 use chrono::Utc;
+use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
-use crate::llm::domain::message_type_adapter::to_langchain_message_type;
+#[derive(Default, Serialize, Deserialize, Clone)]
+pub struct ChatCompletionRequest {
+    pub model: String,
+    pub messages: Vec<ChatCompletionMessageDto>,
+    pub stream: Option<bool>,
+}
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Default, Serialize, Deserialize, Clone)]
 pub struct ChatCompletionMessageDto {
     pub role: String,
-    pub content: String,
+    pub content: Vec<ApiMessageContent>,
 }
 
 impl ChatCompletionMessageDto {
-    pub fn new_assistant(content: &str) -> Self {
+    pub fn assistant(content: &str) -> Self {
         ChatCompletionMessageDto {
             role: "assistant".to_string(),
-            content: content.to_string(),
+            content: vec![ApiMessageContent::text(content)],
         }
     }
-}
 
-impl From<ChatCompletionMessageDto> for langchain_rust::schemas::Message {
-    fn from(message: ChatCompletionMessageDto) -> Self {
-        langchain_rust::schemas::Message {
-            content: message.content.clone(),
-            message_type: to_langchain_message_type(message.role.clone()),
-            id: None,
-            tool_calls: None,
-            images: None,
+    pub fn user(content: &str) -> Self {
+        ChatCompletionMessageDto {
+            role: "user".to_string(),
+            content: vec![ApiMessageContent::text(content)],
         }
+    }
+
+    pub fn to_string_content(&self) -> String {
+        self.content
+            .iter()
+            .filter_map(|c| match c {
+                ApiMessageContent::Text { text } => Some(text.to_string()),
+                _ => None,
+            })
+            .join("")
+    }
+
+    pub fn to_images_url_vec(&self) -> Vec<ImageUrl> {
+        self.content
+            .iter()
+            .filter_map(|c| match c {
+                ApiMessageContent::ImageUrl { image_url } => Some(image_url),
+                _ => None,
+            })
+            .cloned()
+            .collect()
     }
 }
 
@@ -107,10 +130,25 @@ impl ChatCompletionObject {
     }
 }
 
+#[derive(Default, Serialize, Deserialize)]
+pub struct ChatCompletionDeltaDto {
+    pub role: String,
+    pub content: String,
+}
+
+impl ChatCompletionDeltaDto {
+    pub fn new_assistant(content: &str) -> Self {
+        ChatCompletionDeltaDto {
+            role: "assistant".to_string(),
+            content: content.to_string(),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct ChatCompletionChunkChoice {
     pub index: i32,
-    pub delta: Option<ChatCompletionMessageDto>,
+    pub delta: Option<ChatCompletionDeltaDto>,
     pub finish_reason: Option<String>,
 }
 
@@ -162,7 +200,7 @@ impl Default for ChatCompletionChunkObject {
 impl ChatCompletionChunkObject {
     pub fn new_assistant_chunk(message: &str, model: &str) -> Self {
         let choice = ChatCompletionChunkChoice {
-            delta: Some(ChatCompletionMessageDto::new_assistant(message)),
+            delta: Some(ChatCompletionDeltaDto::new_assistant(message)),
             ..ChatCompletionChunkChoice::default()
         };
         ChatCompletionChunkObject {

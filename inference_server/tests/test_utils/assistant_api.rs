@@ -1,9 +1,11 @@
 use std::pin::Pin;
 
-use app_core::assistant::domain::dto::{
-    ApiCreateRunDto, ApiCreateThreadAndRunDto, ApiCreateThreadDto, ApiCreateThreadMessageDto,
-    ApiMessageContent, PageRequest, PageResponse, RunDto, ThreadDto, ThreadEventData,
-    ThreadMessageDto,
+use app_core::{
+    assistant::domain::dto::{
+        ApiCreateRunDto, ApiCreateThreadAndRunDto, ApiCreateThreadDto, ApiCreateThreadMessageDto,
+        PageRequest, PageResponse, RunDto, ThreadDto, ThreadEventData, ThreadMessageDto,
+    },
+    chat_completion::ApiMessageContent,
 };
 use futures::{Stream, StreamExt};
 use hyper::StatusCode;

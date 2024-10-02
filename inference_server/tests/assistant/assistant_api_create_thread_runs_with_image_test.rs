@@ -4,7 +4,7 @@ use crate::{
 };
 
 #[tokio::test]
-async fn test_run_stream_ends_with_thread_run_completed_run_id_is_the_same_as_run_created_event() {
+async fn test_run_stream_with_image_url() {
     let client: AssistantApiClient = AssistantApiClient::new().await;
     let pig_image = assets::pig_base64();
     let messages = MessagesBuilder::new()

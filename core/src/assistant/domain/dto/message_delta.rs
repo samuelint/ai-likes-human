@@ -4,7 +4,7 @@ mod message_delta_test;
 
 use serde::{Deserialize, Serialize};
 
-use super::{ApiTextContent, ImageUrl};
+use crate::chat_completion::{ApiTextContent, ImageUrl};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(untagged)]

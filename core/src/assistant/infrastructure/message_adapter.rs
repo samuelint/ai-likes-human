@@ -5,7 +5,8 @@ mod message_adapter_test;
 use sea_orm::ActiveValue;
 
 use crate::{
-    assistant::domain::dto::{DbCreateThreadMessageDto, ApiMessageContent, ThreadMessageDto},
+    assistant::domain::dto::{DbCreateThreadMessageDto, ThreadMessageDto},
+    chat_completion::ApiMessageContent,
     entities::message,
     utils::time::TimeBuilder,
 };

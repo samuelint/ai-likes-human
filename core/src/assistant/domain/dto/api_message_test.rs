@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests_thread_message_dto {
-    use crate::assistant::domain::dto::{ApiMessageContent, ThreadMessageDto};
+    use crate::{assistant::domain::dto::ThreadMessageDto, chat_completion::ApiMessageContent};
 
     #[test]
     fn test_text_content_are_all_join_in_a_string() {
@@ -22,7 +22,9 @@ mod tests_thread_message_dto {
 mod test_create_thread_message_dto {
     use claim::assert_ok;
 
-    use crate::assistant::domain::dto::{ApiCreateThreadMessageDto, ApiMessageContent};
+    use crate::{
+        assistant::domain::dto::ApiCreateThreadMessageDto, chat_completion::ApiMessageContent,
+    };
 
     #[test]
     fn test_message_deserialization_with_string_text_content() {
@@ -82,8 +84,9 @@ mod test_create_thread_message_dto {
 }
 
 mod test_to_db_message_content {
-    use crate::assistant::domain::dto::{
-        ApiMessageContent, ApiTextContent, DbMessageContent, ImageUrl,
+    use crate::{
+        assistant::domain::dto::DbMessageContent,
+        chat_completion::{ApiMessageContent, ApiTextContent, ImageUrl},
     };
 
     #[test]

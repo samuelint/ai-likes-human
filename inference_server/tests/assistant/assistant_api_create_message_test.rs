@@ -1,6 +1,7 @@
 use crate::test_utils::assistant_api::AssistantApiClient;
-use app_core::assistant::domain::dto::{
-    ApiCreateThreadDto, ApiCreateThreadMessageDto, ApiMessageContent, ApiTextContent,
+use app_core::{
+    assistant::domain::dto::{ApiCreateThreadDto, ApiCreateThreadMessageDto},
+    chat_completion::{ApiMessageContent, ApiTextContent},
 };
 
 #[tokio::test]

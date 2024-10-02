@@ -4,14 +4,12 @@ mod tests {
 
     use crate::{
         assistant::domain::{
-            dto::{
-                message_delta::MessageDeltaContent, ApiMessageContent, DbUpdateThreadMessageDto,
-                ThreadMessageDto,
-            },
+            dto::{message_delta::MessageDeltaContent, DbUpdateThreadMessageDto, ThreadMessageDto},
             message::{message_repository::MockMessageRepository, MessageDeltaUpdateService},
         },
         chat_completion::{
-            ChatCompletionChunkChoice, ChatCompletionChunkObject, ChatCompletionMessageDto,
+            ApiMessageContent, ChatCompletionChunkChoice, ChatCompletionChunkObject,
+            ChatCompletionDeltaDto,
         },
     };
 
@@ -32,7 +30,7 @@ mod tests {
         };
         let chunk = ChatCompletionChunkObject {
             choices: vec![ChatCompletionChunkChoice {
-                delta: Some(ChatCompletionMessageDto {
+                delta: Some(ChatCompletionDeltaDto {
                     role: "assistant".to_string(),
                     content: "World!".to_string(),
                 }),
@@ -82,7 +80,7 @@ mod tests {
         };
         let chunk = ChatCompletionChunkObject {
             choices: vec![ChatCompletionChunkChoice {
-                delta: Some(ChatCompletionMessageDto {
+                delta: Some(ChatCompletionDeltaDto {
                     role: "assistant".to_string(),
                     content: "World!".to_string(),
                 }),
@@ -127,7 +125,7 @@ mod tests {
         };
         let chunk = ChatCompletionChunkObject {
             choices: vec![ChatCompletionChunkChoice {
-                delta: Some(ChatCompletionMessageDto {
+                delta: Some(ChatCompletionDeltaDto {
                     role: "assistant".to_string(),
                     content: "World!".to_string(),
                 }),
@@ -164,7 +162,7 @@ mod tests {
         };
         let chunk = ChatCompletionChunkObject {
             choices: vec![ChatCompletionChunkChoice {
-                delta: Some(ChatCompletionMessageDto {
+                delta: Some(ChatCompletionDeltaDto {
                     role: "assistant".to_string(),
                     content: "World!".to_string(),
                 }),

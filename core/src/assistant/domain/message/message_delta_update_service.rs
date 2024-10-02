@@ -7,9 +7,9 @@ use std::{error::Error, sync::Arc};
 use crate::{
     assistant::domain::dto::{
         message_delta::{MessageDeltaContent, MessageDeltaDto, ThreadMessageDeltaDto},
-        ApiMessageContent, DbUpdateThreadMessageDto, ThreadMessageDto,
+        DbUpdateThreadMessageDto, ThreadMessageDto,
     },
-    chat_completion::ChatCompletionChunkObject,
+    chat_completion::{ApiMessageContent, ChatCompletionChunkObject},
 };
 
 use super::message_repository::MessageRepository;

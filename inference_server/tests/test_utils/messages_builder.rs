@@ -1,4 +1,6 @@
-use app_core::assistant::domain::dto::{ApiCreateThreadMessageDto, ApiMessageContent};
+use app_core::{
+    assistant::domain::dto::ApiCreateThreadMessageDto, chat_completion::ApiMessageContent,
+};
 
 pub struct MessagesBuilder {
     messages: Vec<ApiCreateThreadMessageDto>,

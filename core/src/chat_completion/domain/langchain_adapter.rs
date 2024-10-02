@@ -16,13 +16,18 @@ impl From<ChatCompletionMessageDto> for langchain_rust::schemas::Message {
             .iter()
             .map(|image_url| image_url.into())
             .collect();
+        let images = if images.is_empty() {
+            None
+        } else {
+            Some(images)
+        };
 
         langchain_rust::schemas::Message {
             content,
             message_type: to_langchain_message_type(message.role.clone()),
             id: None,
             tool_calls: None,
-            images: Some(images),
+            images,
         }
     }
 }

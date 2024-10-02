@@ -5,6 +5,15 @@ mod openai_message_tests {
     use pretty_assertions::assert_eq;
 
     #[test]
+    // Avoid bug with langchain_rust where the content is not taken in account if the image is an empty vec
+    fn test_text_content_without_images_have_none_images() {
+        let result: langchain_rust::schemas::Message =
+            ChatCompletionMessageDto::assistant("Hello").into();
+
+        assert_eq!(result.images.is_none(), true);
+    }
+
+    #[test]
     fn test_image_url_and_text_content_are_contained_langchain_message() {
         let message = ChatCompletionMessageDto {
             role: "assistant".to_string(),

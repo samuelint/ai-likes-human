@@ -90,8 +90,14 @@ async fn test_created_threads_are_listed() {
     let threads = page.data;
 
     assert_eq!(threads.len(), 2, "should have 2 threads");
-    assert_eq!(threads[0].id, thread_1.id, "should have first thread");
-    assert_eq!(threads[1].id, thread_2.id, "should have second thread");
+    assert!(
+        threads.iter().any(|t| t.id == thread_1.id),
+        "should have first thread"
+    );
+    assert!(
+        threads.iter().any(|t| t.id == thread_2.id),
+        "should have second thread"
+    );
 }
 
 #[tokio::test]

@@ -31,3 +31,18 @@ async fn test_listing_threads_limit_is_respected() {
     let threads = response.data;
     assert_eq!(threads.len(), 2, "should have 2 threads");
 }
+
+#[tokio::test]
+async fn test_threads_sorted_by_created_date() {
+    let client = AssistantApiClient::new().await;
+
+    let (thread_1, _) = client.create_thread(&ApiCreateThreadDto::default()).await;
+    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+    let (thread_2, _) = client.create_thread(&ApiCreateThreadDto::default()).await;
+
+    let (response, _status) = client.list_threads(&PageRequest::default()).await;
+
+    let threads = response.data;
+    assert_eq!(threads[0].id, thread_2.id);
+    assert_eq!(threads[1].id, thread_1.id);
+}

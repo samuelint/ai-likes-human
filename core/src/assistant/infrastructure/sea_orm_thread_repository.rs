@@ -7,13 +7,13 @@ use crate::entities::thread;
 use crate::utils::time::TimeBuilder;
 use anyhow::anyhow;
 use sea_orm::{
-    ActiveModelTrait, ActiveValue, DatabaseConnection, EntityTrait, QuerySelect, TransactionTrait,
+    ActiveModelTrait, ActiveValue, DatabaseConnection, EntityTrait, QueryOrder, QuerySelect,
+    TransactionTrait,
 };
 use std::error::Error;
 use std::sync::Arc;
 
 use super::metadata::serialize_metadata_opt;
-use super::page_request_adapter::DbPageRequest;
 use super::{SeaOrmMessageRepository, SeaOrmRunRepository};
 
 pub struct SeaOrmThreadRepository {
@@ -114,22 +114,46 @@ impl ThreadRepository for SeaOrmThreadRepository {
         &self,
         page: &PageRequest,
     ) -> Result<PageResponse<ThreadDto>, Box<dyn Error>> {
-        let mut cursor = thread::Entity::find().cursor_by(thread::Column::Id);
+        // Cursor is not working with order_by_desc.
+        // This is commented until this issue is resolved
+        // https://github.com/SeaQL/sea-orm/issues/2376
 
-        let db_page_request: DbPageRequest = page.into();
-        if db_page_request.after.is_some() {
-            cursor.after(db_page_request.after.unwrap());
-        };
-        if db_page_request.before.is_some() {
-            cursor.before(db_page_request.before.unwrap());
-        };
-        let mut cursor = if let Some(limit) = db_page_request.limit {
-            cursor.limit(limit as u64)
-        } else {
-            cursor
+        // let mut cursor: sea_orm::Cursor<sea_orm::SelectModel<thread::Model>> =
+        //     thread::Entity::find()
+        //         .order_by_desc(thread::Column::Id)
+        //         .cursor_by(thread::Column::Id);
+
+        // let db_page_request: DbPageRequest = page.into();
+        // if db_page_request.after.is_some() {
+        //     cursor.after(db_page_request.after.unwrap());
+        // };
+        // if db_page_request.before.is_some() {
+        //     cursor.before(db_page_request.before.unwrap());
+        // };
+        // let mut cursor = if let Some(limit) = db_page_request.limit {
+        //     cursor.limit(limit as u64)
+        // } else {
+        //     cursor
+        // };
+
+        // let result = cursor.all(self.connection.as_ref()).await?;
+
+        // Temporary un paginated result
+        let limit: u64 = match &page.limit {
+            Some(limit) => {
+                let limit: u64 = limit.parse().unwrap();
+
+                limit
+            }
+            None => 10,
         };
 
-        let result = cursor.all(self.connection.as_ref()).await?;
+        let result = thread::Entity::find()
+            .order_by_desc(thread::Column::Id)
+            .limit(limit)
+            .all(self.connection.as_ref())
+            .await?;
+
         let result: Vec<ThreadDto> = result.iter().map(|r| r.clone().into()).collect();
 
         Ok(PageResponse {

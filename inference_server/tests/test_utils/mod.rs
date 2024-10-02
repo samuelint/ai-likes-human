@@ -1,5 +1,6 @@
 pub mod assistant_api;
 pub mod client;
+pub mod messages_builder;
 pub mod prompt_validator;
 pub mod router;
 pub mod router_client;

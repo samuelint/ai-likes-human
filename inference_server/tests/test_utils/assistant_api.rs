@@ -104,17 +104,14 @@ impl AssistantApiClient {
     }
 
     #[allow(dead_code)]
-    pub async fn stream_new_thread_with_prompt(
+    pub async fn stream_new_thread(
         &self,
-        prompt: &str,
+        messages: Vec<ApiCreateThreadMessageDto>,
     ) -> impl Stream<Item = Result<(String, ThreadEventData), axum::Error>> {
         let create_thread_run_dto = ApiCreateThreadAndRunDto {
             model: DEFAULT_LLM_MODEL.to_string(),
             thread: ApiCreateThreadDto {
-                messages: vec![ApiCreateThreadMessageDto {
-                    content: vec![ApiMessageContent::text(prompt)],
-                    ..ApiCreateThreadMessageDto::user()
-                }],
+                messages,
                 ..ApiCreateThreadDto::default()
             },
             stream: Some(true),
@@ -126,13 +123,23 @@ impl AssistantApiClient {
     }
 
     #[allow(dead_code)]
-    pub async fn stream_new_thread_with_prompt_as_chunks_vec(
+    pub async fn stream_new_thread_as_chunks_vec(
         &self,
-        prompt: &str,
+        messages: Vec<ApiCreateThreadMessageDto>,
     ) -> Vec<(String, ThreadEventData)> {
-        let stream = self.stream_new_thread_with_prompt(prompt).await;
+        let stream = self.stream_new_thread(messages).await;
 
         Self::stream_to_events_array(Box::pin(stream)).await
+    }
+
+    #[allow(dead_code)]
+    pub async fn stream_new_thread_as_text(
+        &self,
+        messages: Vec<ApiCreateThreadMessageDto>,
+    ) -> String {
+        let chunks = self.stream_new_thread_as_chunks_vec(messages).await;
+
+        Self::events_array_to_text_response(chunks)
     }
 
     #[allow(dead_code)]
@@ -315,6 +322,18 @@ impl AssistantApiClient {
         }
 
         responses
+    }
+
+    pub fn events_array_to_text_response(events: Vec<(String, ThreadEventData)>) -> String {
+        let mut result = String::new();
+        for (event, data) in events {
+            if event == "thread.message.completed" {
+                if let ThreadEventData::ThreadMessage(data) = data {
+                    result.push_str(&data.to_string_content());
+                }
+            }
+        }
+        result
     }
 
     fn to_query_params(params: &Vec<(&str, &str)>) -> String {

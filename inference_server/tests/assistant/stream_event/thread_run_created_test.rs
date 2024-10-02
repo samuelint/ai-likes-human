@@ -1,13 +1,16 @@
 use app_core::assistant::domain::dto::ThreadEventData;
 use pretty_assertions::assert_eq;
 
-use crate::test_utils::assistant_api::{AssistantApiClient, DEFAULT_LLM_MODEL};
+use crate::test_utils::{
+    assistant_api::{AssistantApiClient, DEFAULT_LLM_MODEL},
+    messages_builder::MessagesBuilder,
+};
 
 #[tokio::test]
 async fn test_run_stream_thread_run_created_chunk_contains_run_data() {
     let client: AssistantApiClient = AssistantApiClient::new().await;
     let chunks = client
-        .stream_new_thread_with_prompt_as_chunks_vec("Tell me a joke.")
+        .stream_new_thread_as_chunks_vec(MessagesBuilder::from_text("Tell me a joke.").into())
         .await;
     let chunk = &chunks[1];
 
@@ -24,7 +27,7 @@ async fn test_run_stream_thread_run_created_chunk_contains_run_data() {
 async fn test_run_stream_thread_run_created_chunk_contains_run_status_is_queued() {
     let client: AssistantApiClient = AssistantApiClient::new().await;
     let chunks = client
-        .stream_new_thread_with_prompt_as_chunks_vec("Tell me a joke.")
+        .stream_new_thread_as_chunks_vec(MessagesBuilder::from_text("Tell me a joke.").into())
         .await;
     let chunk = &chunks[1];
 
@@ -40,7 +43,7 @@ async fn test_run_stream_thread_run_created_chunk_contains_run_status_is_queued(
 async fn test_run_stream_thread_run_created_chunk_contains_llm_model() {
     let client: AssistantApiClient = AssistantApiClient::new().await;
     let chunks = client
-        .stream_new_thread_with_prompt_as_chunks_vec("Tell me a joke.")
+        .stream_new_thread_as_chunks_vec(MessagesBuilder::from_text("Tell me a joke.").into())
         .await;
     let chunk = &chunks[1];
 

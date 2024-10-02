@@ -1,6 +1,7 @@
 mod assistant_api_create_message_test;
 mod assistant_api_create_thread_and_run_test;
 mod assistant_api_create_thread_runs_test;
+mod assistant_api_create_thread_runs_with_image_test;
 mod assistant_api_create_thread_test;
 mod assistant_api_delete_thread_test;
 mod assistant_api_list_messages_test;

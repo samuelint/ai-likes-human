@@ -83,13 +83,13 @@ mod test_create_thread_message_dto {
 
 mod test_to_db_message_content {
     use crate::assistant::domain::dto::{
-        ApiMessageContent, DbMessageContent, ImageUrl, ImageUrlContent, TextContent,
+        ApiMessageContent, ApiTextContent, DbMessageContent, ImageUrl,
     };
 
     #[test]
     fn test_text_content_is_same() {
         let message = ApiMessageContent::Text {
-            text: TextContent::String("Hello World!".to_string()),
+            text: ApiTextContent::String("Hello World!".to_string()),
         };
 
         let result: DbMessageContent = (&message).into();
@@ -105,7 +105,7 @@ mod test_to_db_message_content {
     #[test]
     fn test_annotated_text_content_is_same() {
         let message = ApiMessageContent::Text {
-            text: TextContent::Annotated {
+            text: ApiTextContent::Annotated {
                 value: "Hello World!".to_string(),
                 annotations: vec![],
             },
@@ -124,18 +124,16 @@ mod test_to_db_message_content {
     #[test]
     fn test_image_url_content_is_same() {
         let message = ApiMessageContent::ImageUrl {
-            image_url: ImageUrlContent {
-                image_url: ImageUrl::url("https://example.com/img"),
-            },
+            image_url: ImageUrl::url("https://example.com/img"),
         };
 
         let result: DbMessageContent = (&message).into();
 
         let image_url = match result {
-            DbMessageContent::ImageUrl { image_url } => image_url.image_url,
+            DbMessageContent::ImageUrl { image_url } => image_url.url,
             _ => panic!("Expected Image Url"),
         };
 
-        assert_eq!(image_url.url, "https://example.com/img");
+        assert_eq!(image_url, "https://example.com/img");
     }
 }

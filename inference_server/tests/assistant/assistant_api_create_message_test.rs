@@ -1,6 +1,6 @@
 use crate::test_utils::assistant_api::AssistantApiClient;
 use app_core::assistant::domain::dto::{
-    ApiCreateThreadDto, ApiCreateThreadMessageDto, ApiMessageContent, TextContent,
+    ApiCreateThreadDto, ApiCreateThreadMessageDto, ApiMessageContent, ApiTextContent,
 };
 
 #[tokio::test]
@@ -13,7 +13,7 @@ async fn test_message_with_string_text_is_fetch_annotated() {
             &thread.id,
             &ApiCreateThreadMessageDto {
                 content: vec![ApiMessageContent::Text {
-                    text: TextContent::String("Say Hello!".to_string()),
+                    text: ApiTextContent::String("Say Hello!".to_string()),
                 }],
                 ..ApiCreateThreadMessageDto::user()
             },
@@ -25,7 +25,7 @@ async fn test_message_with_string_text_is_fetch_annotated() {
 
     let value = match content {
         ApiMessageContent::Text { text, .. } => match text {
-            TextContent::Annotated { value, .. } => value,
+            ApiTextContent::Annotated { value, .. } => value,
             _ => panic!("Expected Text Annotated"),
         },
         _ => panic!("Expected Text MessageContent"),

@@ -7,8 +7,7 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
 use super::{
-    annotation::MessageAnnotation, DbCreateThreadMessageDto, DbMessageContent, ImageUrlContent,
-    Metadata,
+    annotation::MessageAnnotation, DbCreateThreadMessageDto, DbMessageContent, ImageUrl, Metadata,
 };
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
@@ -107,7 +106,7 @@ impl Default for ApiCreateThreadMessageDto {
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
 #[serde(untagged)]
-pub enum TextContent {
+pub enum ApiTextContent {
     String(String),
     Annotated {
         value: String,
@@ -115,7 +114,7 @@ pub enum TextContent {
     },
 }
 
-impl TextContent {
+impl ApiTextContent {
     pub fn annotated(text: &str) -> Self {
         Self::Annotated {
             value: text.to_string(),
@@ -129,13 +128,13 @@ impl TextContent {
 
     pub fn to_string(&self) -> String {
         match self {
-            TextContent::String(text) => text.to_string(),
-            TextContent::Annotated { value, .. } => value.to_string(),
+            ApiTextContent::String(text) => text.to_string(),
+            ApiTextContent::Annotated { value, .. } => value.to_string(),
         }
     }
 }
 
-impl Default for TextContent {
+impl Default for ApiTextContent {
     fn default() -> Self {
         Self::Annotated {
             value: "".to_string(),
@@ -147,14 +146,14 @@ impl Default for TextContent {
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum ApiMessageContent {
-    Text { text: TextContent },
-    ImageUrl { image_url: ImageUrlContent },
+    Text { text: ApiTextContent },
+    ImageUrl { image_url: ImageUrl },
 }
 
 impl Default for ApiMessageContent {
     fn default() -> Self {
         Self::Text {
-            text: TextContent::Annotated {
+            text: ApiTextContent::Annotated {
                 value: "".to_string(),
                 annotations: vec![],
             },
@@ -165,13 +164,13 @@ impl Default for ApiMessageContent {
 impl ApiMessageContent {
     pub fn text(value: &str) -> Self {
         Self::Text {
-            text: TextContent::annotated(value),
+            text: ApiTextContent::annotated(value),
         }
     }
 
     pub fn image_url(url: &str) -> Self {
         Self::ImageUrl {
-            image_url: ImageUrlContent::url(url),
+            image_url: ImageUrl::url(url),
         }
     }
 }

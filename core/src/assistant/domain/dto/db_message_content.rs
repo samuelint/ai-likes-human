@@ -6,7 +6,7 @@ use super::annotation::MessageAnnotation;
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum DbMessageContent {
     Text { text: DbTextContent },
-    ImageUrl { image_url: ImageUrlContent },
+    ImageUrl { image_url: ImageUrl },
 }
 
 impl DbMessageContent {
@@ -73,26 +73,3 @@ impl ImageUrl {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
-pub struct ImageUrlContent {
-    pub image_url: ImageUrl,
-}
-
-impl ImageUrlContent {
-    pub fn url(url: &str) -> Self {
-        ImageUrlContent {
-            image_url: ImageUrl {
-                url: url.to_string(),
-                ..ImageUrl::default()
-            },
-        }
-    }
-}
-
-impl Default for ImageUrlContent {
-    fn default() -> Self {
-        Self {
-            image_url: ImageUrl::default(),
-        }
-    }
-}

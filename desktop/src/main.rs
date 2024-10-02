@@ -11,7 +11,7 @@ use core::tauri_command::{
     find_configuration, get_app_directory_path, get_inference_server_url, is_server_up,
     upsert_configuration,
 };
-use log::info;
+use log::{info, LevelFilter};
 use screencapture::tauri_command::{assert_screen_capture_permissions, capture_screen};
 use system_tray::{build_menu, on_system_tray_event};
 use tauri::{AppHandle, Manager, RunEvent, State, SystemTray, WindowEvent};
@@ -20,12 +20,14 @@ use tauri_plugin_window_state::{AppHandleExt, StateFlags};
 
 #[tokio::main]
 async fn main() {
-    let log_builder = tauri_plugin_log::Builder::default().targets([
-        LogTarget::LogDir,
-        LogTarget::Stdout,
-        LogTarget::Stderr,
-        LogTarget::Webview,
-    ]);
+    let log_builder = tauri_plugin_log::Builder::default()
+        .targets([
+            LogTarget::LogDir,
+            LogTarget::Stdout,
+            LogTarget::Stderr,
+            LogTarget::Webview,
+        ])
+        .level(LevelFilter::Warn);
 
     tauri::Builder::default()
         .system_tray(SystemTray::new().with_menu(build_menu()))

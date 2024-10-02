@@ -3,7 +3,7 @@ import NewMessage from '@/components/new-message';
 import { ImageAttachment as ImageDto } from '@/lib/assistant/image-attachment.type';
 import { ImageAttachment } from '@/components/image-attachment';
 import AssistantModelSettingsModal from './assistant-model-settings-modal';
-
+import { useClipboardPasteImage } from '@/lib/assistant/use-clipboard-paste-image';
 
 
 interface Props {
@@ -18,6 +18,8 @@ interface Props {
 }
 
 export default function NewAssistantMessage({ input, submitMessage, handleInputChange, abort, isLoading, imageAttachments = [], addImageAttachments, removeImageAttachment }: Props) {
+  useClipboardPasteImage((image) => addImageAttachments([image]));
+
   return (
     <div className='w-full flex flex-col gap-0.5'>
       <NewMessage

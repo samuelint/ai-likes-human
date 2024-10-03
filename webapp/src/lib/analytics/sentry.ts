@@ -5,7 +5,7 @@ export function initSentry() {
   if (appConfig.sentry_dsn) {
     Sentry.init({
       dsn: appConfig.sentry_dsn,
-      integrations: [Sentry.feedbackIntegration({
+      integrations: [Sentry.feedbackSyncIntegration({
         colorScheme: 'system',
         autoInject: false,
         formTitle: 'Give Feedback',

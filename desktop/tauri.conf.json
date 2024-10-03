@@ -62,7 +62,7 @@
     "security": {
       "csp": {
         "default-src": "'self' customprotocol: asset:",
-        "connect-src": "ipc: http://localhost:1234",
+        "connect-src": "ipc: http://localhost:1234 https://*.ingest.us.sentry.io",
         "img-src": "'self' data: *"
       }
     },

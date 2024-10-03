@@ -1,6 +1,6 @@
-import FeedbackButton from '@/components/feedback-button';
 import BrandLink from './brand.link';
 import SettingLink from './settings.link';
+import { FeedbackFormModal } from '@/components/feedback-form-modal';
 
 
 export default function Header() {
@@ -11,7 +11,7 @@ export default function Header() {
           <BrandLink />
         </div>
         <div className='flex items-center gap-4'>
-          <FeedbackButton />
+          <FeedbackFormModal />
           <SettingLink />
         </div>
       </div>

@@ -1,18 +1,17 @@
 use std::sync::Arc;
 
 use crate::{
-    chat_completion::{ChatCompletionMessageDto, ChatCompletionObject},
+    chat_completion::{
+        domain::langchain_adapter::messages_to_langchain_messages, ChatCompletionChunkObject,
+        ChatCompletionMessageDto, ChatCompletionObject, ChatCompletionResult, ChatCompletionStream,
+    },
     llm::domain::llm_factory::{CreateLLMParameters, LLMFactory},
 };
 use anyhow::anyhow;
 use async_stream::stream;
 use futures::StreamExt;
 
-use super::{
-    inference::{Inference, InferenceArgs},
-    langchain_adapter::messages_to_langchain_messages,
-    ChatCompletionChunkObject, ChatCompletionResult, ChatCompletionStream,
-};
+use super::inference::{Inference, InferenceArgs};
 
 pub struct LLMInference {
     llm_factory: Arc<dyn LLMFactory>,

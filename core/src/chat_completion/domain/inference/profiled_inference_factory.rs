@@ -2,11 +2,11 @@ use std::{error::Error, sync::Arc};
 
 use async_stream::stream;
 
-use super::{
-    inference::{Inference, InferenceArgs},
-    ChatCompletionMessageDto, ChatCompletionResult, ChatCompletionStream,
+use super::inference::{Inference, InferenceArgs};
+use crate::{
+    chat_completion::{ChatCompletionMessageDto, ChatCompletionResult, ChatCompletionStream},
+    profile::domain::ProfileSystemPromptFactory,
 };
-use crate::profile::domain::ProfileSystemPromptFactory;
 use futures::StreamExt;
 
 pub struct ProfiledInferenceFactory {

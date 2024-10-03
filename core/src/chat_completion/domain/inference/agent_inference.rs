@@ -5,17 +5,15 @@ use langchain_rust::{chain::Chain, prompt_args};
 use std::{error::Error, sync::Arc};
 
 use crate::{
-    chat_completion::domain::langchain_adapter::{
-        langchain_messages_to_string, messages_to_langchain_messages,
+    chat_completion::{
+        domain::langchain_adapter::{langchain_messages_to_string, messages_to_langchain_messages},
+        ChatCompletionChunkObject, ChatCompletionMessageDto, ChatCompletionObject,
+        ChatCompletionResult, ChatCompletionStream,
     },
     llm::domain::agent::{base_agent_factory::CreateAgentArgs, AgentFactory},
 };
 
-use super::{
-    inference::{Inference, InferenceArgs},
-    ChatCompletionChunkObject, ChatCompletionMessageDto, ChatCompletionObject,
-    ChatCompletionResult, ChatCompletionStream,
-};
+use super::inference::{Inference, InferenceArgs};
 
 pub struct AgentInference {
     agent_factory: Arc<AgentFactory>,

@@ -1,9 +1,7 @@
 mod domain;
 
 pub use domain::*;
-use inference::Inference;
-use llm_inference::LLMInference;
-use profiled_inference_factory::ProfiledInferenceFactory;
+use inference::{Inference, LLMInference, ProfiledInferenceFactory};
 use std::sync::Arc;
 
 use crate::{llm::LLMDIModule, profile::ProfileDIModule};

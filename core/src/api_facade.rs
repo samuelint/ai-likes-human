@@ -2,8 +2,8 @@ use std::sync::Arc;
 
 use crate::{
     chat_completion::{
-        inference::{Inference, InferenceArgs},
-        ChatCompletionMessageDto, ChatCompletionResult, ChatCompletionStream,
+        inference::InferenceArgs, ChatCompletionMessageDto, ChatCompletionResult,
+        ChatCompletionStream,
     },
     configuration::ConfigurationDto,
     profile::domain::dto::ProfileDto,

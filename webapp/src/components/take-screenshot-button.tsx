@@ -36,7 +36,5 @@ export function TakeScreenshotButton({ className, onClick, isLoading }: Props) {
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
-
-
   );
 }

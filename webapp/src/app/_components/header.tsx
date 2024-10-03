@@ -1,5 +1,7 @@
+import FeedbackButton from '@/components/feedback-button';
 import BrandLink from './brand.link';
 import SettingLink from './settings.link';
+
 
 export default function Header() {
   return (
@@ -9,6 +11,7 @@ export default function Header() {
           <BrandLink />
         </div>
         <div className='flex items-center gap-4'>
+          <FeedbackButton />
           <SettingLink />
         </div>
       </div>

@@ -16,7 +16,7 @@ interface Props {
   isLoading?: boolean
 }
 
-export function TakeScreenshotButton({ className, onClick, isLoading }: Props) {
+export function TakeFullScreenScreenshotButton({ className, onClick, isLoading }: Props) {
   return (
     <TooltipProvider>
       <Tooltip>
@@ -32,7 +32,7 @@ export function TakeScreenshotButton({ className, onClick, isLoading }: Props) {
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          Take Screenshot
+          Full Screen Screenshot
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

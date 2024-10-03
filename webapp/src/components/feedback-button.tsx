@@ -6,11 +6,7 @@ export default function FeedbackButton() {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <button
-            type='button'
-          >
-            <MessageSquareShare className='w-4 h-4'/>
-          </button>
+          <MessageSquareShare className='w-4 h-4'/>
         </TooltipTrigger>
         <TooltipContent>
           Give Feedback

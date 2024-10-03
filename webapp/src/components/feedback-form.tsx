@@ -59,7 +59,7 @@ export function FeedbackForm({ onSubmit }: Props) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="w-2/3 space-y-6">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="">
         <FormField
           control={form.control}
           name="name"

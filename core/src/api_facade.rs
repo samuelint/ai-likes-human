@@ -24,7 +24,7 @@ impl ApiFacade {
         model: &str,
         messages: &Vec<ChatCompletionMessageDto>,
     ) -> ChatCompletionResult {
-        let inference = self.container.chat_completion_module.get_llm_inference();
+        let inference = self.container.chat_completion_module.get_inference();
 
         inference
             .invoke(InferenceArgs {
@@ -40,7 +40,7 @@ impl ApiFacade {
         model: &str,
         messages: &Vec<ChatCompletionMessageDto>,
     ) -> ChatCompletionStream {
-        let inference = self.container.chat_completion_module.get_llm_inference();
+        let inference = self.container.chat_completion_module.get_inference();
 
         inference
             .stream(InferenceArgs {

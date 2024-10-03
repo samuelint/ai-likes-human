@@ -4,7 +4,7 @@ use crate::chat_completion::{
     ChatCompletionMessageDto, ChatCompletionResult, ChatCompletionStream,
 };
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct InferenceArgs {
     pub model: String,
     pub temperature: Option<f32>,

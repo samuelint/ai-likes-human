@@ -27,7 +27,10 @@ impl AppContainer {
             configuration_module.clone(),
             profile_module.clone(),
         ));
-        let chat_completion_module = Arc::new(ChatCompletionDIModule::new(Arc::clone(&llm_module)));
+        let chat_completion_module = Arc::new(ChatCompletionDIModule::new(
+            Arc::clone(&llm_module),
+            Arc::clone(&profile_module),
+        ));
         let agent_module: AgentDIModule =
             AgentDIModule::new(Arc::clone(&connection), Arc::clone(&chat_completion_module));
 

@@ -74,7 +74,7 @@ impl AgentDIModule {
     }
 
     pub fn get_thread_inference_service(&self) -> Arc<ThreadChatCompletionInference> {
-        let inference = self.chat_completion_module.get_llm_inference();
+        let inference = self.chat_completion_module.get_inference();
 
         Arc::new(ThreadChatCompletionInference::new(inference))
     }

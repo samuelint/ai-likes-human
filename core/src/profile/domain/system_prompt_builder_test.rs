@@ -4,7 +4,7 @@ mod tests {
 
     #[test]
     fn test_prompt_have_personal_assistant_role() {
-        let builder = SystemPromptBuilder::new();
+        let builder = SystemPromptBuilder::new().with_personal_assistant_role();
 
         let prompt = builder.build();
 
@@ -31,5 +31,23 @@ mod tests {
         let prompt = builder.build();
 
         assert!(prompt.contains("Your are a super hero."));
+    }
+
+    #[test]
+    fn test_prompt_with_multiple_profiles() {
+        let profile1 = ProfileDto {
+            name: "some".to_string(),
+            prompt: "Your are a super hero.".to_string(),
+        };
+        let profile2 = ProfileDto {
+            name: "other".to_string(),
+            prompt: "Be gentle".to_string(),
+        };
+        let builder = SystemPromptBuilder::new().with_profiles(&vec![profile1, profile2]);
+
+        let prompt = builder.build();
+
+        assert!(prompt.contains("Your are a super hero."));
+        assert!(prompt.contains("Be gentle"));
     }
 }

@@ -72,7 +72,7 @@ impl ApiFacade {
         self.container
             .profile_module
             .get_selected_profiles_service()
-            .get()
+            .find_selected_profiles()
             .await
     }
 }

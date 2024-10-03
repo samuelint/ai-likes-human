@@ -40,6 +40,9 @@ For example:
 - LLamaCPP
 - Etc...
 
+Also implement agent creation. Creation of a custom agent based on existing LLM (using langgraph rust).
+Can add, tool, chain of tought, etc..
+
 ### profile
 
 User profiles. For example system prompt for a `Software Engineer`

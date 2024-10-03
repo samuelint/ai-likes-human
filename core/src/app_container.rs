@@ -22,9 +22,12 @@ impl AppContainer {
         let connection: Arc<::sea_orm::DatabaseConnection> = connection_factory.create().await?;
 
         let configuration_module = Arc::new(ConfigurationDIModule::new(Arc::clone(&connection)));
-        let llm_module = Arc::new(LLMDIModule::new(configuration_module.clone()));
-        let chat_completion_module = Arc::new(ChatCompletionDIModule::new(Arc::clone(&llm_module)));
         let profile_module = Arc::new(ProfileDIModule::new(Arc::clone(&connection)));
+        let llm_module = Arc::new(LLMDIModule::new(
+            configuration_module.clone(),
+            profile_module.clone(),
+        ));
+        let chat_completion_module = Arc::new(ChatCompletionDIModule::new(Arc::clone(&llm_module)));
         let agent_module: AgentDIModule =
             AgentDIModule::new(Arc::clone(&connection), Arc::clone(&chat_completion_module));
 

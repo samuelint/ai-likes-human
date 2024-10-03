@@ -13,7 +13,7 @@ impl SelectedProfileService {
         Self { profile_repository }
     }
 
-    pub async fn get(&self) -> Result<Vec<ProfileDto>, Box<dyn Error + Send>> {
+    pub async fn find_selected_profiles(&self) -> Result<Vec<ProfileDto>, Box<dyn Error + Send>> {
         let profile = self
             .profile_repository
             .find_by_name(SOFTWARE_ENGINEER_PROFILE_NAME)

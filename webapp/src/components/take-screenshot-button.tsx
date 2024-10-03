@@ -36,7 +36,5 @@ export function TakeFullScreenScreenshotButton({ className, onClick, isLoading }
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
-
-
   );
 }

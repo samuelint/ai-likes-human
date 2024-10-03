@@ -10,6 +10,7 @@ const appConfig = {
   api_url,
   openai_api_url,
   available_llm_models: AVAILABLE_LLM_MODELS,
+  sentry_dsn: process.env.SENTRY_DSN ?? 'https://9245f149e4e89cfcce3c336ce6df072d@o4508059383824384.ingest.us.sentry.io/4508059486060544',
 };
 
 export { api_url, openai_api_url, LLM_API_KEYS_KEYS };

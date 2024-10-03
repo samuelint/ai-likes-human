@@ -31,7 +31,7 @@ impl AgentFactory {
     pub async fn create(
         &self,
         agent_id: &str,
-        args: &CreateAgentArgs,
+        args: CreateAgentArgs,
     ) -> Result<Box<dyn Chain>, Box<dyn Error + Send>> {
         let chain = match self.find_factory(agent_id) {
             Some(factory) => factory.create(args).await,

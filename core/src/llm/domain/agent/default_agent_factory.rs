@@ -45,10 +45,7 @@ impl BaseAgentFactory for DefaultAgentFactory {
         true
     }
 
-    async fn create(
-        &self,
-        args: &CreateAgentArgs,
-    ) -> Result<Box<dyn Chain>, Box<dyn Error + Send>> {
+    async fn create(&self, args: CreateAgentArgs) -> Result<Box<dyn Chain>, Box<dyn Error + Send>> {
         let system_prompt = self.system_prompt_factory.create().await?;
         let llm = self
             .llm_factory
@@ -61,10 +58,12 @@ impl BaseAgentFactory for DefaultAgentFactory {
 
         let agent = ConversationalAgentBuilder::new()
             // .tools(&[Arc::new(command_executor)])
-            .options(Self::create_options(args))
+            .options(Self::create_options(&args))
             .prefix(system_prompt)
             .build(llm)
             .unwrap();
+
+            
 
         let executor = AgentExecutor::from_agent(agent);
 

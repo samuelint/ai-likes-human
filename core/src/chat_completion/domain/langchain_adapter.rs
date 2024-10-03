@@ -40,3 +40,16 @@ impl From<&ImageUrl> for langchain_rust::schemas::ImageContent {
         }
     }
 }
+
+pub fn messages_to_langchain_messages(
+    messages: &[ChatCompletionMessageDto],
+) -> Vec<langchain_rust::schemas::Message> {
+    let messages: Vec<langchain_rust::schemas::Message> =
+        messages.iter().map(|m| m.clone().into()).collect();
+
+    messages
+}
+
+pub fn langchain_messages_to_string(messages: &[langchain_rust::schemas::Message]) -> String {
+    langchain_rust::schemas::Message::messages_to_string(messages)
+}

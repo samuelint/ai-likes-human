@@ -14,6 +14,5 @@ pub struct CreateAgentArgs {
 pub trait BaseAgentFactory: Send + Sync {
     fn is_compatible(&self, agent_id: &str) -> bool;
 
-    async fn create(&self, args: &CreateAgentArgs)
-        -> Result<Box<dyn Chain>, Box<dyn Error + Send>>;
+    async fn create(&self, args: CreateAgentArgs) -> Result<Box<dyn Chain>, Box<dyn Error + Send>>;
 }

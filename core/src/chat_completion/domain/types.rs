@@ -4,6 +4,6 @@ use futures::Stream;
 
 use super::dto::{ChatCompletionChunkObject, ChatCompletionObject};
 
-pub type ChatCompletionResult = Result<ChatCompletionObject, Box<dyn Error>>;
+pub type ChatCompletionResult = Result<ChatCompletionObject, Box<dyn Error + Send>>;
 pub type ChatCompletionStream =
     Pin<Box<dyn Stream<Item = Result<ChatCompletionChunkObject, Box<dyn Error + Send>>> + Send>>;

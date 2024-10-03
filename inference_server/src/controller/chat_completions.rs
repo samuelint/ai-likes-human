@@ -43,7 +43,7 @@ pub async fn run_chat_completions(
 async fn run_json_chat_completions(
     state: Arc<ServerState>,
     payload: ApiChatCompletionRequestDto,
-) -> Result<Json<ChatCompletionObject>, Box<dyn Error>> {
+) -> Result<Json<ChatCompletionObject>, Box<dyn Error + Send>> {
     let result = state
         .api
         .chat_completion_invoke(&payload.model, &payload.messages)
@@ -59,7 +59,7 @@ fn run_stream_chat_completions(
     let model = payload.model.clone();
 
     Sse::new(try_stream! {
-        let mut stream = state.api.chat_completion_stream(&model, &payload.messages);
+        let mut stream = state.api.chat_completion_stream(&model, &payload.messages).await;
         while let Some(chunk) = stream.next().await {
             match chunk {
                 Ok(chunk) => {

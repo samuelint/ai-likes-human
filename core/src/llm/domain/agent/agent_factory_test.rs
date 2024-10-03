@@ -55,7 +55,7 @@ mod test {
         let instance = AgentFactory::new(vec![Arc::new(factory1), Arc::new(factory2)]);
 
         let result = instance
-            .create("AAA", &CreateAgentArgs::default())
+            .create("AAA", CreateAgentArgs::default())
             .await
             .unwrap();
         let gen_result = result.call(HashMap::new()).await.unwrap();

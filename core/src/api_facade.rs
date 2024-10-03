@@ -1,7 +1,10 @@
 use std::sync::Arc;
 
 use crate::{
-    chat_completion::{ChatCompletionMessageDto, ChatCompletionResult, ChatCompletionStream},
+    chat_completion::{
+        inference::{Inference, InferenceArgs},
+        ChatCompletionMessageDto, ChatCompletionResult, ChatCompletionStream,
+    },
     configuration::ConfigurationDto,
     profile::domain::dto::ProfileDto,
     AppContainer,
@@ -21,25 +24,31 @@ impl ApiFacade {
         model: &str,
         messages: &Vec<ChatCompletionMessageDto>,
     ) -> ChatCompletionResult {
-        let factory = self
-            .container
-            .chat_completion_module
-            .get_inference_factory();
+        let inference = self.container.chat_completion_module.get_llm_inference();
 
-        factory.invoke(model, messages).await
+        inference
+            .invoke(InferenceArgs {
+                model: model.to_string(),
+                messages: messages.clone(),
+                ..Default::default()
+            })
+            .await
     }
 
-    pub fn chat_completion_stream(
+    pub async fn chat_completion_stream(
         &self,
         model: &str,
         messages: &Vec<ChatCompletionMessageDto>,
     ) -> ChatCompletionStream {
-        let factory = self
-            .container
-            .chat_completion_module
-            .get_inference_factory();
+        let inference = self.container.chat_completion_module.get_llm_inference();
 
-        factory.stream(model, messages)
+        inference
+            .stream(InferenceArgs {
+                model: model.to_string(),
+                messages: messages.clone(),
+                ..Default::default()
+            })
+            .await
     }
 
     pub async fn find_configuration(

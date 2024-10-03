@@ -7,7 +7,7 @@ interface Props extends PropsWithChildren {
 
 export function PageSection({ title, children }: Props) {
   return (
-    <div className="w-full h-full flex flex-col justify-between p-6 overflow-y-auto">
+    <div className="w-full h-full flex flex-col gap-6 p-6 overflow-y-auto">
       <H1>{title}</H1>
       {children}
     </div>

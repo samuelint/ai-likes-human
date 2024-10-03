@@ -9,7 +9,7 @@ export function useClipboardPasteImage(onEvent: OnImagePasteEvent) {
     if (event.type === 'image') {
       const base64 = await fileToBase64(event.image);
       onEvent({
-        title: event.image.name,
+        title: 'Clipboard Image',
         base64,
       });
     }

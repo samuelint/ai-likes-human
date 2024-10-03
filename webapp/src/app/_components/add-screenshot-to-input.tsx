@@ -1,4 +1,4 @@
-import { TakeScreenshotButton } from '@/components/take-screenshot-button';
+import { TakeFullScreenScreenshotButton } from '@/components/take-screenshot-button';
 import { useToast } from '@/components/ui/use-toast';
 import { useCallback, useState } from 'react';
 import { AddImageAttachments } from '@/lib/assistant/image-attachment.type';
@@ -36,5 +36,5 @@ export function AddScreenshotToInput({ addImageAttachments }: Props) {
 
   }, [toast, addImageAttachments]);
 
-  return <TakeScreenshotButton onClick={addScreenshotToInput} isLoading={isLoading}/>;
+  return <TakeFullScreenScreenshotButton onClick={addScreenshotToInput} isLoading={isLoading}/>;
 }

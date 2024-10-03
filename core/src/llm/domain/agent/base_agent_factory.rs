@@ -11,7 +11,7 @@ pub struct CreateAgentArgs {
 
 #[automock]
 #[async_trait::async_trait]
-pub trait BaseAgentFactory {
+pub trait BaseAgentFactory: Send + Sync {
     fn is_compatible(&self, agent_id: &str) -> bool;
 
     async fn create(&self, args: &CreateAgentArgs)

@@ -21,8 +21,8 @@ impl ChatCompletionDIModule {
     }
 
     pub fn get_inference_factory(&self) -> Arc<InferenceService> {
-        let llm_factory = self.llm_module.get_llm_factory();
+        let agent_factory = self.llm_module.get_agent_factory();
 
-        Arc::new(InferenceService::new(llm_factory))
+        Arc::new(InferenceService::new(agent_factory))
     }
 }

@@ -1,22 +1,21 @@
-use std::{error::Error, sync::Arc};
-
-use async_stream::stream;
-
-use crate::llm::domain::llm_factory::{CreateLLMParameters, LLMFactory};
+use std::{collections::HashMap, error::Error, sync::Arc};
 
 use super::{
     dto::{ChatCompletionChunkObject, ChatCompletionMessageDto, ChatCompletionObject},
     ChatCompletionResult, ChatCompletionStream,
 };
+use crate::llm::domain::agent::{base_agent_factory::CreateAgentArgs, AgentFactory};
+use async_stream::stream;
 use futures::StreamExt;
+use langchain_rust::{chain::Chain, prompt_args};
 
 pub struct InferenceService {
-    llm_factory: Arc<dyn LLMFactory>,
+    agent_factory: Arc<AgentFactory>,
 }
 
 impl InferenceService {
-    pub fn new(llm_factory: Arc<dyn LLMFactory>) -> Self {
-        Self { llm_factory }
+    pub fn new(agent_factory: Arc<AgentFactory>) -> Self {
+        Self { agent_factory }
     }
 
     pub async fn invoke(
@@ -24,20 +23,14 @@ impl InferenceService {
         model: &str,
         messages: &Vec<ChatCompletionMessageDto>,
     ) -> ChatCompletionResult {
-        let messages: Vec<langchain_rust::schemas::Message> =
-            messages.iter().map(|m| m.clone().into()).collect();
-        let llm = self
-            .llm_factory
-            .create(&CreateLLMParameters {
-                model: model.to_string(),
-                ..CreateLLMParameters::default()
-            })
+        let input_variables = Self::messages_to_input_variables(messages);
+        let chain = self
+            .create_chain("default", model)
             .await
             .map_err(|e| e as Box<dyn Error>)?;
+        let result = chain.invoke(input_variables).await?;
 
-        let result = llm.generate(&messages[..]).await?;
-
-        let message = ChatCompletionMessageDto::assistant(&result.generation);
+        let message = ChatCompletionMessageDto::assistant(&result);
         let data = ChatCompletionObject::new_single_choice(message, model);
 
         Ok(data)
@@ -48,24 +41,22 @@ impl InferenceService {
         model: &str,
         messages: &Vec<ChatCompletionMessageDto>,
     ) -> ChatCompletionStream {
-        let messages: Vec<langchain_rust::schemas::Message> =
-            messages.iter().map(|m| m.clone().into()).collect();
+        let input_variables = Self::messages_to_input_variables(messages);
 
-        let model = model.to_string();
-        let llm_factory = Arc::clone(&self.llm_factory);
+        let model: String = model.to_string();
+        let self_clone = self.clone();
+
         let stream = stream! {
-            let llm = match llm_factory.create(&CreateLLMParameters {
-                model: model.clone(),
-                ..CreateLLMParameters::default()
-            }).await {
-                Ok(llm) => llm,
-                Err(e) => {
-                    yield Err(e);
-                    return;
-                }
-            };
+            let chain = match self_clone.create_chain("default", &model)
+                .await {
+                    Ok(chain) => chain,
+                    Err(e) => {
+                        yield Err(e);
+                        return;
+                    }
+                };
 
-            let mut llm_stream = match llm.stream(&messages[..]).await {
+            let mut llm_stream = match chain.stream(input_variables).await {
                 Ok(stream) => stream,
                 Err(e) => {
                     yield Err(Box::new(e));
@@ -88,5 +79,49 @@ impl InferenceService {
         };
 
         Box::pin(stream)
+    }
+
+    async fn create_chain(
+        &self,
+        agent_id: &str,
+        model: &str,
+    ) -> Result<Box<dyn Chain>, Box<dyn Error + Send>> {
+        let chain = self
+            .agent_factory
+            .create(
+                agent_id,
+                &CreateAgentArgs {
+                    model: model.to_string(),
+                    ..CreateAgentArgs::default()
+                },
+            )
+            .await?;
+
+        Ok(chain)
+    }
+
+    fn messages_to_string(messages: &Vec<ChatCompletionMessageDto>) -> String {
+        let messages: Vec<langchain_rust::schemas::Message> =
+            messages.iter().map(|m| m.clone().into()).collect();
+
+        langchain_rust::schemas::Message::messages_to_string(&messages)
+    }
+
+    fn messages_to_input_variables(
+        messages: &Vec<ChatCompletionMessageDto>,
+    ) -> HashMap<String, serde_json::Value> {
+        let input = Self::messages_to_string(messages);
+
+        prompt_args! {
+            "input" => input,
+        }
+    }
+}
+
+impl Clone for InferenceService {
+    fn clone(&self) -> Self {
+        InferenceService {
+            agent_factory: Arc::clone(&self.agent_factory),
+        }
     }
 }

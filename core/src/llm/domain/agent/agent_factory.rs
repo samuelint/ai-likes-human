@@ -41,3 +41,11 @@ impl AgentFactory {
         chain
     }
 }
+
+impl Clone for AgentFactory {
+    fn clone(&self) -> Self {
+        Self {
+            agent_factories: self.agent_factories.clone(),
+        }
+    }
+}

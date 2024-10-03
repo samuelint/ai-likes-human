@@ -6,6 +6,10 @@ mod m20220101_000002_create_thread_table;
 mod m20220101_000003_create_run_table;
 mod m20220101_000004_create_message_table;
 mod m20220101_000005_seed_default_llm_configuration;
+mod m20220101_000006_create_profile_table;
+mod m20220101_000007_seed_profile_software_engineer;
+
+pub use m20220101_000007_seed_profile_software_engineer::SOFTWARE_ENGINEER_PROFILE_NAME;
 
 pub struct Migrator;
 
@@ -18,6 +22,8 @@ impl MigratorTrait for Migrator {
             Box::new(m20220101_000003_create_run_table::Migration),
             Box::new(m20220101_000004_create_message_table::Migration),
             Box::new(m20220101_000005_seed_default_llm_configuration::Migration),
+            Box::new(m20220101_000006_create_profile_table::Migration),
+            Box::new(m20220101_000007_seed_profile_software_engineer::Migration),
         ]
     }
 }

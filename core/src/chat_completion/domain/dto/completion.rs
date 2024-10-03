@@ -35,6 +35,13 @@ impl ChatCompletionMessageDto {
         }
     }
 
+    pub fn system(content: &str) -> Self {
+        ChatCompletionMessageDto {
+            role: "system".to_string(),
+            content: vec![ApiMessageContent::text(content)],
+        }
+    }
+
     pub fn to_string_content(&self) -> String {
         self.content
             .iter()

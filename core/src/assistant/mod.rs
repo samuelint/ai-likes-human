@@ -74,11 +74,9 @@ impl AgentDIModule {
     }
 
     pub fn get_thread_inference_service(&self) -> Arc<ThreadChatCompletionInference> {
-        let chat_completion_inference_service = self.chat_completion_module.get_inference_factory();
+        let inference = self.chat_completion_module.get_inference();
 
-        Arc::new(ThreadChatCompletionInference::new(
-            chat_completion_inference_service,
-        ))
+        Arc::new(ThreadChatCompletionInference::new(inference))
     }
 
     pub fn get_run_status_mutator(&self) -> Arc<RunStatusMutator> {

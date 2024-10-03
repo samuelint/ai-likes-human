@@ -157,7 +157,7 @@ impl StreamThreadRunService {
             yield ThreadEventDto::thread_message_created(&response_message);
             yield ThreadEventDto::thread_message_in_progress(&response_message);
 
-            let mut stream = inference_service.stream(&run.model, &messages);
+            let mut stream = inference_service.stream(&run.model, &messages).await;
             while let Some(chunk) = stream.next().await {
                 let chunk = match chunk {
                     Ok(chunk) => chunk,

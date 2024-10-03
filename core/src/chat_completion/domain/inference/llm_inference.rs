@@ -1,41 +1,43 @@
-use std::{error::Error, sync::Arc};
+use std::sync::Arc;
 
-use async_stream::stream;
-
-use crate::llm::domain::llm_factory::{CreateLLMParameters, LLMFactory};
-
-use super::{
-    dto::{ChatCompletionChunkObject, ChatCompletionMessageDto, ChatCompletionObject},
-    ChatCompletionResult, ChatCompletionStream,
+use crate::{
+    chat_completion::{
+        domain::langchain_adapter::messages_to_langchain_messages, ChatCompletionChunkObject,
+        ChatCompletionMessageDto, ChatCompletionObject, ChatCompletionResult, ChatCompletionStream,
+    },
+    llm::domain::llm_factory::{CreateLLMParameters, LLMFactory},
 };
+use anyhow::anyhow;
+use async_stream::stream;
 use futures::StreamExt;
 
-pub struct InferenceService {
+use super::inference::{Inference, InferenceArgs};
+
+pub struct LLMInference {
     llm_factory: Arc<dyn LLMFactory>,
 }
 
-impl InferenceService {
+impl LLMInference {
     pub fn new(llm_factory: Arc<dyn LLMFactory>) -> Self {
         Self { llm_factory }
     }
+}
 
-    pub async fn invoke(
-        &self,
-        model: &str,
-        messages: &Vec<ChatCompletionMessageDto>,
-    ) -> ChatCompletionResult {
-        let messages: Vec<langchain_rust::schemas::Message> =
-            messages.iter().map(|m| m.clone().into()).collect();
+#[async_trait::async_trait]
+impl Inference for LLMInference {
+    async fn invoke(&self, args: InferenceArgs) -> ChatCompletionResult {
+        let model = &args.model;
+        let messages = messages_to_langchain_messages(&args.messages);
+
         let llm = self
             .llm_factory
             .create(&CreateLLMParameters {
                 model: model.to_string(),
-                ..CreateLLMParameters::default()
+                temperature: args.temperature,
             })
-            .await
-            .map_err(|e| e as Box<dyn Error>)?;
+            .await?;
 
-        let result = llm.generate(&messages[..]).await?;
+        let result = llm.generate(&messages[..]).await.map_err(|e| anyhow!(e))?;
 
         let message = ChatCompletionMessageDto::assistant(&result.generation);
         let data = ChatCompletionObject::new_single_choice(message, model);
@@ -43,15 +45,11 @@ impl InferenceService {
         Ok(data)
     }
 
-    pub fn stream(
-        &self,
-        model: &str,
-        messages: &Vec<ChatCompletionMessageDto>,
-    ) -> ChatCompletionStream {
+    async fn stream(&self, args: InferenceArgs) -> ChatCompletionStream {
         let messages: Vec<langchain_rust::schemas::Message> =
-            messages.iter().map(|m| m.clone().into()).collect();
+            args.messages.iter().map(|m| m.clone().into()).collect();
 
-        let model = model.to_string();
+        let model = args.model.to_string();
         let llm_factory = Arc::clone(&self.llm_factory);
         let stream = stream! {
             let llm = match llm_factory.create(&CreateLLMParameters {

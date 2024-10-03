@@ -11,10 +11,8 @@ export default function Settings() {
 
   return (
     <PageSection title="Settings">
-      <div className='flex flex-col gap-6'>
-        <ApiKeysSection />
-        { process.env.NODE_ENV === 'development' && isInDesktopApp && <InternalInfo /> }
-      </div>
+      <ApiKeysSection />
+      { process.env.NODE_ENV === 'development' && isInDesktopApp && <InternalInfo /> }
     </PageSection>
   );
 }

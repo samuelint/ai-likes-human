@@ -1,5 +1,5 @@
 use crate::app_state::app_state::AppState;
-use app_core::configuration::ConfigurationDto;
+use app_core::{configuration::ConfigurationDto, profile::domain::dto::ProfileDto};
 use tauri::State;
 
 #[tauri::command]
@@ -41,6 +41,15 @@ pub async fn upsert_configuration(
     app_state
         .api
         .upsert_configuration(key, value)
+        .await
+        .map_err(|err| err.to_string())
+}
+
+#[tauri::command]
+pub async fn selected_profiles(app_state: State<'_, AppState>) -> Result<Vec<ProfileDto>, String> {
+    app_state
+        .api
+        .get_selected_profiles()
         .await
         .map_err(|err| err.to_string())
 }

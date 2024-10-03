@@ -1,8 +1,12 @@
 use std::sync::Arc;
 
 use crate::{
-    chat_completion::{ChatCompletionMessageDto, ChatCompletionResult, ChatCompletionStream},
+    chat_completion::{
+        inference::InferenceArgs, ChatCompletionMessageDto, ChatCompletionResult,
+        ChatCompletionStream,
+    },
     configuration::ConfigurationDto,
+    profile::domain::dto::ProfileDto,
     AppContainer,
 };
 
@@ -20,25 +24,31 @@ impl ApiFacade {
         model: &str,
         messages: &Vec<ChatCompletionMessageDto>,
     ) -> ChatCompletionResult {
-        let factory = self
-            .container
-            .chat_completion_module
-            .get_inference_factory();
+        let inference = self.container.chat_completion_module.get_inference();
 
-        factory.invoke(model, messages).await
+        inference
+            .invoke(InferenceArgs {
+                model: model.to_string(),
+                messages: messages.clone(),
+                ..Default::default()
+            })
+            .await
     }
 
-    pub fn chat_completion_stream(
+    pub async fn chat_completion_stream(
         &self,
         model: &str,
         messages: &Vec<ChatCompletionMessageDto>,
     ) -> ChatCompletionStream {
-        let factory = self
-            .container
-            .chat_completion_module
-            .get_inference_factory();
+        let inference = self.container.chat_completion_module.get_inference();
 
-        factory.stream(model, messages)
+        inference
+            .stream(InferenceArgs {
+                model: model.to_string(),
+                messages: messages.clone(),
+                ..Default::default()
+            })
+            .await
     }
 
     pub async fn find_configuration(
@@ -63,5 +73,15 @@ impl ApiFacade {
             .get_configuration_service();
 
         configuration_service.upsert(key, value).await
+    }
+
+    pub async fn get_selected_profiles(
+        &self,
+    ) -> Result<Vec<ProfileDto>, Box<dyn std::error::Error + Send>> {
+        self.container
+            .profile_module
+            .get_selected_profiles_service()
+            .find_selected_profiles()
+            .await
     }
 }

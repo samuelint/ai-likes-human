@@ -3,7 +3,7 @@ use std::{error::Error, sync::Arc};
 use crate::{
     app_configuration::CoreConfiguration, assistant::AgentDIModule,
     chat_completion::ChatCompletionDIModule, configuration::ConfigurationDIModule,
-    infrastructure::sea_orm::ConnectionFactory, llm::LLMDIModule,
+    infrastructure::sea_orm::ConnectionFactory, llm::LLMDIModule, profile::ProfileDIModule,
 };
 
 pub struct AppContainer {
@@ -12,6 +12,7 @@ pub struct AppContainer {
     pub configuration_module: Arc<ConfigurationDIModule>,
     pub llm_module: Arc<LLMDIModule>,
     pub chat_completion_module: Arc<ChatCompletionDIModule>,
+    pub profile_module: Arc<ProfileDIModule>,
     pub agent_module: AgentDIModule,
 }
 
@@ -21,8 +22,15 @@ impl AppContainer {
         let connection: Arc<::sea_orm::DatabaseConnection> = connection_factory.create().await?;
 
         let configuration_module = Arc::new(ConfigurationDIModule::new(Arc::clone(&connection)));
-        let llm_module = Arc::new(LLMDIModule::new(configuration_module.clone()));
-        let chat_completion_module = Arc::new(ChatCompletionDIModule::new(Arc::clone(&llm_module)));
+        let profile_module = Arc::new(ProfileDIModule::new(Arc::clone(&connection)));
+        let llm_module = Arc::new(LLMDIModule::new(
+            configuration_module.clone(),
+            profile_module.clone(),
+        ));
+        let chat_completion_module = Arc::new(ChatCompletionDIModule::new(
+            Arc::clone(&llm_module),
+            Arc::clone(&profile_module),
+        ));
         let agent_module: AgentDIModule =
             AgentDIModule::new(Arc::clone(&connection), Arc::clone(&chat_completion_module));
 
@@ -32,6 +40,7 @@ impl AppContainer {
             configuration_module,
             llm_module,
             chat_completion_module,
+            profile_module,
             agent_module,
         })
     }

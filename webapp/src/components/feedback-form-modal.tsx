@@ -7,10 +7,10 @@ import { useState } from 'react';
 
 
 export function FeedbackFormModal() {
-  const [isFeedbackModalOpen, setFeedbackModalOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Dialog open={isFeedbackModalOpen} onOpenChange={setFeedbackModalOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger>
         <FeedbackButton />
       </DialogTrigger>
@@ -22,7 +22,7 @@ export function FeedbackFormModal() {
           </DialogDescription>
         </DialogHeader>
         <div className='max-w-full'>
-          <FeedbackForm onSubmit={() => setFeedbackModalOpen(false)} />
+          <FeedbackForm onSubmit={() => setIsOpen(false)} />
         </div>
       </DialogContent>
     </Dialog>

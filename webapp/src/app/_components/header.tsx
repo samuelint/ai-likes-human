@@ -1,5 +1,5 @@
+import { SettingsModal } from '../settings/modal';
 import BrandLink from './brand.link';
-import SettingLink from './settings.link';
 import { FeedbackFormModal } from '@/components/feedback-form-modal';
 
 
@@ -12,7 +12,7 @@ export default function Header() {
         </div>
         <div className='flex items-center gap-4'>
           <FeedbackFormModal />
-          <SettingLink />
+          <SettingsModal />
         </div>
       </div>
     </header>

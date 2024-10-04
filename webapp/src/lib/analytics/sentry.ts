@@ -5,6 +5,7 @@ export function initSentry() {
   if (appConfig.sentry_dsn) {
     Sentry.init({
       dsn: appConfig.sentry_dsn,
+      environment: process.env.NODE_ENV === 'development' ? 'development' : 'production',
       integrations: [Sentry.feedbackSyncIntegration({
         colorScheme: 'system',
         autoInject: false,

@@ -40,27 +40,25 @@ export function ConfigurationKvEditor({ label, kv_key, isSecret, hint }: Props) 
   };
 
   return (
-    <>
-      <form
-        method="post"
-        onSubmit={handleSubmit}
-        className="grid w-full max-w-sm items-center gap-1.5"
-      >
-        <fieldset disabled={isLoading || !!error}>
-          <Label htmlFor={kv_key}>{label || kv_key}</Label>
-          <div className="flex w-full max-w-sm items-center space-x-2">
-            { isSecret ?
-              <SecretInput name={kv_key} id={kv_key} placeholder={kv_key} defaultValue={data?.value} />
-              :
-              <Input name={kv_key} id={kv_key} placeholder={kv_key} defaultValue={data?.value} />
-            }
-            <Button type="submit">Save</Button>
-          </div>
-          { hint && <div className='text-xs text-slate-600 pt-0.5'>
-            { hint }
-          </div> }
-        </fieldset>
-      </form>
-    </>
+    <form
+      method="post"
+      onSubmit={handleSubmit}
+      className="grid w-full items-center gap-1.5"
+    >
+      <fieldset disabled={isLoading || !!error}>
+        <Label htmlFor={kv_key}>{label || kv_key}</Label>
+        <div className="flex w-full max-w-sm items-center space-x-2">
+          { isSecret ?
+            <SecretInput name={kv_key} id={kv_key} placeholder={kv_key} defaultValue={data?.value} />
+            :
+            <Input name={kv_key} id={kv_key} placeholder={kv_key} defaultValue={data?.value} />
+          }
+          <Button type="submit">Save</Button>
+        </div>
+        { hint && <div className='text-xs text-slate-600 pt-0.5'>
+          { hint }
+        </div> }
+      </fieldset>
+    </form>
   );
 }

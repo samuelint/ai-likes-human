@@ -3,6 +3,7 @@ import { invoke } from './invoke';
 export interface ConfigurationItemDto {
   key: string
   value: string
+  hint?: string
 }
 
 export async function findConfiguration(key: string): Promise<ConfigurationItemDto | undefined> {

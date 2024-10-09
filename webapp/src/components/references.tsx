@@ -1,5 +1,5 @@
 import { MessageReference } from '@/lib/assistant/message-reference.type';
-import { AppLink } from './app-link';
+import { ExternalLink } from './external-link';
 
 
 interface Props {
@@ -17,7 +17,7 @@ export function References({ references }: Props) {
       }}
     >
       { references.map((reference, index) => (
-        <AppLink
+        <ExternalLink
           className='text-end'
           href={reference.link}
           key={index}
@@ -27,7 +27,7 @@ export function References({ references }: Props) {
           }}
         >
           { reference.title || reference.link }
-        </AppLink>
+        </ExternalLink>
       ))}
     </section>
   );

@@ -4,3 +4,4 @@ export * from './use-llm-model';
 export * from './use-llm-temperature';
 export * from './use-model-settings-form';
 export * from './llm';
+export * from './vendor.dto';

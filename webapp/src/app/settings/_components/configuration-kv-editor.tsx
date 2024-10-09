@@ -5,15 +5,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { useConfigurationKV } from '@/lib/configuration/use-configuration-kv';
+import { ReactNode } from 'react';
 
 
 interface Props {
   label?: string
   kv_key: string
   isSecret?: boolean
+  hint?: ReactNode
 }
 
-export function ConfigurationKvEditor({ label, kv_key, isSecret }: Props) {
+export function ConfigurationKvEditor({ label, kv_key, isSecret, hint }: Props) {
   const { toast } = useToast();
   const { data, error, isLoading, mutate } = useConfigurationKV(kv_key);
 
@@ -54,6 +56,9 @@ export function ConfigurationKvEditor({ label, kv_key, isSecret }: Props) {
             }
             <Button type="submit">Save</Button>
           </div>
+          { hint && <div className='text-xs text-slate-600 pt-0.5'>
+            { hint }
+          </div> }
         </fieldset>
       </form>
     </>

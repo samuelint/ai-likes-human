@@ -56,9 +56,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error + 'static
     tauri::async_runtime::spawn(async move {
         match app_state_factory::create_and_bind(&app_handle).await {
             Ok(_) => {}
-            Err(e) => {
-                panic!("Failed to create app state: {}", e);
-            }
+            Err(e) => panic!("Failed to create app state: {}", e),
         }
 
         let state: State<'_, AppState> = app_handle.state();

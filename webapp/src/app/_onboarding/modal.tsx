@@ -1,6 +1,5 @@
 import {
   Dialog,
-  DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
@@ -10,6 +9,7 @@ import OnBoarding from './onboarding';
 import { Button } from '@/components/ui/button';
 import { useMustOnboard } from './use-must-onboard';
 import { useEffect, useState } from 'react';
+import { FullScreenDialogContent } from '@/components/ui/full-screen-dialog';
 
 export function OnBoardingModal() {
   const { value: mustOnboard } = useMustOnboard();
@@ -27,7 +27,7 @@ export function OnBoardingModal() {
 
   return (
     <Dialog open={openOnboarding}>
-      <DialogContent>
+      <FullScreenDialogContent className="[&>button]:hidden">
         <DialogHeader>
           <DialogTitle>Onboarding</DialogTitle>
           <DialogDescription>
@@ -40,7 +40,7 @@ export function OnBoardingModal() {
         <DialogFooter>
           <Button type="submit" disabled={mustOnboard} onClick={() => onOpenChange(false)}>Done</Button>
         </DialogFooter>
-      </DialogContent>
+      </FullScreenDialogContent>
     </Dialog>
   );
 }

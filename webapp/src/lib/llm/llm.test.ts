@@ -1,15 +1,15 @@
 import { when } from 'jest-when';
 import { isAtLeastOneLlmApiKeySet } from './llm';
 import { findConfiguration } from '@/lib/core-api/tauri';
-import { LLM_API_KEYS_KEYS } from '@/app.config';
+import { LLM_VENDORS_CONFIGURATIONS } from '@/app.config';
 
 vi.mock('@/lib/core-api/tauri');
 describe('isAtLeastOneLlmApiKeySet', () => {
 
   it('should return false when each api key value is empty', async () => {
-    LLM_API_KEYS_KEYS.forEach((key) => {
+    LLM_VENDORS_CONFIGURATIONS.forEach((vendor) => {
       when(findConfiguration).mockResolvedValue({
-        key: key,
+        key: vendor.api_key_key!,
         value: '',
       });
     });
@@ -25,7 +25,7 @@ describe('isAtLeastOneLlmApiKeySet', () => {
       value: '',
     });
 
-    when(findConfiguration).calledWith(LLM_API_KEYS_KEYS[0]).mockResolvedValue({
+    when(findConfiguration).calledWith(LLM_VENDORS_CONFIGURATIONS[0].api_key_key!).mockResolvedValue({
       key: '',
       value: 'some',
     });

@@ -57,7 +57,7 @@ export function SecretInput({ label, id, name, defaultValue, placeholder, classN
   };
 
   return (
-    <div>
+    <div className='w-full'>
       <label htmlFor={`#${id}`} className='text-gray-600 capitalize'>{label}</label>
       <div className={`w-full flex items-center justify-center gap-1 min-w-72 ${className}`}>
         <div className="w-full relative flex items-center">

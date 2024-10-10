@@ -47,13 +47,18 @@ impl AsyncLLamaCPP {
         }
     }
 
-    pub async fn invoke(
+    pub async fn invoke(&self, model_path: &str, prompt: &str) -> Result<String> {
+        self.invoke_with_options(model_path, RunOptions::default(), prompt)
+            .await
+    }
+
+    pub async fn invoke_with_options(
         &self,
         model_path: &str,
-        options: &RunOptions,
+        options: RunOptions,
         prompt: &str,
     ) -> Result<String> {
-        let mut stream = self.stream(model_path, options, prompt);
+        let mut stream = self.stream_with_options(model_path, options, prompt);
 
         let mut responses: Vec<String> = Vec::new();
         while let Some(chunk) = stream.next().await {
@@ -70,13 +75,17 @@ impl AsyncLLamaCPP {
         Ok(responses.join(""))
     }
 
-    pub fn stream<'s>(
+    pub fn stream<'s>(&self, model_path: &str, prompt: &'s str) -> LlamaCppStream<'s> {
+        self.stream_with_options(model_path, RunOptions::default(), prompt)
+    }
+
+    pub fn stream_with_options<'s>(
         &self,
         model_path: &str,
-        options: &'s RunOptions,
+        options: RunOptions,
         prompt: &'s str,
     ) -> LlamaCppStream<'s> {
-        let prompt_and_response_length = 32; // the length of the prompt + output in tokens
+        let prompt_and_response_length = options.prompt_and_response_length; 
         let model_path = model_path.to_string();
         let model_factory = self.model_factory.clone();
         let context_factory = self.context_factory.clone();

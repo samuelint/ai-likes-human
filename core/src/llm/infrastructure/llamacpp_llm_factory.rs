@@ -23,10 +23,11 @@ impl LLMFactory for LlamaCppLLMFactory {
         &self,
         parameters: &CreateLLMParameters,
     ) -> Result<Box<dyn LLM>, Box<dyn Error + Send>> {
-        let llm = LLamaCPP::new(LLamaCPPArgs {
-            model_path: TMP_LOCAL_MODEL_PATH.to_string(),
-            ..Default::default()
-        });
-        Ok(Box::new(llm))
+        unimplemented!()
+        // let llm = LLamaCPP::new(LLamaCPPArgs {
+        //     model_path: TMP_LOCAL_MODEL_PATH.to_string(),
+        //     ..Default::default()
+        // });
+        // Ok(Box::new(llm))
     }
 }

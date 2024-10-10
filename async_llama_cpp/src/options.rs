@@ -30,11 +30,15 @@ impl Default for ContextOptions {
 
 #[derive(Clone)]
 pub struct RunOptions {
-    pub n_batch: usize,
+    pub n_batch: usize, // the maximum number of tokens that can be added to the batch
+    pub prompt_and_response_length: i32, // the length of the prompt + output in tokens
 }
 
 impl Default for RunOptions {
     fn default() -> Self {
-        Self { n_batch: 512 }
+        Self {
+            n_batch: 512,
+            prompt_and_response_length: 32,
+        }
     }
 }

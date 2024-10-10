@@ -1,11 +1,11 @@
 [package]
-name = "async_llama_cpp"
+name = "async-llama-cpp"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-llama-cpp-2 = { version = "0.1.81", features = ["metal"] }
-llama-cpp-sys-2 = { version = "0.1.81", features = ["metal"] }
+llama-cpp-2 = { version = "0.1.81" }
+llama-cpp-sys-2 = { version = "0.1.81" }
 encoding_rs = "0.8.34"
 futures = "0.3.30"
 async-stream = "0.3.5"

@@ -5,4 +5,6 @@ pub mod model_context_factory;
 pub mod model_factory;
 pub mod options;
 
+pub use async_llama_cpp::AsyncLLamaCPP;
 pub use llama_cpp_builder::Builder;
+pub use options::{ContextOptions, ModelOptions, RunOptions};

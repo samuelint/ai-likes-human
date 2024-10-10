@@ -13,6 +13,7 @@ async fn test_invoke() {
     let instance = async_llama_cpp::Builder::create()
         .unwrap()
         .with_model(
+            "llama-3-8b",
             &model_gguf_path,
             ModelOptions {
                 n_gpu_layers: 1000,
@@ -23,7 +24,7 @@ async fn test_invoke() {
         .build();
 
     let result = instance
-        .invoke(&model_gguf_path, "Tell me a joke about turtles.")
+        .invoke("llama-3-8b", "Tell me a joke about turtles.")
         .await
         .unwrap();
 

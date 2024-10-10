@@ -14,24 +14,41 @@ use super::{model_factory::ModelFactory, options::ModelOptions};
 
 pub struct CachedModelFactory {
     backend: Arc<LlamaBackend>,
-    default_model_options: ModelOptions,
     model_cache: Mutex<HashMap<String, Arc<LlamaModel>>>,
 }
 
 impl CachedModelFactory {
-    pub fn new(backend: Arc<LlamaBackend>, default_model_options: ModelOptions) -> Self {
+    pub fn new(backend: Arc<LlamaBackend>) -> Self {
         Self {
             backend,
-            default_model_options,
             model_cache: Mutex::new(HashMap::new()),
         }
     }
 
-    pub fn load_model(&self, model_path: &str, options: &ModelOptions) -> Result<LlamaModel> {
+    pub fn load_model(
+        &self,
+        model_alias: &str,
+        model_path: &str,
+        options: &ModelOptions,
+    ) -> Result<Arc<LlamaModel>> {
         let model_params = LlamaModelParams::default().with_n_gpu_layers(options.n_gpu_layers);
         let model = LlamaModel::load_from_file(&self.backend, model_path, &model_params)?;
 
+        let model = Arc::new(model);
+        self.model_cache
+            .lock()
+            .unwrap()
+            .insert(model_alias.to_string(), model.clone());
+
         Ok(model)
+    }
+
+    pub fn load_model_path(
+        &self,
+        model_path: &str,
+        options: &ModelOptions,
+    ) -> Result<Arc<LlamaModel>> {
+        self.load_model(model_path, model_path, options)
     }
 
     fn find_existing_model(&self, model_path: &str) -> Option<Arc<LlamaModel>> {
@@ -39,21 +56,10 @@ impl CachedModelFactory {
         binding.get(model_path).map(Arc::clone)
     }
 
-    fn get_or_create_model(&self, model_path: &str) -> Result<Arc<LlamaModel>> {
-        let model_path = model_path.to_string();
-
-        let model = match self.find_existing_model(&model_path) {
+    fn get(&self, alias: &str) -> Result<Arc<LlamaModel>> {
+        let model = match self.find_existing_model(alias) {
             Some(model) => model.clone(),
-            None => {
-                let model = self.load_model(&model_path, &self.default_model_options)?;
-                let model = Arc::new(model);
-                self.model_cache
-                    .lock()
-                    .unwrap()
-                    .insert(model_path, model.clone());
-
-                model
-            }
+            None => return Err(anyhow::anyhow!("Model not found: {}", alias)),
         };
 
         Ok(model)
@@ -61,7 +67,7 @@ impl CachedModelFactory {
 }
 
 impl ModelFactory for CachedModelFactory {
-    fn create(&self, model_path: &str) -> Result<Arc<LlamaModel>> {
-        self.get_or_create_model(model_path)
+    fn create(&self, alias: &str) -> Result<Arc<LlamaModel>> {
+        self.get(alias)
     }
 }

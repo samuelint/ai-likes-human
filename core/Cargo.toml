@@ -11,6 +11,7 @@ sea-orm = { version = "^0.12.0", features = [
     "macros",
 ] }
 migration = { path = "./migration" }
+async-llama-cpp = { path = "../async_llama_cpp" }
 serde = "1.0.210"
 futures = "0.3.30"
 tokio = "1.40.0"
@@ -29,3 +30,4 @@ claim = "0.5.0"
 mockall = "0.13.0"
 pretty_assertions = "1.4.1"
 serial_test = "3.1.1"
+shellexpand = "3.1.0"

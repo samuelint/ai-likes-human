@@ -3,7 +3,7 @@ import { LLMVendorConfiguration } from './lib/llm';
 const api_url = 'http://localhost:1234';
 const openai_api_url = `${api_url}/openai/v1`;
 
-const AVAILABLE_LLM_MODELS: readonly [string, ...string[]] = ['openai:gpt-4o', 'openai:gpt-4o-mini', 'anthropic:claude-3-5-sonnet-20240620', 'anthropic:claude-3-opus-20240229'];
+const AVAILABLE_LLM_MODELS: readonly [string, ...string[]] = ['openai:gpt-4o', 'openai:gpt-4o-mini', 'anthropic:claude-3-5-sonnet-20241022', 'anthropic:claude-3-opus-20240229'];
 
 const LLM_VENDORS_CONFIGURATIONS: readonly [LLMVendorConfiguration, ...LLMVendorConfiguration[]] = [
   {

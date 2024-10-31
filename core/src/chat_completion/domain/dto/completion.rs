@@ -135,6 +135,20 @@ impl ChatCompletionObject {
             ..ChatCompletionObject::default()
         }
     }
+
+    pub fn new_assistant_chunk(chunk: &str, model: &str, finish_reason: Option<String>) -> Self {
+        let message = ChatCompletionMessageDto::assistant(chunk);
+        ChatCompletionObject {
+            model: model.to_string(),
+            choices: vec![ChatCompletionChoice {
+                index: 0,
+                message: Some(message),
+                finish_reason,
+                ..ChatCompletionChoice::default()
+            }],
+            ..ChatCompletionObject::default()
+        }
+    }
 }
 
 #[derive(Default, Serialize, Deserialize)]

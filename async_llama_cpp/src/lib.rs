@@ -8,3 +8,4 @@ pub mod options;
 pub use async_llama_cpp::AsyncLLamaCPP;
 pub use llama_cpp_builder::Builder;
 pub use options::{ContextOptions, ModelOptions, RunOptions};
+mod backend_singleton;

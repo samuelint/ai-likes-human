@@ -1,5 +1,7 @@
 use anyhow::{anyhow, Result};
 use futures::Stream;
+use llama_cpp_2::context::params::LlamaContextParams;
+use llama_cpp_2::llama_backend::LlamaBackend;
 use std::{pin::Pin, sync::Arc};
 
 use futures::StreamExt;
@@ -12,53 +14,39 @@ use llama_cpp_2::{context::LlamaContext, token::LlamaToken};
 use super::options::RunOptions;
 use super::{model_context_factory::ModelContextFactory, model_factory::ModelFactory};
 
-#[derive(Clone)]
-pub struct PredictOptions {
-    pub top_k: i32,
-    pub temperature: f32,
-    pub f16_kv: bool,
-}
-
-impl Default for PredictOptions {
-    fn default() -> Self {
-        Self {
-            top_k: 90,
-            temperature: 0.7,
-            f16_kv: true,
-        }
-    }
-}
-
-pub type LlamaCppStream<'a> = Pin<Box<dyn Stream<Item = Result<String>> + 'a>>;
+pub type LlamaCppStream = Pin<Box<dyn Stream<Item = Result<String>> + Send>>;
 
 pub struct AsyncLLamaCPP {
+    backend: Arc<LlamaBackend>,
     model_factory: Arc<dyn ModelFactory>,
     context_factory: Arc<dyn ModelContextFactory>,
 }
 
 impl AsyncLLamaCPP {
     pub fn new(
+        backend: Arc<LlamaBackend>,
         model_factory: Arc<dyn ModelFactory>,
         context_factory: Arc<dyn ModelContextFactory>,
     ) -> Self {
         Self {
+            backend,
             model_factory,
             context_factory,
         }
     }
 
-    pub async fn invoke(&self, model_path: &str, prompt: &str) -> Result<String> {
-        self.invoke_with_options(model_path, RunOptions::default(), prompt)
+    pub async fn invoke(&self, model: &str, prompt: &str) -> Result<String> {
+        self.invoke_with_options(model, RunOptions::default(), prompt)
             .await
     }
 
     pub async fn invoke_with_options(
         &self,
-        model_path: &str,
+        model: &str,
         options: RunOptions,
         prompt: &str,
     ) -> Result<String> {
-        let mut stream = self.stream_with_options(model_path, options, prompt);
+        let mut stream = self.stream_with_options(model, options, prompt);
 
         let mut responses: Vec<String> = Vec::new();
         while let Some(chunk) = stream.next().await {
@@ -75,91 +63,107 @@ impl AsyncLLamaCPP {
         Ok(responses.join(""))
     }
 
-    pub fn stream<'s>(&self, model_path: &str, prompt: &'s str) -> LlamaCppStream<'s> {
-        self.stream_with_options(model_path, RunOptions::default(), prompt)
+    pub fn stream(&self, model: &str, prompt: &str) -> LlamaCppStream {
+        self.stream_with_options(model, RunOptions::default(), prompt)
     }
 
-    pub fn stream_with_options<'s>(
+    pub fn stream_with_options(
         &self,
-        model_path: &str,
+        model: &str,
         options: RunOptions,
-        prompt: &'s str,
-    ) -> LlamaCppStream<'s> {
-        let prompt_and_response_length = options.prompt_and_response_length; 
-        let model_path = model_path.to_string();
+        prompt: &str,
+    ) -> LlamaCppStream {
+        let prompt_and_response_length = options.prompt_and_response_length;
+        let model_path = model.to_string();
         let model_factory = self.model_factory.clone();
-        let context_factory = self.context_factory.clone();
 
         let s = async_stream::stream! {
             let model = model_factory.create(&model_path).unwrap();
-            let mut ctx = context_factory.create(&model).unwrap();
-
-            let tokens_list = match Self::generate_tokens(&model, prompt) {
-                Ok(tokens_list) => tokens_list,
-                Err(err) => {
-                    yield Err(err.into());
-                    return;
-                }
-            };
-
-            match Self::assert_tokens(&ctx, &tokens_list, prompt_and_response_length) {
-                Ok(_) => {},
-                Err(err) => {
-                    yield Err(err.into());
-                    return;
-                }
-            };
-
-            let mut batch = match Self::create_batch(tokens_list, &options) {
-                Ok(batch) => batch,
-                Err(err) => {
-                    yield Err(err.into());
-                    return;
-                }
-            };
-
-            match ctx.decode(&mut batch) {
-                Ok(_) => {}
-                Err(err) => {
-                    yield Err(err.into());
-                    return;
-                }
-            }
-            let mut decoder = encoding_rs::UTF_8.new_decoder();
-            let mut n_cur = batch.n_tokens();
-
-            while n_cur <= prompt_and_response_length {
-                // sample the next token
-                {
-                    let candidates = ctx.candidates();
-
-                    let candidates_p = LlamaTokenDataArray::from_iter(candidates, false);
-
-                    // sample the most likely token
-                    let new_token_id = ctx.sample_token_greedy(candidates_p);
-
-                    // is it an end of stream?
-                    if model.is_eog_token(new_token_id) {
-                        break;
+                let mut ctx = match model.new_context(&self.backend, LlamaContextParams::default()) {
+                    Ok(ctx) => ctx,
+                    Err(err) => {
+                        yield Err(err.into());
+                        return;
                     }
+                };
 
-                    let output_bytes =
-                        match model.token_to_bytes(new_token_id, Special::Tokenize) {
-                            Ok(output_bytes) => output_bytes,
+                let tokens_list = match Self::generate_tokens(&model, prompt) {
+                    Ok(tokens_list) => tokens_list,
+                    Err(err) => {
+                        yield Err(err.into());
+                        return;
+                    }
+                };
+
+                match Self::assert_tokens(&ctx, &tokens_list, prompt_and_response_length) {
+                    Ok(_) => {},
+                    Err(err) => {
+                        yield Err(err.into());
+                        return;
+                    }
+                };
+
+                let mut batch = match Self::create_batch(tokens_list, &options) {
+                    Ok(batch) => batch,
+                    Err(err) => {
+                        yield Err(err.into());
+                        return;
+                    }
+                };
+
+                match ctx.decode(&mut batch) {
+                    Ok(_) => {}
+                    Err(err) => {
+                        yield Err(err.into());
+                        return;
+                    }
+                }
+                let mut decoder = encoding_rs::UTF_8.new_decoder();
+                let mut n_cur = batch.n_tokens();
+
+                while n_cur <= prompt_and_response_length {
+                    // sample the next token
+                    {
+                        let candidates = ctx.candidates();
+
+                        let candidates_p = LlamaTokenDataArray::from_iter(candidates, false);
+
+                        // sample the most likely token
+                        let new_token_id = ctx.sample_token_greedy(candidates_p);
+
+                        // is it an end of stream?
+                        if model.is_eog_token(new_token_id) {
+                            break;
+                        }
+
+                        let output_bytes =
+                            match model.token_to_bytes(new_token_id, Special::Tokenize) {
+                                Ok(output_bytes) => output_bytes,
+                                Err(err) => {
+                                    yield Err(err.into());
+                                    return;
+                                }
+                            };
+                        // use `Decoder.decode_to_string()` to avoid the intermediate buffer
+                        let mut output_string = String::with_capacity(32);
+                        let _decode_result =
+                            decoder.decode_to_string(&output_bytes, &mut output_string, false);
+
+                        yield Ok(output_string);
+
+                        batch.clear();
+                        match batch.add(new_token_id, n_cur, &[0], true) {
+                            Ok(_) => {}
                             Err(err) => {
                                 yield Err(err.into());
                                 return;
                             }
                         };
-                    // use `Decoder.decode_to_string()` to avoid the intermediate buffer
-                    let mut output_string = String::with_capacity(32);
-                    let _decode_result =
-                        decoder.decode_to_string(&output_bytes, &mut output_string, false);
+                    }
 
-                    yield Ok(output_string);
+                    n_cur += 1;
 
-                    batch.clear();
-                    match batch.add(new_token_id, n_cur, &[0], true) {
+                    match ctx.decode(&mut batch) {
                         Ok(_) => {}
                         Err(err) => {
                             yield Err(err.into());
@@ -168,16 +172,6 @@ impl AsyncLLamaCPP {
                     };
                 }
 
-                n_cur += 1;
-
-                match ctx.decode(&mut batch) {
-                    Ok(_) => {}
-                    Err(err) => {
-                        yield Err(err.into());
-                        return;
-                    }
-                };
-            }
         };
 
         Box::pin(s)

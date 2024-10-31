@@ -1,4 +1,7 @@
-use std::{num::NonZeroU32, sync::Arc};
+use std::{
+    num::NonZeroU32,
+    sync::{Arc, Mutex},
+};
 
 use llama_cpp_2::{
     context::{params::LlamaContextParams, LlamaContext},
@@ -10,8 +13,12 @@ use anyhow::Result;
 
 use super::options::ContextOptions;
 
+struct ThreadSafeLlamaContext<'a> {
+    pub inner: Arc<Mutex<LlamaContext<'a>>>,
+}
+
 pub trait ModelContextFactory: Send + Sync {
-    fn create<'a>(&self, model: &'a LlamaModel) -> Result<LlamaContext<'a>>;
+    fn create<'a>(&self, model: &'a LlamaModel) -> Result<ThreadSafeLlamaContext<'a>>;
 }
 
 pub struct ModelContextFactoryImpl {
@@ -43,7 +50,11 @@ impl ModelContextFactoryImpl {
 }
 
 impl ModelContextFactory for ModelContextFactoryImpl {
-    fn create<'b>(&self, model: &'b LlamaModel) -> Result<LlamaContext<'b>> {
-        self.create_context_from_model(model)
+    fn create<'a>(&self, model: &'a LlamaModel) -> Result<ThreadSafeLlamaContext<'a>> {
+        let r = self.create_context_from_model(model)?;
+
+        Ok(ThreadSafeLlamaContext {
+            inner: Arc::new(Mutex::new(r)),
+        })
     }
 }
